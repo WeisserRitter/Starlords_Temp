@@ -99,11 +99,13 @@ public class BattleListener extends BaseCampaignEventListener {
             if (!lord.getFleet().isEmpty()) maybeCaptor.add(lord);
 
             // level up if enough stuff is killed
-            if (!lord.isPlayer()) levelUpWithChance(winner, 200 * killsFP / totalFP);
+            if (!lord.isPlayer()) {
+                levelUpWithChance(winner, 200 * killsFP / totalFP);
 
-            // pirates get happier about being pirates when they kill stuff
-            if (Misc.isPirateFaction(lord.getFaction()) && Utils.rand.nextFloat() < ((float) killsFP) / totalFP) {
-                RelationController.modifyLoyalty(lord, 1);
+                // pirates get happier about being pirates when they kill stuff
+                if (Misc.isPirateFaction(lord.getFaction()) && Utils.rand.nextFloat() < ((float) killsFP) / totalFP) {
+                    RelationController.modifyLoyalty(lord, 1);
+                }
             }
         }
         // record kills and levels up losers, but no relations increase

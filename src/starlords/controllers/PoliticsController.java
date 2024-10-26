@@ -1304,6 +1304,9 @@ public class PoliticsController implements EveryFrameScript {
         if (getCurrProposal(faction) != null) {
             timeLimit = DEBATE_DAYS;
         }
+        if (!getInstance().factionTimestampMap.containsKey(faction.getId())) {
+            return -1;
+        }
         long proposalStart = getInstance().factionTimestampMap.get(faction.getId());
         return Math.round(timeLimit - Global.getSector().getClock().getElapsedDaysSince(proposalStart));
     }

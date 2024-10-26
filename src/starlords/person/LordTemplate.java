@@ -50,7 +50,7 @@ public final class LordTemplate {
                 factionId = Factions.LUDDIC_PATH;
                 break;
             default:
-                factionId = template.getString("faction").toLowerCase();
+                factionId = template.getString("faction");
         }
         fleetName = template.getString("fleetName");
         isMale = template.getBoolean("isMale");
@@ -64,7 +64,7 @@ public final class LordTemplate {
             preferredItemId = "food";
         }
         // What kind of parser maps null to the string null???
-        String fief = template.getString("fief").toLowerCase();
+        String fief = template.getString("fief").toLowerCase();  // TODO this could be case-sensitive
         this.fief = fief.equals("null") ? null : fief;
         battlePersonality = template.getString("battle_personality").toLowerCase();
         level = template.getInt("level");
