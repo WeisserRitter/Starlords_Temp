@@ -114,7 +114,6 @@ public class Lord {
         }
         persistentData = (Map<String, Object>) lordDataMap.get(lord.getId());
         this.template = template;
-        if (lord.getId() == null){ String[] aaaa = {}; aaaa[5] = "";}
         lordAPI = lord;
         fiefs = new ArrayList<>();
         prisoners = new ArrayList<>();
