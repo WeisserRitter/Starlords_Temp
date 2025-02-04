@@ -15,6 +15,7 @@ import starlords.listeners.MarketStateChangeListener;
 import starlords.listeners.MarketStateChangeNexListener;
 import starlords.listeners.MonthlyUpkeepListener;
 import org.apache.log4j.Logger;
+import starlords.lunaSettings.StoredSettings;
 import starlords.person.Lord;
 import starlords.person.LordEvent;
 import starlords.scripts.ActionCompleteScript;
@@ -82,7 +83,8 @@ public class LordsModPlugin extends BaseModPlugin {
         PoliticsController.getInstance(true);
 
         RelationController.tryToAddlordMapMidGame();
-
+        StoredSettings.attemptEnableLunalib();
+        StoredSettings.getSettings();
         if (Utils.nexEnabled()) {
             sector.getListenerManager().addListener(new MarketStateChangeNexListener(), true);
         }
