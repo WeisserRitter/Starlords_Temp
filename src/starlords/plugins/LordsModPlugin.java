@@ -81,6 +81,8 @@ public class LordsModPlugin extends BaseModPlugin {
         RelationController.getInstance(true);
         PoliticsController.getInstance(true);
 
+        RelationController.tryToAddlordMapMidGame();
+
         if (Utils.nexEnabled()) {
             sector.getListenerManager().addListener(new MarketStateChangeNexListener(), true);
         }
@@ -107,5 +109,10 @@ public class LordsModPlugin extends BaseModPlugin {
         sector.addListener(new BattleListener(true));
         sector.getListenerManager().addListener(new MarketStateChangeListener(), false);
         sector.addScript(new LordAI());
+    }
+
+    @Override
+    public void beforeGameSave() {
+        LordController.saveUnusualLords();
     }
 }

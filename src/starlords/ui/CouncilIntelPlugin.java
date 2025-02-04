@@ -170,8 +170,10 @@ public class CouncilIntelPlugin extends BaseIntelPlugin {
         panel.addUIElement(supportPanel).belowLeft(voteHeader, opad);
         panel.addUIElement(supportButtonPanel).rightOfTop(supportPanel, opad);
 
-
-        int progress = (100 * totalSupport /  (totalSupport + totalOpposition));
+        int progress = 0;
+        if (totalSupport + totalOpposition != 0) {
+            progress = (100 * totalSupport / (totalSupport + totalOpposition));
+        }
         CustomPanelAPI debateBar = createDebateBar(panel, width * 0.8f, 40, progress);
         panel.addComponent(debateBar).belowLeft(supportPanel, 2 * opad);
         populateLords(panel, debateBar);

@@ -5,6 +5,7 @@ import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.RepLevel;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.campaign.comm.IntelInfoPlugin;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
 import com.fs.starfarer.api.ui.*;
 import com.fs.starfarer.api.util.Misc;
@@ -21,6 +22,7 @@ import starlords.util.StringUtil;
 import starlords.util.Utils;
 
 import java.awt.*;
+import java.util.List;
 import java.util.Set;
 
 import static starlords.util.Constants.CATEGORY_UI;
@@ -252,5 +254,16 @@ public class LordsIntelPlugin extends BaseIntelPlugin {
         Global.getSector().getIntelManager().addIntel(profile, true);
         profile.setNew(false);
     }
-
+    public static void removeProfile(Lord lord){
+        List<IntelInfoPlugin> lordIntel = Global.getSector().getIntelManager().getIntel();
+        for (IntelInfoPlugin plugin : lordIntel) {
+            if (plugin instanceof LordsIntelPlugin) {
+                Lord newLord = ((LordsIntelPlugin) plugin).getLord();
+                if (newLord.getLordAPI().getId().equals(lord.getLordAPI().getId())){
+                    Global.getSector().getIntelManager().removeIntel(plugin);
+                    return;
+                }
+            }
+        }
+    }
 }

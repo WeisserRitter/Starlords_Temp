@@ -66,6 +66,31 @@ public class PoliticsController implements EveryFrameScript {
         }
     }
 
+    public static void addLord(Lord lord){
+        Random rand = new Random();
+        instance.lordTimestampMap.put(lord.getLordAPI().getId(),Global.getSector().getClock().getTimestamp()
+                - rand.nextInt((int) (LORD_THINK_INTERVAL * ONE_DAY)));
+    }
+    public static void removeLord(Lord lord){
+        instance.lordTimestampMap.remove(lord.getLordAPI().getId());
+        instance.lordProposalsMap.remove(lord.getLordAPI().getId());
+        for(int a = instance.lordProposalsMap.size()-1; a >= 0; a--){
+            ArrayList<String> b = ((LawProposal)instance.lordProposalsMap.values().toArray()[a]).getOpposers();
+            for(int c = 0; c < b.size(); c++){
+                if (b.get(c).equals(lord.getLordAPI().getId())){
+                    b.remove(c);
+                    break;
+                }
+            }
+            b = ((LawProposal)instance.lordProposalsMap.values().toArray()[a]).getSupporters();
+            for(int c = 0; c < b.size(); c++){
+                if (b.get(c).equals(lord.getLordAPI().getId())){
+                    b.remove(c);
+                    break;
+                }
+            }
+        }
+    }
     @Override
     public void advance(float amount) {
         float days = Global.getSector().getClock().convertToDays(amount);
@@ -110,7 +135,8 @@ public class PoliticsController implements EveryFrameScript {
         for (Lawset laws : factionLawsMap.values()) {
             FactionAPI faction = Global.getSector().getFaction(laws.getFactionId());
             MarketAPI award = laws.getFiefAward();
-            if (award == null || !faction.equals(award.getFaction())) {
+
+            if (award == null || Global.getSector().getEconomy().getMarket(award.getId()) == null || !faction.equals(award.getFaction())) {
                 MarketAPI newAward = FiefController.chooseNextFiefAward(faction);
                 laws.setFiefAward(newAward);
             }

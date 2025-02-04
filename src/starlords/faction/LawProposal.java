@@ -116,41 +116,45 @@ public class LawProposal {
     // 1-line summary of proposal
     public String getSummary() {
         Lord lord;
-        switch (law) {
-            case CROWN_AUTHORITY:
-            case NOBLE_AUTHORITY:
-            case TRADE_LAW:
-            case FEAST_LAW:
-                return "Change " + law.lawName + " to " + LawLevel.values()[targetLevel].displayName;
-            case APPOINT_MARSHAL:
-                lord = LordController.getLordOrPlayerById(targetLord);
-                return "Appoint " + lord.getTitle() + " " + lord.getLordAPI().getNameString() + " to Marshal.";
-            case AWARD_FIEF:
-                lord = LordController.getLordOrPlayerById(targetLord);
-                return "Award " + Global.getSector().getEconomy().getMarket(targetFief).getName()
-                        + " to " + lord.getTitle() + " " + lord.getLordAPI().getNameString();
-            case DECLARE_WAR:
-                return "Declare war on " + Global.getSector().getFaction(targetFaction).getDisplayNameWithArticle();
-            case SUE_FOR_PEACE:
-                return "Sue for peace with " + Global.getSector().getFaction(targetFaction).getDisplayNameWithArticle();
-            case REVOKE_FIEF:
-                lord = LordController.getLordOrPlayerById(targetLord);
-                return "Revoke " + Global.getSector().getEconomy().getMarket(targetFief)
-                        + " from " + lord.getTitle() + " " + lord.getLordAPI().getNameString();
-            case CHANGE_RANK:
-                lord = LordController.getLordOrPlayerById(targetLord);
-                String ret;
-                if (lord.getRanking() > targetLevel) {
-                    ret = "Demote ";
-                } else {
-                    ret = "Promote ";
-                }
-                ret += lord.getTitle() + " " + lord.getLordAPI().getNameString() + " to " + Utils.getTitle(
-                        lord.getFaction(), targetLevel);
-                return ret;
-            case EXILE_LORD:
-                lord = LordController.getLordOrPlayerById(targetLord);
-                return "Exile " + lord.getTitle() + " " + lord.getLordAPI().getNameString() + " from the realm.";
+        try {
+            switch (law) {
+                case CROWN_AUTHORITY:
+                case NOBLE_AUTHORITY:
+                case TRADE_LAW:
+                case FEAST_LAW:
+                    return "Change " + law.lawName + " to " + LawLevel.values()[targetLevel].displayName;
+                case APPOINT_MARSHAL:
+                    lord = LordController.getLordOrPlayerById(targetLord);
+                    return "Appoint " + lord.getTitle() + " " + lord.getLordAPI().getNameString() + " to Marshal.";
+                case AWARD_FIEF:
+                    lord = LordController.getLordOrPlayerById(targetLord);
+                    return "Award " + Global.getSector().getEconomy().getMarket(targetFief).getName()
+                            + " to " + lord.getTitle() + " " + lord.getLordAPI().getNameString();
+                case DECLARE_WAR:
+                    return "Declare war on " + Global.getSector().getFaction(targetFaction).getDisplayNameWithArticle();
+                case SUE_FOR_PEACE:
+                    return "Sue for peace with " + Global.getSector().getFaction(targetFaction).getDisplayNameWithArticle();
+                case REVOKE_FIEF:
+                    lord = LordController.getLordOrPlayerById(targetLord);
+                    return "Revoke " + Global.getSector().getEconomy().getMarket(targetFief)
+                            + " from " + lord.getTitle() + " " + lord.getLordAPI().getNameString();
+                case CHANGE_RANK:
+                    lord = LordController.getLordOrPlayerById(targetLord);
+                    String ret;
+                    if (lord.getRanking() > targetLevel) {
+                        ret = "Demote ";
+                    } else {
+                        ret = "Promote ";
+                    }
+                    ret += lord.getTitle() + " " + lord.getLordAPI().getNameString() + " to " + Utils.getTitle(
+                            lord.getFaction(), targetLevel);
+                    return ret;
+                case EXILE_LORD:
+                    lord = LordController.getLordOrPlayerById(targetLord);
+                    return "Exile " + lord.getTitle() + " " + lord.getLordAPI().getNameString() + " from the realm.";
+            }
+        }catch (Exception e){
+            return e.getMessage();
         }
         return "";
     }

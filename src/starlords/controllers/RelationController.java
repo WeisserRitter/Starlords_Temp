@@ -15,6 +15,7 @@ import static starlords.util.Constants.STARTING_LOYALTY;
 // tracks relations between all lords, lieges, and player
 public class RelationController extends BaseIntelPlugin {
 
+    private HashMap<String, Integer> lordMap;
     private int[][] lordRelations;
     private int[][] factionRelations;
     private HashMap<String, Integer> factionIdxMap = new HashMap<>(); // This belongs somewhere else eventually
@@ -31,17 +32,104 @@ public class RelationController extends BaseIntelPlugin {
         }
         lordRelations = new int[numLords][numLords];
         factionRelations = new int[numLieges][numLords];
-
-        // set initial relations
+        lordMap = new HashMap<>();
+        /*// set initial relations
         for (int i = 0; i < lordRelations.length; i++) {
             lordRelations[i][i] = 100; // lords love themselves!
-        }
+        }*/
+        int a = 0;
         for (Lord lord : LordController.getLordsList()) {
+            //set initial relations and create lord hashmap
+            lordMap.put(lord.getLordAPI().getId(),a);
+            lordRelations[a][a] = 100; // lords love themselves!
+            //create default relations each faction has with there lords
             int factionIdx = factionIdxMap.get(lord.getLordAPI().getFaction().getId());
-            factionRelations[factionIdx][LordController.indexOf(lord)] = STARTING_LOYALTY;
+            factionRelations[factionIdx][a] = STARTING_LOYALTY;
             if (DEBUG_MODE) {
-                factionRelations[factionIdx][LordController.indexOf(lord)] = 0;
+                factionRelations[factionIdx][a] = 0;
             }
+            a++;
+        }
+    }
+    private static int getIndexOfLord(Lord lord){
+        return instance.lordMap.get(lord.getLordAPI().getId());
+    }
+    public static void addLord(Lord lord){
+        //initalization data
+        int numLords = LordController.getLordsList().size();
+        List<FactionAPI> factions = Global.getSector().getAllFactions();
+        int numLieges = 24 + factions.size();  // save some space for adding new factions
+
+        //gets the new lord relationship default.
+        int[][] tempa = instance.lordRelations;
+        instance.lordRelations = new int[numLords][numLords];
+        for (int a = 0; a < tempa.length; a++){
+            for (int b = 0; b < tempa[a].length; b++){
+                instance.lordRelations[a][b] = tempa[a][b];
+            }
+        }
+        instance.lordMap.put(lord.getLordAPI().getId(),instance.lordRelations.length-1);
+        instance.lordRelations[getIndexOfLord(lord)][getIndexOfLord(lord)] = 100;
+
+        //gets the new lord factionRelationship default.
+        tempa = instance.factionRelations;
+        instance.factionRelations = new int[numLieges][numLords];
+        for (int a = 0; a < tempa.length; a++){
+            for (int b = 0; b < tempa[a].length; b++){
+                instance.factionRelations[a][b] = tempa[a][b];
+            }
+        }
+
+        int factionIdx = instance.factionIdxMap.get(lord.getLordAPI().getFaction().getId());
+        instance.factionRelations[factionIdx][getIndexOfLord(lord)] = STARTING_LOYALTY;
+        if (DEBUG_MODE) {
+            instance.factionRelations[factionIdx][getIndexOfLord(lord)] = 0;
+        }
+    }
+    public static void removeLord(Lord lord){
+        int index = getIndexOfLord(lord);
+
+        //recreates the relationship array without the inputted lord.
+        int[][] tempa = instance.lordRelations;
+        instance.lordRelations = new int[instance.lordRelations.length - 1][instance.lordRelations.length - 1];
+        for (int a = 0; a < index; a++){
+            /*for (int b = 0; b < index; b++){
+                instance.lordRelations[a][b] = tempa[a][b];
+            }*/
+            for (int b = index+1; b < tempa[a].length; b++){
+                instance.lordRelations[a][b-1] = tempa[a][b];
+            }
+        }
+        for (int a = tempa.length+1; a < tempa.length; a++){
+            for (int b = 0; b < index; b++){
+                instance.lordRelations[a-1][b] = tempa[a][b];
+            }
+            for (int b = index+1; b < tempa[a].length; b++){
+                instance.lordRelations[a-1][b-1] = tempa[a][b];
+            }
+        }
+
+        //recreates the faction relationship array without the inputted lord.
+        tempa = instance.factionRelations;
+        instance.factionRelations = new int[instance.factionRelations.length][LordController.getLordsList().size() - 1];
+        for (int a = 0; a < tempa.length; a++){
+            /*for (int b = 0; b < index; b++){
+                instance.lordRelations[a][b] = tempa[a][b];
+            }*/
+            for (int b = index+1; b < tempa[a].length; b++){
+                instance.lordRelations[a][b-1] = tempa[a][b];
+            }
+        }
+        //finally, removes the lord from the hashmap. never to be seen again...
+        instance.lordMap.remove(lord.getLordAPI().getId());
+    }
+    public static void tryToAddlordMapMidGame(){
+        if (instance.lordMap != null) return;
+        instance.lordMap = new HashMap<>();
+        int a = 0;
+        for (Lord lord : LordController.getLordsList()) {
+            instance.lordMap.put(lord.getLordAPI().getId(),a);
+            a++;
         }
     }
 
@@ -54,8 +142,8 @@ public class RelationController extends BaseIntelPlugin {
             lord1.getLordAPI().getRelToPlayer().adjustRelationship(amount / 100f, null);
             return;
         }
-        int idx1 = LordController.indexOf(lord1);
-        int idx2 = LordController.indexOf(lord2);
+        int idx1 = getIndexOfLord(lord1);
+        int idx2 = getIndexOfLord(lord2);
         int newRel = Math.max(-100, Math.min(100, getInstance().lordRelations[Math.min(idx1, idx2)][Math.max(idx1, idx2)] + amount));
         getInstance().lordRelations[Math.min(idx1, idx2)][Math.max(idx1, idx2)] = newRel;
     }
@@ -67,8 +155,8 @@ public class RelationController extends BaseIntelPlugin {
         if (lord2.isPlayer()) {
             return lord1.getLordAPI().getRelToPlayer().getRepInt();
         }
-        int idx1 = LordController.indexOf(lord1);
-        int idx2 = LordController.indexOf(lord2);
+        int idx1 = getIndexOfLord(lord1);
+        int idx2 = getIndexOfLord(lord2);
         return getInstance().lordRelations[Math.min(idx1, idx2)][Math.max(idx1, idx2)];
     }
 
@@ -81,8 +169,8 @@ public class RelationController extends BaseIntelPlugin {
             modifyRelation(lord, LordController.getPlayerLord(), amount);
         } else {
             int newLoyalty = Math.min(100, Math.max(-100, amount +
-                    getInstance().factionRelations[getFactionIdx(factionId)][LordController.indexOf(lord)]));
-            getInstance().factionRelations[getFactionIdx(factionId)][LordController.indexOf(lord)] = newLoyalty;
+                    getInstance().factionRelations[getFactionIdx(factionId)][getIndexOfLord(lord)]));
+            getInstance().factionRelations[getFactionIdx(factionId)][getIndexOfLord(lord)] = newLoyalty;
         }
     }
 
@@ -92,7 +180,7 @@ public class RelationController extends BaseIntelPlugin {
 
     public static int getLoyalty(Lord lord, String factionId) {
         if (Global.getSector().getPlayerFaction().getId().equals(factionId)) return lord.getPlayerRel();
-        return getInstance().factionRelations[getFactionIdx(factionId)][LordController.indexOf(lord)];
+        return getInstance().factionRelations[getFactionIdx(factionId)][getIndexOfLord(lord)];
     }
 
     private static int getFactionIdx(String factionId) {

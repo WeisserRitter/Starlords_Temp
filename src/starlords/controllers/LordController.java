@@ -1,5 +1,6 @@
 package starlords.controllers;
 
+import com.fs.starfarer.api.characters.PersonAPI;
 import starlords.ai.LordStrategicModule;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
@@ -58,10 +59,122 @@ public class LordController {
         return lordsMap.get(id);
     }
 
+    public static void addLordMidGame(LordTemplate template){
+        //'add lord' copied code was removed, do to it already being ran by default.
+        Lord currLord = new Lord(template);
+
+        //decided the lords spawn.
+        MarketAPI lordMarket = null;
+        if (currLord.getFiefs().isEmpty()) {
+            // backup
+            if (lordMarket == null) {
+                lordMarket = getDefaultSpawnLoc(currLord, null);
+            }
+            // backup-backup
+            if (lordMarket == null) {
+                List<MarketAPI> markets = Global.getSector().getEconomy().getMarketsCopy();
+                lordMarket = markets.get(Utils.rand.nextInt(markets.size()));
+            }
+        } else {
+            lordMarket = currLord.getFiefs().get(0).getMarket();
+        }
+
+
+        //create the fleet itself, as well as a bunch of AI stuff.
+        CampaignFleetAPI fleet = FleetFactoryV3.createEmptyFleet(
+                template.factionId, FleetTypes.TASK_FORCE, lordMarket);
+        fleet.setName(template.fleetName);
+        fleet.setNoFactionInName(true);
+        fleet.setAIMode(true);
+        fleet.setCommander(currLord.getLordAPI());
+        fleet.setNoAutoDespawn(true);
+        currLord.getLordAPI().setFleet(fleet);
+
+        LordFleetFactory.addToLordFleet(new ShipRolePick(template.flagShip), fleet, new Random());
+        fleet.getFleetData().getMembersInPriorityOrder().get(0).setFlagship(true);
+        LordFleetFactory.addToLordFleet(template.shipPrefs, fleet, new Random(), 150, 1e8f);
+        LordFleetFactory.populateCaptains(currLord);
+
+        lordMarket.getPrimaryEntity().getContainingLocation().addEntity(fleet);
+        fleet.setLocation(lordMarket.getPrimaryEntity().getLocation().x,
+                lordMarket.getPrimaryEntity().getLocation().y);
+        fleet.getMemoryWithoutUpdate().set(MemFlags.MEMORY_KEY_WAR_FLEET, true);
+        fleet.getMemoryWithoutUpdate().set(MemFlags.DO_NOT_TRY_TO_AVOID_NEARBY_FLEETS, true);
+        fleet.addAbility(Abilities.TRANSVERSE_JUMP);
+        //fleet.setAI(new LordCampaignFleetAI(currLord, fleet.getAI()));
+        ModularFleetAIAPI baseAI = (ModularFleetAIAPI) fleet.getAI();
+        baseAI.setStrategicModule(new LordStrategicModule(currLord, baseAI.getStrategicModule()));
+        LordController.addLord(currLord);
+        LordsIntelPlugin.createProfile(currLord);
+
+        //I think this does something quite important after a lord is added, as its always ran.
+        ensureLordOrder();
+
+        QuestController.addLord(currLord);
+        PoliticsController.addLord(currLord);
+        RelationController.addLord(currLord);
+    }
+    public static void removeLordMidGame(Lord lord){
+        //attempt to remove a saved lord memory, provided it exists (I don't understand memory.)
+        getSavedLordsMemeoryKey(lord);
+        Global.getSector().getMemory().set(getSavedLordsMemeoryKey(lord),null,1f);
+        lord.getLordAPI().getFleet().despawn();
+
+        //go into fiefController, politics, quest, relation, and remove this lord from them all.
+        FiefController.stripLord(lord);
+        RelationController.removeLord(lord);
+        QuestController.removeLord(lord);
+        PoliticsController.removeLord(lord);
+
+        //remove the lord from the lists
+        lordsList.remove(lord);
+        lordsMap.remove(lord);
+
+        //remove the lord from the intel plugins.
+        LordsIntelPlugin.removeProfile(lord);
+
+        //also this. dont know if it helps or not though.
+        ensureLordOrder();
+
+    }
+    private static String StarlordMemoryKey = "$starlord_extraLordMemory_";
+    private static String getSavedLordsMemeoryKey(Lord lord){
+        return StarlordMemoryKey+lord.getLordAPI().getId();
+    }
+    public static void saveUnusualLords(){
+        //ArrayList<Lord> savedLords = new ArrayList<>();
+        //saveTemplates
+        List<IntelInfoPlugin> lordIntel = Global.getSector().getIntelManager().getIntel();
+        for (IntelInfoPlugin plugin : lordIntel) {
+            if (plugin instanceof LordsIntelPlugin) {
+                Lord newLord = ((LordsIntelPlugin) plugin).getLord();
+                if (lordTemplates.containsKey(newLord.getTemplate().name)) {
+                    newLord.setTemplate(lordTemplates.get(newLord.getTemplate().name));
+                    newLord.getTemplate();
+                }else{
+                    //savedLords.add(newLord);
+                    Global.getSector().getMemory().set(getSavedLordsMemeoryKey(newLord),newLord.getTemplate());
+                }
+            }
+        }
+    }
+    public static void LoadSavedLord(Lord newLord){
+        LordTemplate template = (LordTemplate) Global.getSector().getMemory().get(getSavedLordsMemeoryKey(newLord));
+        //after a lord has been determend to have been 'saved', load it.
+        newLord.setTemplate(template);
+        //savedTemplates.add(template);
+    }
+
+
+
     private static void addLord(Lord lord) {
+        //add lord to lord list
         lordsList.add(lord);
         lordsMap.put(lord.getLordAPI().getId(), lord);
         factionsWithLords.add(lord.getFaction());
+
+
+        //
     }
 
     public static int indexOf(Lord lord) {
@@ -93,8 +206,14 @@ public class LordController {
         for (IntelInfoPlugin plugin : lordIntel) {
             if (plugin instanceof LordsIntelPlugin) {
                 Lord newLord = ((LordsIntelPlugin) plugin).getLord();
+                boolean gotLord = false;
                 if (lordTemplates.containsKey(newLord.getTemplate().name)) {
                     newLord.setTemplate(lordTemplates.get(newLord.getTemplate().name));
+                    gotLord = true;
+                    newLord.getTemplate();
+                }
+                if (!gotLord){
+                    LoadSavedLord(newLord);
                 }
                 // prevents capture from take no prisoners
                 if (!newLord.getLordAPI().hasTag("coff_nocapture")) {
@@ -220,7 +339,11 @@ public class LordController {
         }
         for (Iterator it = templates.keys(); it.hasNext(); ) {
             String key = (String) it.next();
-            lordTemplates.put(key, new LordTemplate(key, templates.getJSONObject(key)));
+            try {
+                lordTemplates.put(key, new LordTemplate(key, templates.getJSONObject(key)));
+            }catch (Exception e){
+
+            }
         }
     }
 

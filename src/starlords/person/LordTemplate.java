@@ -1,6 +1,7 @@
 package starlords.person;
 
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
+import lombok.SneakyThrows;
 import org.json.JSONObject;
 import starlords.controllers.LordController;
 
@@ -25,6 +26,7 @@ public final class LordTemplate {
     public final int ranking;
     public final String preferredItemId;
 
+    @SneakyThrows
     public LordTemplate(String name, JSONObject template){
         this.name = name;
         switch (template.getString("faction").toLowerCase()) {

@@ -64,7 +64,6 @@ public class LordAI implements EveryFrameScript {
 
     private static Random rand = new Random();
     private float lastUpdate;
-    private boolean notifiedError = false;
     private final static HashSet<LordAction> sameFactionTargetActions = new HashSet<>(Arrays.asList(
             LordAction.FEAST, LordAction.COLLECT_TAXES));
     private final static HashSet<LordAction> friendlyTargetActions = new HashSet<>(Arrays.asList(
@@ -91,23 +90,10 @@ public class LordAI implements EveryFrameScript {
 
         lastUpdate = 0;
         for (Lord lord : LordController.getLordsList()) {
-            try {
-                if (lord.getCurrAction() == null) {
-                    chooseAssignment(lord);
-                }
-                progressAssignment(lord);
-            } catch (Exception e) {
-                if (!notifiedError) {
-                    notifiedError = true;
-                    Global.getSector().getCampaignUI().addMessage(
-                            "Error detected in lord AI. Please check logs for details.",
-                            Color.RED);
-                }
-                log.info("Encountered lord AI error: " + e + ", " + Arrays.toString(e.getStackTrace()));
-                EventController.removeFromAllEvents(lord);
-                lord.setCurrAction(null);
-                lord.getFleet().getAI().clearAssignments();
+            if (lord.getCurrAction() == null) {
+                chooseAssignment(lord);
             }
+            progressAssignment(lord);
         }
 
     }

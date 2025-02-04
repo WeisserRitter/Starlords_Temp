@@ -93,8 +93,7 @@ public class LordStrategicModule implements StrategicModulePlugin {
         Lord lord = LordController.getLordById(lordId);
         FactionAPI faction = lord.getFaction();
         FactionAPI targetFaction = other.getFaction();
-        if (!lord.getFleet().getMemoryWithoutUpdate().getBoolean(MemFlags.FLEET_IGNORES_OTHER_FLEETS)
-                && lord.getFleet().getContainingLocation() != null) {
+        if (!lord.getFleet().getMemoryWithoutUpdate().getBoolean(MemFlags.FLEET_IGNORES_OTHER_FLEETS)) {
             int alliedFp = lord.getFleet().getFleetPoints();
             int enemyFp = 0;
             HashSet<CampaignFleetAPI> seen = new HashSet<>();

@@ -38,6 +38,16 @@ public class FiefController extends BaseIntelPlugin {
         }
     }
 
+    public static void stripLord(Lord lord){
+        String id = lord.getLordAPI().getId();
+        for (int a = 0; a < instance.fiefOwner.size(); a++){
+            if(instance.fiefOwner.values().toArray()[a].toString().equals(id)){
+                MarketAPI marketTemp = (MarketAPI)instance.fiefOwner.keySet().toArray()[a];
+                setOwner(marketTemp,null);
+            }
+        }
+    }
+
     public static float getTax(MarketAPI market) {
         if (!getInstance().taxValue.containsKey(market)) {
             return 0f;
