@@ -1,80 +1,43 @@
 fieldID,fieldName,fieldType,defaultValue,secondaryValue,fieldDescription,minValue,maxValue,tab
 Header_LordLevel,,Header,Lord level ratio,,,,,Generator
 text_lordLevel,,Text,This handles the ratio of possable lord levels,,,,,Generator
-generator_LordLevel_1,Level 1,Double,1,,,0,100,Generator
-generator_LordLevel_2,Level 2,Double,1,,,0,100,Generator
-generator_LordLevel_3,Level 3,Double,1,,,0,100,Generator
-generator_LordLevel_4,Level 4,Double,1,,,0,100,Generator
-generator_LordLevel_5,Level 5,Double,1,,,0,100,Generator
-generator_LordLevel_6,Level 6,Double,1,,,0,100,Generator
-generator_LordLevel_7,Level 7,Double,1,,,0,100,Generator
-generator_LordLevel_8,Level 8,Double,1,,,0,100,Generator
-generator_LordLevel_9,Level 9,Double,1,,,0,100,Generator
-generator_LordLevel_10,Level 10,Double,1,,,0,100,Generator
-generator_LordLevel_11,Level 11,Double,1,,,0,100,Generator
-generator_LordLevel_12,Level 12,Double,1,,,0,100,Generator
-generator_LordLevel_13,Level 13,Double,1,,,0,100,Generator
-generator_LordLevel_14,Level 14,Double,1,,,0,100,Generator
-generator_LordLevel_15,Level 15,Double,1,,,0,100,Generator
-generator_LordLevel_16,Level 16,Double,1,,,0,100,Generator
-generator_LordLevel_17,Level 17,Double,1,,,0,100,Generator
-generator_LordLevel_18,Level 18,Double,1,,,0,100,Generator
-generator_LordLevel_19,Level 19,Double,1,,,0,100,Generator
-generator_LordLevel_20,Level 20,Double,1,,,0,100,Generator
+generator_lordLevel_min,Mim lord level,Int,1,,,1,100,Generator
+generator_lordLevel_max,Max lord level,Int,15,,,1,100,Generator
+generator_lordLevel_target,Target lord level,Int,10,,,1,100,Generator
+generator_lordLevel_i,Weight,Double,1.5,,"The higher this value, the less vareance from the target level there will be.
+the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current target, to numbers off by each point",1,5,Generator
 ,,,,,,,,
 Header_shipRatio,,Header,Ship Size Ratio Chances,,,,,Generator
 Header_frigateRatio,,Header,Frigate size ratio,,,,,Generator
 text_frigateRatio,,Text,This handles all the ratio of frigates to other ships in a generated lords fleet,,,,,Generator
-generator_FrigateSize_0,0,Double,1,,,0,100,Generator
-generator_FrigateSize_1,1,Double,1,,,0,100,Generator
-generator_FrigateSize_2,2,Double,1,,,0,100,Generator
-generator_FrigateSize_3,3,Double,1,,,0,100,Generator
-generator_FrigateSize_4,4,Double,1,,,0,100,Generator
-generator_FrigateSize_5,5,Double,1,,,0,100,Generator
-generator_FrigateSize_6,6,Double,1,,,0,100,Generator
-generator_FrigateSize_7,7,Double,1,,,0,100,Generator
-generator_FrigateSize_8,8,Double,1,,,0,100,Generator
-generator_FrigateSize_9,9,Double,1,,,0,100,Generator
-generator_FrigateSize_10,10,Double,1,,,0,100,Generator
+generator_frigateRatio_min,Mim number of frigets,Int,1,,,1,100,Generator
+generator_frigateRatio_max,Max number of frigets,Int,15,,,1,100,Generator
+generator_frigateRatio_target,Target number of frigets,Int,10,,,1,100,Generator
+generator_frigateRatio_i,Weight,Double,1.5,,"The higher this value, the less vareance from the target level there will be.
+the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current target, to numbers off by each point",1,5,Generator
 Header_destroyer_ratio,,Header,Destroyer size ratio,,,,,Generator
 text_destroyerRatio,,Text,This handles all the ratio of destroyers to other ships in a generated lords fleet,,,,,Generator
-generator_DestroyerSize_0,0,Double,1,,,0,100,Generator
-generator_DestroyerSize_1,1,Double,1,,,0,100,Generator
-generator_DestroyerSize_2,2,Double,1,,,0,100,Generator
-generator_DestroyerSize_3,3,Double,1,,,0,100,Generator
-generator_DestroyerSize_4,4,Double,1,,,0,100,Generator
-generator_DestroyerSize_5,5,Double,1,,,0,100,Generator
-generator_DestroyerSize_6,6,Double,1,,,0,100,Generator
-generator_DestroyerSize_7,7,Double,1,,,0,100,Generator
-generator_DestroyerSize_8,8,Double,1,,,0,100,Generator
-generator_DestroyerSize_9,9,Double,1,,,0,100,Generator
-generator_DestroyerSize_10,10,Double,1,,,0,100,Generator
+generator_destroyerRatio_min,Mim number of destroyers,Int,1,,,1,100,Generator
+generator_destroyerRatio_max,Max number of destroyers,Int,15,,,1,100,Generator
+generator_destroyerRatio_target,Target number of destroyers,Int,10,,,1,100,Generator
+generator_destroyerRatio_i,Weight,Double,1.5,,"The higher this value, the less vareance from the target level there will be.
+the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current target, to numbers off by each point",1,5,Generator
 Header_cruiserRatio,,Header,Cruiser size ratio,,,,,Generator
 text_cruiserRatio,,Text,This handles all the ratio of cruisers to other ships in a generated lords fleet,,,,,Generator
-generator_CruiserSize_0,0,Double,1,,,0,100,Generator
-generator_CruiserSize_1,1,Double,1,,,0,100,Generator
-generator_CruiserSize_2,2,Double,1,,,0,100,Generator
-generator_CruiserSize_3,3,Double,1,,,0,100,Generator
-generator_CruiserSize_4,4,Double,1,,,0,100,Generator
-generator_CruiserSize_5,5,Double,1,,,0,100,Generator
-generator_CruiserSize_6,6,Double,1,,,0,100,Generator
-generator_CruiserSize_7,7,Double,1,,,0,100,Generator
-generator_CruiserSize_8,8,Double,1,,,0,100,Generator
-generator_CruiserSize_9,9,Double,1,,,0,100,Generator
-generator_CruiserSize_10,10,Double,1,,,0,100,Generator
+generator_cruiserRatio_min,Mim number of cruisers,Int,1,,,1,100,Generator
+generator_cruiserRatio_max,Max number of cruisers,Int,15,,,1,100,Generator
+generator_cruiserRatio_target,Target number of cruisers,Int,10,,,1,100,Generator
+generator_cruiserRatio_i,Weight,Double,1.5,,"The higher this value, the less vareance from the target level there will be.
+the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current target, to numbers off by each point",1,5,Generator
 Header_capitalRatio,,Header,Capital size ratio,,,,,Generator
 text_captialRatio,,Text,This handles all the ratio of capitals to other ships in a generated lords fleet,,,,,Generator
-generator_CapitalSize_0,0,Double,1,,,0,100,Generator
-generator_CapitalSize_1,1,Double,1,,,0,100,Generator
-generator_CapitalSize_2,2,Double,1,,,0,100,Generator
-generator_CapitalSize_3,3,Double,1,,,0,100,Generator
-generator_CapitalSize_4,4,Double,1,,,0,100,Generator
-generator_CapitalSize_5,5,Double,1,,,0,100,Generator
-generator_CapitalSize_6,6,Double,1,,,0,100,Generator
-generator_CapitalSize_7,7,Double,1,,,0,100,Generator
-generator_CapitalSize_8,8,Double,1,,,0,100,Generator
-generator_CapitalSize_9,9,Double,1,,,0,100,Generator
-generator_CapitalSize_10,10,Double,1,,,0,100,Generator
+generator_captialRatio_min,Mim number of captials,Int,1,,,1,100,Generator
+generator_captialRatio_max,Max number of captials,Int,15,,,1,100,Generator
+generator_captialRatio_target,Target number of captials,Int,10,,,1,100,Generator
+generator_captialRatio_i,Weight,Double,1.5,,"The higher this value, the less vareance from the target level there will be.
+the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current target, to numbers off by each point",1,5,Generator
+,,,,,,,,
+,,,,,,,,
 #luna_exampleText,Example Text Field,Text,"Any value below is merely an example for Modders. 
 None of the Settings here do anything.
 ",,,,,Examples
