@@ -5,20 +5,27 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.util.ListMap;
+import com.fs.starfarer.combat.entities.Ship;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
+import starlords.generator.support.AvailableShipData;
+import starlords.generator.support.ShipData;
 import starlords.generator.types.flagship.LordFlagshipPickerBase;
 import starlords.generator.types.fleet.LordFleetGeneratorBase;
+import starlords.person.LordTemplate;
+import starlords.util.Constants;
 import starlords.util.WeightedRandom;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import com.fs.starfarer.api.impl.campaign.ids.ShipRoles;
 public class LordGenerator {
     @Setter
     private static WeightedRandom[] sizeRatio = new WeightedRandom[4];
+    @Setter
+    private static WeightedRandom[] typeRatio = new WeightedRandom[4];
     @Setter
     private static WeightedRandom starlordLevelRatio;
 
@@ -48,13 +55,26 @@ public class LordGenerator {
         log.info("DEBUG: got random of: "+sizeRatio[2].getRandom());
         log.info("DEBUG: got random of: "+sizeRatio[3].getRandom());
     }
-
-    public static void generateStarlord(String factionID, MarketAPI StartingMarket){
+    @SneakyThrows
+    public static LordTemplate generateStarlord(String factionID, MarketAPI StartingMarket){
+        JSONObject json = Global.getSettings().getMergedJSONForMod("data/generator/blankLord.json", Constants.MOD_ID);
         int[] sizeratio = {
                 sizeRatio[0].getRandom(),
                 sizeRatio[1].getRandom(),
                 sizeRatio[2].getRandom(),
                 sizeRatio[3].getRandom()
+        };
+        int[] typeratio = {
+                typeRatio[0].getRandom(),
+                typeRatio[1].getRandom(),
+                typeRatio[2].getRandom(),
+                /*typeRatio[3].getRandom(),
+                typeRatio[4].getRandom(),
+                typeRatio[5].getRandom(),
+                typeRatio[6].getRandom(),
+                typeRatio[7].getRandom(),
+                typeRatio[8].getRandom(),
+                typeRatio[9].getRandom()*/
         };
         int maxShip = maxShipRatio.getRandom();
         int minShip = minShipRatio.getRandom();
@@ -63,13 +83,71 @@ public class LordGenerator {
         int level = starlordLevelRatio.getRandom();
         boolean useAllShips = oddsOfNonePriorityShips > Math.random();
         boolean useSelectedShipsForFlagship = oddsOfNoneSelectedFlagship > Math.random();
+
+        //I need to run, and rerun getShips repeatedly, untill ether the number of ships I have is equal to my target, or until I am out of possable ships.
+        //note: this requires redrawing my generator, each time? or do I keep my generator, but have it repick its target? I think repick target, 3 times.
+
+        /*json.getString("portrai");
+        json.getString("");
+        json.getString("");
+        json.getString("");
+        json.getString("");
+        json.getString("");
+        json.getString("");*/
+        //LordTemplate lord = new LordTemplate("",json);
+        //lord.name=name;
+        //lord.lore=lore;
+        //lord.battlePersonality=battlePersonality;
+        //lord.factionId=factionID;
+        //lord.flagShip=flahship;
+        //lord.fleetName=fleetName;
+        //lord.isMale=isMale;
+        //lord.level=level;
+        //lord.personality=personality;
+        //lord.portrait=portrait;
+        //lord.preferredItemId=prefurredITemId;
+        //lord.ranking=ranking;
+        //lord.shipPrefs=shipPrefs;
+        return null;
+    }
+    private static ArrayList<ShipData> getShips(AvailableShipData ships,int[] sizeratio,int[] typeratio,int targetShips){
+        ArrayList<ShipData> output = new ArrayList<>();
+        String[] sizes = {
+                AvailableShipData.HULLSIZE_FRIGATE,
+                AvailableShipData.HULLSIZE_DESTROYER,
+                AvailableShipData.HULLSIZE_CRUISER,
+                AvailableShipData.HULLSIZE_CAPITALSHIP
+        };
+        String[] types = {
+                AvailableShipData.HULLTYPE_CARRIER,
+                AvailableShipData.HULLTYPE_WARSHIP,
+                AvailableShipData.HULLTYPE_PHASE,
+                /*AvailableShipData.HULLTYPE_CARGO,
+                AvailableShipData.HULLTYPE_COMBATCIV,
+                AvailableShipData.HULLTYPE_LINER,
+                AvailableShipData.HULLTYPE_PERSONNEL,
+                AvailableShipData.HULLTYPE_TANKER,
+                AvailableShipData.HULLTYPE_TUG,
+                AvailableShipData.HULLTYPE_UTILITY,*/
+        };
+        while(ships.getUnorganizedShips().size() > 0 && output.size() < targetShips){
+            String type = sizes[getValueFromWeight(typeratio)];
+            String size = types[getValueFromWeight(sizeratio)];
+            Object[] a = ships.getOrganizedShips().get(type).get(size).values().toArray();
+            if (a.length == 0) continue;
+            ShipData b = (ShipData)a[(int)(Math.random() * a.length)];
+            output.add(b);
+            ships.getOrganizedShips().remove(b.getHullID());
+            ships.getUnorganizedShips().remove(b.getHullID());
+        }
+        return output;
     }
 
-    public static void getAvailableShips(String factionID,boolean allShips){
-        /*Notes:
-            1) isCivilan, isCombat, isCarrer appear to do nothing at all.
-         */
-        Logger log = Global.getLogger(LordGenerator.class);;
+
+
+
+    //gets availble ships to a faction (but only ones with default ship roles.). returns null if no matches
+    public static AvailableShipData getAvailableShips(String factionID,boolean allShips){
         Set<String> a = null;
         if (!allShips) {
             a = Global.getSector().getFaction(factionID).getFactionSpec().getPriorityShips();
@@ -77,70 +155,13 @@ public class LordGenerator {
         if (allShips || a == null || a.size() == 0){
             a = Global.getSector().getFaction(factionID).getFactionSpec().getKnownShips();
         }
-        Set<String> carriers = Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.CARRIER_LARGE);
-        carriers.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.CARRIER_MEDIUM));
-        carriers.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.CARRIER_SMALL));
-
-        Set<String> warships = Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.COMBAT_CAPITAL);
-        warships.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.COMBAT_LARGE));
-        warships.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.COMBAT_MEDIUM));
-        warships.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.COMBAT_SMALL));
-        warships.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.COMBAT_SMALL_FOR_SMALL_FLEET));
-
-        Set<String> phase = Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.PHASE_CAPITAL);
-        phase.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.PHASE_LARGE));
-        phase.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.PHASE_MEDIUM));
-        phase.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.PHASE_SMALL));
-
-        Set<String> combatFrigeters = Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.COMBAT_FREIGHTER_LARGE);
-        combatFrigeters.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.COMBAT_FREIGHTER_MEDIUM));
-        combatFrigeters.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.COMBAT_FREIGHTER_SMALL));
-
-        log.info("runing data for faction of name: "+ Global.getSector().getFaction(factionID).getDisplayName());
-        for (Object d : phase.toArray()){
-            log.info("TESTING: getting a phase ship: "+ d);
+        if (a == null){
+            return null;
         }
-        //Global.getSector().getAutofitVariants().getTargetVariants()//this is for filling weapon slots I think???
-        //Global.getSector().getAutofitVariants().getTargetVariants()//or maybe its not!?!?! I dont knowwwwwwww
-        //filter out all ships without both a goal variant, and spawning conditions for a variant.
-        //also filter out all ships that are only used for civilian operations.
-        //Global.getFactory().createEmptyFleet()
-        //Global.getSector().getFaction(factionID).pick
-        //ok, so I dont know what im even looking at. like, how do I determin if a ship is phase, carrier, or not at all???
-        Set<ShipVariantAPI> resultVariants = new HashSet<>();
-        ListMap<String> allVariants = Global.getSettings().getHullIdToVariantListMap();
-        //Global.getFactory().//getAllShipHullSpecs()
-        for (String blueprintId : a) {
-            ShipHullSpecAPI spec = Global.getSettings().getHullSpec(blueprintId);
-            List<String> hullVariants = allVariants.getList(spec.getHullId());
-            ShipVariantAPI targetVariant = null;
-            for (String variantId : hullVariants) {
-                ShipVariantAPI checked = Global.getSettings().getVariant(variantId);
-                if (checked.isGoalVariant()) {
-                    targetVariant = checked;
-                }
-                if (checked.isCivilian()){
-
-                }
-                boolean temp = true;
-                if (phase.contains(variantId)){
-                    log.info("DEBUG: determining phase ships stats; name: "+checked.getHullSpec().getHullName()+", isPhase: "+checked.getHullSpec().isPhase()+", size: "+checked.getHullSpec().getHullSize());
-                    temp = false;
-                }
-                if (checked.getHullSpec().isPhase() && temp){
-                    log.info("DEBUG: FAILED to get phase ship; name: "+checked.getHullSpec().getHullName()+", isPhase: "+checked.getHullSpec().isPhase()+", size: "+checked.getHullSpec().getHullSize());
-                }
-            }
-            if (targetVariant != null) {
-                resultVariants.add(targetVariant);
-                targetVariant.getDesignation();//.getSource().//.getDesignation()
-            }
-        }
+        AvailableShipData b = AvailableShipData.getNewASD(a);
+        if (b.getUnorganizedShips().size() == 0) return null;
+        return b;
     }
-
-
-
-
     private static int getValueFromWeight(double[] weight){
         double totalValue = 0;
         double randomValue = Math.random();
@@ -154,6 +175,13 @@ public class LordGenerator {
             if (currentValue >= totalValue) return a;
         }
         return -1;//force a crash because I did something wrong and need to fix this.
+    }
+    private static int getValueFromWeight(int[] weight){
+        double[] a = new double[weight.length];
+        for (int b = 0; b < a.length; b++){
+            a[b] = weight[b];
+        }
+        return getValueFromWeight(a);//force a crash because I did something wrong and need to fix this.
     }
 
 }

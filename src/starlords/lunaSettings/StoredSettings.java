@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import starlords.controllers.LordController;
 import starlords.generator.LordGenerator;
+import starlords.generator.support.AvailableShipData;
 import starlords.person.Lord;
 import starlords.util.Constants;
 import starlords.util.WeightedRandom;
@@ -45,6 +46,7 @@ public class StoredSettings {
     }
     @SneakyThrows
     private static void getConfigSettings(){
+        AvailableShipData.startup();
         JSONObject json = Global.getSettings().getMergedJSONForMod("data/generator/starlord_generaterSettings.json",Constants.MOD_ID);
         //LordGenerator.set getConfigWeightedRandom("",json);
         Logger log = Global.getLogger(StoredSettings.class);;

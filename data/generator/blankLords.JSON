@@ -1,0 +1,17 @@
+{
+    "portrait": "blank",
+    "personality": "blank",
+    "battle_personality": "blank",
+    "preferredItem": "blank",
+    "level": 999,
+    "isMale": true,
+    "fief": null,
+    "ranking": 0,
+    "lore": "blanks lore",
+    "fleetName": "blanks fleet",
+    "faction": "blank",
+    "flagship": "nothing",
+    "shipPref": {
+      "#centurion_Assault": 5
+    }
+}
