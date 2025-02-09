@@ -119,13 +119,13 @@ public class AvailableShipData {
         defaultShips.addListShips(carriers,HULLTYPE_CARRIER);
         defaultShips.addListShips(warships,HULLTYPE_WARSHIP);
         defaultShips.addListShips(phase,HULLTYPE_PHASE);
-        defaultShips.addListShips(combatCiv,HULLTYPE_COMBATCIV);
+        /*defaultShips.addListShips(combatCiv,HULLTYPE_COMBATCIV);
         defaultShips.addListShips(tanker,HULLTYPE_TANKER);
         defaultShips.addListShips(cargo,HULLTYPE_CARGO);
         defaultShips.addListShips(liner,HULLTYPE_LINER);
         defaultShips.addListShips(personnel,HULLTYPE_PERSONNEL);
         defaultShips.addListShips(tug,HULLTYPE_TUG);
-        defaultShips.addListShips(utility,HULLTYPE_UTILITY);
+        defaultShips.addListShips(utility,HULLTYPE_UTILITY);*/
 
     }
     private static void test2(String key){
@@ -178,5 +178,22 @@ public class AvailableShipData {
         ShipData a = unorganizedShips.get(hullID);
         unorganizedShips.remove(hullID);
         organizedShips.get(a.getHullType()).get(a.getHullType()).remove(hullID);
+    }
+
+
+    public ShipData getRandomShip(){
+        Object[] a = this.unorganizedShips.values().toArray();
+        if (a.length == 0) return null;
+        return (ShipData) a[(int)(Math.random()*a.length)];
+    }
+    /*public ShipData getRandomShip(int[] types, int[] sizes){
+        Object[] a = this.organizedShips.get(type).get(size).values().toArray();
+        if (a.length == 0) return null;
+        return (ShipData) a[(int)(Math.random()*a.length)];
+    }*/
+    public ShipData getRandomShip(String type,String size){
+        Object[] a = this.organizedShips.get(type).get(size).values().toArray();
+        if (a.length == 0) return null;
+        return (ShipData) a[(int)(Math.random()*a.length)];
     }
 }
