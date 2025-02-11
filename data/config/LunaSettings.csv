@@ -10,9 +10,9 @@ the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current ta
 Header_shipRatio,,Header,Ship Size Ratio Chances,,,,,Generator
 Header_frigateRatio,,Header,Frigate size ratio,,,,,Generator
 text_frigateRatio,,Text,This handles all the ratio of frigates to other ships in a generated lords fleet,,,,,Generator
-generator_frigateRatio_min,Mim number of frigets,Int,1,,,1,100,Generator
-generator_frigateRatio_max,Max number of frigets,Int,15,,,1,100,Generator
-generator_frigateRatio_target,Target number of frigets,Int,10,,,1,100,Generator
+generator_frigateRatio_min,Mim number of frigates,Int,1,,,1,100,Generator
+generator_frigateRatio_max,Max number of frigates,Int,15,,,1,100,Generator
+generator_frigateRatio_target,Target number of frigates,Int,10,,,1,100,Generator
 generator_frigateRatio_i,Weight,Double,1.5,,"The higher this value, the less vareance from the target level there will be.
 the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current target, to numbers off by each point",1,5,Generator
 Header_destroyer_ratio,,Header,Destroyer size ratio,,,,,Generator
@@ -37,20 +37,63 @@ generator_captialRatio_target,Target number of captials,Int,10,,,1,100,Generator
 generator_captialRatio_i,Weight,Double,1.5,,"The higher this value, the less vareance from the target level there will be.
 the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current target, to numbers off by each point",1,5,Generator
 ,,,,,,,,
+Header_shipTypeRatio,,Header,Ship Type Ratio Chances,,,,,Generator
+Header_warshipRatio,,Header,Warship type ratio,,,,,Generator
+text_warshipRatio,,Text,This handles all the ratio of warships to other ship types in a generated lords fleet,,,,,Generator
+generator_warshipRatio_min,Mim number of warships,Int,1,,,1,100,Generator
+generator_warshipRatio_max,Max number of warships,Int,15,,,1,100,Generator
+generator_warshipRatio_target,Target number of warships,Int,10,,,1,100,Generator
+generator_warshipRatio_i,Weight,Double,1.5,,"The higher this value, the less vareance from the target level there will be.
+the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current target, to numbers off by each point",1,5,Generator
+Header_carrier_ratio,,Header,Carrier type ratio,,,,,Generator
+text_carrierRatio,,Text,This handles all the ratio of carriers to other ship types in a generated lords fleet,,,,,Generator
+generator_carrierRatio_min,Mim number of carriers,Int,1,,,1,100,Generator
+generator_carrierRatio_max,Max number of carriers,Int,15,,,1,100,Generator
+generator_carrierRatio_target,Target number of carriers,Int,10,,,1,100,Generator
+generator_carrierRatio_i,Weight,Double,1.5,,"The higher this value, the less vareance from the target level there will be.
+the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current target, to numbers off by each point",1,5,Generator
+Header_phaseRatio,,Header,Phase Ship Type size ratio,,,,,Generator
+text_phaseRatio,,Text,This handles all the ratio of phase ships to other ships in a generated lords fleet,,,,,Generator
+generator_phaseRatio_min,Mim number of phases,Int,1,,,1,100,Generator
+generator_phaseRatio_max,Max number of phases,Int,15,,,1,100,Generator
+generator_phaseRatio_target,Target number of phases,Int,10,,,1,100,Generator
+generator_phaseRatio_i,Weight,Double,1.5,,"The higher this value, the less vareance from the target level there will be.
+the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current target, to numbers off by each point",1,5,Generator
 ,,,,,,,,
-#luna_exampleText,Example Text Field,Text,"Any value below is merely an example for Modders. 
-None of the Settings here do anything.
-",,,,,Examples
-#luna_exampleString,Example String,String,some string,,"Strings will accept any characters put in, with no filtering.",,,Examples
-#luna_exampleBoolean,Example Boolean,Boolean,true,,A button that switches between true and false.,,,Examples
-#luna_exampleInt,Example Int,Int,100,,"Int Fields will only accept whole Numbers, and block any other character from being entered.",-50,200,Examples
-#luna_exampleDouble,Example Double,Double,10.2,,Doubles allow only numbers and a single decimal dot (.) ,0,20,Examples
-#luna_exampleKeybind,Example Keybind,Keycode,0,,"Lets users register a keybind. The saved keycodes are the same as used by org.lwjgl.input.Keyboard and Starsectors InputEventAPI.
-
-Make sure to set a condition for your input checks to not accept numbers of 0, as lwjgl sets both unbound & unknown characters to that value.",,,Examples
-#luna_newExampleColor,Example Color,Color,#f22e6e,,"Creates a color picker, giving both a hex text field and three sliders for the HSV color selection.
-",,,Examples
-#luna_exampleRadio,Example Radio,Radio,None,"None, Hegemony, Tritachyon, Persean League, Sindrian, Independent","Creates a radio button selector. 
-
-The defaultValue decides which one is selected by default, the secondaryValue creates the list of choices with a comma seperated String. 
-Can be retrieved as a String.",,,Examples
+Header_personalityRatio,,Header,Starlord Personality odds,,,,,Generator
+generator_personalityRatio_Quarrelsome,Odds of a given lord having a Quarrelsome personality,Double,13,,,0,100,Generator
+generator_personalityRatio_Calculating,Odds of a given lord having a Calculating personality,Double,13,,,0,100,Generator
+generator_personalityRatio_Martial,Odds of a given lord having a Martial personality,Double,13,,,0,100,Generator
+generator_personalityRatio_Upstanding,Odds of a given lord having a Upstanding personality,Double,9,,,0,100,Generator
+,,,,,,,,
+Header_personalityRatio,,Header,Starlord Personality odds,,,,,Generator
+generator_battlePersonalityRatio_Timid,Odds of a given lord having a Timid battle personality,Double,0,,,0,100,Generator
+generator_battlePersonalityRatio_Cautious,Odds of a given lord having a Cautious battle personality,Double,5,,,0,100,Generator
+generator_battlePersonalityRatio_Steady,Odds of a given lord having a Steady battle personality,Double,15,,,0,100,Generator
+generator_battlePersonalityRatio_Aggressive,Odds of a given lord having a Aggressive battle personality,Double,18,,,0,100,Generator
+generator_battlePersonalityRatio_Reckless,Odds of a given lord having a Reckless battle personality,Double,10,,,0,100,Generator
+,,,,,,,,
+Header_FleetTemplates,,Header,Fleet generation weights,,,,,Generator
+text_FleetTemplates,,Text,this is the odds of a given fleet generator being used on a randomly generated starlords fleet. set to 0 to disable,,,,,Generator
+generator_fleetTemplates_system,Odds of a given lord chosing there ships based of there system,Double,1,,,0,100,Generator
+generator_fleetTemplates_hullmod,Odds of a given lord chosing there ships based on there hullmods,Double,1,,,0,100,Generator
+generator_fleetTemplates_manufacture,Odds of a given lord chosing there ships based on there manufacture,Double,1,,,0,100,Generator
+,,,,,,,,
+Header_FlagshipTemplates,,Header,Flagship picker weights,,,,,Generator
+text_FlagshipTemplates,,Text,this is the odds of a given flagship being used on a randomly generated starlords flagship. set to 0 to disable,,,,,Generator
+generator_flagshipPicker_DP,Odds of a given lord chosing there flahship based of its DP,Double,1,,,0,100,Generator
+generator_flagshipPicker_HP,Odds of a given lord chosing there flahship based of its HP,Double,1,,,0,100,Generator
+generator_flagshipPicker_Cost,Odds of a given lord chosing there flahship based of its cost,Double,1,,,0,100,Generator
+,,,,,,,,
+Header_GeneratorMisc,,Header,Misc options,,,,,Generator
+generator_isMaleChance,Male chance,double,0.5,,"The odds of a given lord being male. set to 0 for every lord to be female, set to 1 for every lord to be male",0,1,Generator
+generator_fleetAdjective,Fleet adjective,String,'s fleet,,The word that goes on the end of a given lords fleet for example: with a value of ''s fleet' a lords fleet might be called Aderson Jaksons's fleet,,,Generator
+generator_oddsOfNonePriorityShips,Chance of using all ships,Double,0.05,,The odds of any given lord using ships that are not prioritized by there faction,0,1,Generator
+generator_oddsOfNoneSelectedFlagship,Chance of random flahship,Double,0.05,,The odds of any given lord using a flahship that is not present in there fleet in any other way,0,1,Generator
+Header_ShipSpawnWeightRaitio,,Header,ship Spawn ratio chances,,,,,Generator
+text_shipSpawnRatio,,Text,This applys a random multiplyer to the spawn raitio of a given ship well keeping the raitio of size / types the same,,,,,Generator
+generator_shipSpawnRatio_min,Mim multiplier,Int,1,,,1,100,Generator
+generator_shipSpawnRatio_max,Max multiplier,Int,20,,,1,100,Generator
+generator_shipSpawnRatio_target,Target multiplier,Int,10,,,1,100,Generator
+generator_shipSpawnRatio_i,Weight,Double,1.1,,"The higher this value, the less vareance from the target level there will be.
+the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current target, to numbers off by each point",1,5,Generator

@@ -1,6 +1,7 @@
 package starlords.generator.support;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 

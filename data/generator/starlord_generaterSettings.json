@@ -28,5 +28,57 @@
     "max": 15,
     "target": 10,
     "i": 1.5
-  }
+  },
+  "generator_warshipRatio": {
+    "min": 1,
+    "max": 15,
+    "target": 10,
+    "i": 1.5
+  },
+  "generator_carrierRatio": {
+    "min": 1,
+    "max": 15,
+    "target": 10,
+    "i": 1.5
+  },
+  "generator_phaseRatio": {
+    "min": 1,
+    "max": 15,
+    "target": 10,
+    "i": 1.5
+  },
+  "generator_shipSpawnRatio": {
+    "min": 1,
+    "max": 20,
+    "target": 10,
+    "i": 1.1
+  },
+
+
+  "generator_personalityRatio_Quarrelsome": 13,
+  "generator_personalityRatio_Calculating": 13,
+  "generator_personalityRatio_Martial": 13,
+  "generator_personalityRatio_Upstanding": 9,
+
+  "generator_battlePersonalityRatio_Timid": 0,
+  "generator_battlePersonalityRatio_Cautious": 5,
+  "generator_battlePersonalityRatio_Steady": 15,
+  "generator_battlePersonalityRatio_Aggressive": 18,
+  "generator_battlePersonalityRatio_Reckless": 9,
+
+  "generator_isMaleChance": 0.5,
+  "generator_fleetAdjective": "'s fleet",
+
+  "generator_oddsOfNonePriorityShips": 0.05,
+  "generator_oddsOfNoneSelectedFlagship": 0.05,
+
+
+
+  "generator_fleetTemplates_system": 1,
+  "generator_fleetTemplates_hullmod": 1,
+  "generator_fleetTemplates_manufacture": 1,
+
+  "generator_flagshipPicker_Cost": 1,
+  "generator_flagshipPicker_DP": 1,
+  "generator_flagshipPicker_HP": 1
 }
