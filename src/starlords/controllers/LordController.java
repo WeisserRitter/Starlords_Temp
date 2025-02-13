@@ -59,24 +59,23 @@ public class LordController {
         return lordsMap.get(id);
     }
 
-    public static void addLordMidGame(LordTemplate template){
+    public static CampaignFleetAPI addLordMidGame(LordTemplate template,MarketAPI lordMarket) {
         //'add lord' copied code was removed, do to it already being ran by default.
         Lord currLord = new Lord(template);
 
         //decided the lords spawn.
-        MarketAPI lordMarket = null;
-        if (currLord.getFiefs().isEmpty()) {
-            // backup
-            if (lordMarket == null) {
+        if (lordMarket == null) {
+            if (currLord.getFiefs().isEmpty()) {
+                // backup
                 lordMarket = getDefaultSpawnLoc(currLord, null);
+                // backup-backup
+                if (lordMarket == null) {
+                    List<MarketAPI> markets = Global.getSector().getEconomy().getMarketsCopy();
+                    lordMarket = markets.get(Utils.rand.nextInt(markets.size()));
+                }
+            } else {
+                lordMarket = currLord.getFiefs().get(0).getMarket();
             }
-            // backup-backup
-            if (lordMarket == null) {
-                List<MarketAPI> markets = Global.getSector().getEconomy().getMarketsCopy();
-                lordMarket = markets.get(Utils.rand.nextInt(markets.size()));
-            }
-        } else {
-            lordMarket = currLord.getFiefs().get(0).getMarket();
         }
 
 
@@ -113,6 +112,17 @@ public class LordController {
         QuestController.addLord(currLord);
         PoliticsController.addLord(currLord);
         RelationController.addLord(currLord);
+
+        return fleet;
+    }
+    public static CampaignFleetAPI addLordMidGame(LordTemplate template,com.fs.starfarer.api.campaign.SectorEntityToken system, float x, float y) {
+        CampaignFleetAPI fleet = addLordMidGame(template);
+        system.getContainingLocation().addEntity(fleet);
+        fleet.setLocation(x, y);
+        return fleet;
+    }
+    public static CampaignFleetAPI addLordMidGame(LordTemplate template){
+        return addLordMidGame(template,null);
     }
     public static void removeLordMidGame(Lord lord){
         //attempt to remove a saved lord memory, provided it exists (I don't understand memory.)

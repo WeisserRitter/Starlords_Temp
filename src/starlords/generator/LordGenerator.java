@@ -2,14 +2,23 @@ package starlords.generator;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.econ.MarketDemandAPI;
+import com.fs.starfarer.api.campaign.econ.MarketDemandDataAPI;
+import com.fs.starfarer.api.characters.FullName;
+import com.fs.starfarer.api.characters.PersonAPI;
+import com.fs.starfarer.api.impl.campaign.events.OfficerManagerEvent;
+import com.fs.starfarer.rpg.Person;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.apache.log4j.Logger;
+import starlords.controllers.LordController;
 import starlords.generator.support.AvailableShipData;
 import starlords.generator.support.ShipData;
 import starlords.generator.types.flagship.LordFlagshipPickerBase;
 import starlords.generator.types.fleet.LordFleetGeneratorBase;
+import starlords.lunaSettings.StoredSettings;
+import starlords.person.LordTemplate;
 import starlords.person.PosdoLordTemplate;
 import starlords.util.WeightedRandom;
 
@@ -76,6 +85,21 @@ public class LordGenerator {
         log.info("DEBUG: got random of: "+sizeRatio[2].getRandom());
         log.info("DEBUG: got random of: "+sizeRatio[3].getRandom());
     }
+    public static void createStarlord(String factionID){
+        PosdoLordTemplate lord = generateStarlord(factionID);
+        lord.preferredItemId = getFavCommodity(factionID);
+        LordController.addLordMidGame(new LordTemplate(lord));
+    }
+    public static void createStarlord(String factionID, com.fs.starfarer.api.campaign.SectorEntityToken system, float x, float y){
+        PosdoLordTemplate lord = generateStarlord(factionID);
+        lord.preferredItemId = getFavCommodity(factionID);
+        LordController.addLordMidGame(new LordTemplate(lord),system,x,y);
+    }
+    public static void createStarlord(String factionID,MarketAPI market){
+        PosdoLordTemplate lord = generateStarlord(factionID);
+        lord.preferredItemId = getFavCommodity(market);
+        LordController.addLordMidGame(new LordTemplate(lord),market);
+    }
     @SneakyThrows
     public static PosdoLordTemplate generateStarlord(String factionID){
         PosdoLordTemplate lord = new PosdoLordTemplate();
@@ -86,7 +110,6 @@ public class LordGenerator {
 
         lord.factionId=factionID;
         //lord.fleetName=fleetName;
-        lord.isMale=isMaleChance < Math.random();
         lord.level=starlordLevelRatio.getRandom();
         lord.personality = personalities[getValueFromWeight(personalityRatio)];
         lord.battlePersonality = battlePersonalities[getValueFromWeight(battlePersonalityRatio)];
@@ -94,8 +117,30 @@ public class LordGenerator {
         //lord.preferredItemId=prefurredITemId;
         lord.ranking=0;
         generateAllShipsForLord(lord,factionID);
+        generatePerson(lord,factionID);
         return lord;
     }
+
+    private static String getFavCommodity(String factionID){
+        List<MarketAPI> markets = Global.getSector().getEconomy().getMarketsCopy();
+        ArrayList<MarketAPI> factionMarkets = new ArrayList<>();
+        for (MarketAPI a : markets){
+            if (a.getFactionId().equals(factionID)) factionMarkets.add(a);
+        }
+        if (factionMarkets.size() != 0){
+            return getFavCommodity(factionMarkets.get((int) (Math.random()*factionMarkets.size())));
+        }
+        if (markets.size() != 0){
+            return getFavCommodity(markets.get((int) (Math.random()*markets.size())));
+        }
+        return null;
+    }
+    private static String getFavCommodity(MarketAPI market){
+        List<MarketDemandAPI> a = market.getDemandData().getDemandList();
+        if (a.size() == 0) return null;
+        return a.get((int) (Math.random()*a.size())).getBaseCommodity().getId();
+    }
+
     private static void generateAllShipsForLord(PosdoLordTemplate lord, String factionID){
         int[] sizeratio = {
                 sizeRatio[0].getRandom(),
@@ -304,6 +349,7 @@ public class LordGenerator {
             }
             maxLoops--;
         }
+        //backup generator. runs if I failed to reach the min number of ships I wanted with more picky generators.
         if(ships.size() < minShip){
             fleetGeneratorBackup.skimPossibleShips(availableShipData);
             ArrayList<ShipData> newShips = getShips(availableShipData,sizeratio,typeratio,maxShip);
@@ -312,23 +358,25 @@ public class LordGenerator {
                 availableShipData.removeShip(a.getHullID());
             }
         }
-
+        //final backup generator. only activates if I still don't have enough ships (signaling that my ship ratios cannot produce ships)
+        if (ships.size() < minShip){
+            ArrayList<ShipData> newShips = getShips(availableShipData,new int[]{1,1,1,1},new int[]{1,1,1},minShip);
+            for (ShipData a : newShips){
+                ships.add(a);
+                availableShipData.removeShip(a.getHullID());
+            }
+        }
         //generate ship ratio
-        shipSpawnRatio.getRandom();//this will act as a modifier to the 'weight' of a given variant, in its type / size ratio
-        /* OK: math issue time.
-        I have 4 'weights' (marked a[]) and 3 'weights' (marked b[]).
-        I also have x items (i). each i has 2 weights in total, one from each array.
-        write an equation were I take x I's, and make it so the raitio of each respects -both- inserted weigts perfictly. the ratio of all item
-
-         */
         lord.shipPrefs = assingFleetSpawnWeights(ships,sizeratio,typeratio);
-        if (availableShipData.getUnorganizedShips().size() != 0 && oddsOfNonePriorityShips < Math.random()){
+
+        //get unselected ship for possible flagship if required.
+        if (availableShipData.getUnorganizedShips().size() != 0 && oddsOfNoneSelectedFlagship < Math.random()){
             ships = new ArrayList<>();
             for(Object a : availableShipData.getUnorganizedShips().values().toArray()){
                 ships.add((ShipData) a);
             }
-
         }
+        //pick flagship
         lord.flagShip = pickFlagship(ships);
     }
     private static String pickFlagship(ArrayList<ShipData> ships){
@@ -337,23 +385,47 @@ public class LordGenerator {
         }
         return flagshipPickerTypes.get(getValueFromWeight(flagshipPickerRatio)).pickFlagship(ships);
     }
-
-    //gets availble ships to a faction (but only ones with default ship roles.). returns null if no matches
     public static AvailableShipData getAvailableShips(String factionID,boolean allShips){
+        Logger log = Global.getLogger(LordGenerator.class);
+        log.info("DEBUG: attempting to get available ships with a factionID, allShips of: "+factionID+", "+allShips);
         Set<String> a = null;
+        AvailableShipData b=null;
         if (!allShips) {
             a = Global.getSector().getFaction(factionID).getFactionSpec().getPriorityShips();
+            if (a.size() != 0) {
+                b = AvailableShipData.getNewASD(a);
+                log.info("DEBUG: got available ships ships (from priority) as: "+b.getUnorganizedShips().size());
+            }
         }
-        if (allShips || a == null || a.size() == 0){
+        if (allShips || a == null || a.size() == 0 || b == null || b.getUnorganizedShips().size() == 0){
             a = Global.getSector().getFaction(factionID).getFactionSpec().getKnownShips();
+            if (a.size() != 0) {
+                b = AvailableShipData.getNewASD(a);
+                log.info("DEBUG: got available ships ships (from all) as: "+b.getUnorganizedShips().size());
+            }
         }
         if (a == null){
+            log.info("DEBUG: failed to get any ships at all. returning null");
             return null;
         }
-        AvailableShipData b = AvailableShipData.getNewASD(a);
+        log.info("DEBUG: got "+a.size()+" ships");
+        log.info("DEBUG: got "+b.getUnorganizedShips().size()+" electable ships");
         if (b.getUnorganizedShips().size() == 0) return null;
+        log.info("DEBUG: successfully got all ships. returning...");
         return b;
     }
+
+    public static void generatePerson(PosdoLordTemplate lord,String factionID){
+        lord.isMale=isMaleChance < Math.random();
+        FullName.Gender gender = FullName.Gender.FEMALE;
+        if (lord.isMale) gender = FullName.Gender.MALE;
+
+        PersonAPI person = Global.getSector().getFaction(factionID).createRandomPerson(gender);
+        lord.portrait = person.getPortraitSprite();
+        lord.name = person.getNameString();
+        lord.fleetName = person.getNameString()+fleetAdjective;
+    }
+
     private static int getValueFromWeight(ArrayList<Double> weight){
         double totalValue = 0;
         double randomValue = Math.random();

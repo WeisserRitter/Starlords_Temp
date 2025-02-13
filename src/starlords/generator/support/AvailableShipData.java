@@ -8,6 +8,7 @@ import com.fs.starfarer.api.loading.RoleEntryAPI;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.log4j.Logger;
+import starlords.generator.LordGenerator;
 import starlords.lunaSettings.StoredSettings;
 
 import java.util.ArrayList;
@@ -43,13 +44,18 @@ public class AvailableShipData {
         return getNewASD(hullIds,defaultShips);
     }
     public static AvailableShipData getNewASD(Set<String> hullIds,AvailableShipData AvailableShips){
+        Logger log = Global.getLogger(LordGenerator.class);
+        log.info("DEBUG: attempting to get a new ASD with hullIds, AvailableShips: "+hullIds.size()+", "+AvailableShips.getUnorganizedShips().size());
         AvailableShipData b = new AvailableShipData();
         for (String a : hullIds){
+            log.info("Looking at a hull of ID: "+a);
             ShipData c = AvailableShips.unorganizedShips.get(a);
             if (c != null){
+                log.info("  adding a new ShipData:");
                 b.unorganizedShips.put(a,c);
                 b.organizedShips.get(c.getHullType()).get(c.getHullSize()).put(a,c);
             }
+            log.info("  NOT adding a new ship, because ship does not exist in inputted AvilableShipData");
         }
         return b;
 

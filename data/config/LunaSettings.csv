@@ -98,3 +98,17 @@ generator_shipSpawnRatio_max,Max multiplier,Int,20,,,1,100,Generator
 generator_shipSpawnRatio_target,Target multiplier,Int,10,,,1,100,Generator
 generator_shipSpawnRatio_i,Weight,Double,1.1,,"The higher this value, the less vareance from the target level there will be.
 the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current target, to numbers off by each point",1,5,Generator
+Header_maxShipSpawnWeightRaitio,,Header,Maximum ships per lords fleet chances,,,,,Generator
+text_maxShipSpawnRatio,,Text,This handles the calculations that determin the maximum number of diffrent ship that a lord can build there fleet with,,,,,Generator
+generator_maxShipSpawnRatio_min,Mim multiplier,Int,5,,,1,100,Generator
+generator_maxShipSpawnRatio_max,Max multiplier,Int,30,,,1,100,Generator
+generator_maxShipSpawnRatio_target,Target multiplier,Int,15,,,1,100,Generator
+generator_maxShipSpawnRatio_i,Weight,Double,1.1,,"The higher this value, the less vareance from the target level there will be.
+the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current target, to numbers off by each point",1,5,Generator
+Header_minShipSpawnWeightRaitio,,Header,ship Spawn ratio chances,,,,,Generator
+text_minShipSpawnRatio,,Text,This handles the calculations that determin the minmum number of diffrent ship that a lord can build there fleet with,,,,,Generator
+generator_minShipSpawnRatio_min,Mim multiplier,Int,1,,,1,100,Generator
+generator_minShipSpawnRatio_max,Max multiplier,Int,20,,,1,100,Generator
+generator_minShipSpawnRatio_target,Target multiplier,Int,5,,,1,100,Generator
+generator_minShipSpawnRatio_i,Weight,Double,1.1,,"The higher this value, the less vareance from the target level there will be.
+the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current target, to numbers off by each point",1,5,Generator

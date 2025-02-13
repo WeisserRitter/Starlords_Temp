@@ -79,10 +79,11 @@ public class StoredSettings {
 
 
         LordGenerator.setShipSpawnRatio(getLunaWeightedRandom("generator_shipSpawnRatio"));
+        LordGenerator.setMaxShipRatio(getLunaWeightedRandom("generator_maxShipSpawnRatio"));
+        LordGenerator.setMinShipRatio(getLunaWeightedRandom("generator_minShipSpawnRatio"));
         //LordGenerator.setMinShipRatio(getLunaWeightedRandom("generator_lordLevel"));
         //LordGenerator.setMaxShipRatio(getLunaWeightedRandom("generator_lordLevel"));
 
-        test();
         log.info("DEBUG: luna settings loaded successfully.");
     }
     @SneakyThrows
@@ -133,15 +134,11 @@ public class StoredSettings {
         LordGenerator.addFlagshipPicker(new LordFlagshipPicker_DP("random"),json.getDouble("generator_flagshipPicker_Random"));
         LordGenerator.addFlagshipPicker(new LordFlagshipPicker_HP("hp"),json.getDouble("generator_flagshipPicker_HP"));
 
+        LordGenerator.setMaxShipRatio(getConfigWeightedRandom("generator_maxShipSpawnRatio",json));
+        LordGenerator.setMinShipRatio(getConfigWeightedRandom("generator_minShipSpawnRatio",json));
+
         LordGenerator.setShipSpawnRatio(getConfigWeightedRandom("generator_shipSpawnRatio",json));
         log.info("DEBUG: normal config settings loaded successfully.");
-        test();
-    }
-    private static void test(){
-        LordGenerator.tempTest();
-        for (FactionAPI a : Global.getSector().getAllFactions()) {
-            LordGenerator.getAvailableShips(a.getId(),true);
-        }
     }
 
     private static WeightedRandom getLunaWeightedRandom(String name){
