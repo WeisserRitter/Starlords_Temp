@@ -78,10 +78,11 @@ text_FleetTemplates,,Text,this is the odds of a given fleet generator being used
 generator_fleetTemplates_system,Odds of a given lord chosing there ships based of there system,Double,1,,,0,100,Generator
 generator_fleetTemplates_hullmod,Odds of a given lord chosing there ships based on there hullmods,Double,1,,,0,100,Generator
 generator_fleetTemplates_manufacture,Odds of a given lord chosing there ships based on there manufacture,Double,1,,,0,100,Generator
+generator_fleetTemplates_random,Odds of a given lord chosing there ships compleatly randomly,Double,1,,,0,100,Generator
 ,,,,,,,,
 Header_FlagshipTemplates,,Header,Flagship picker weights,,,,,Generator
 text_FlagshipTemplates,,Text,this is the odds of a given flagship being used on a randomly generated starlords flagship. set to 0 to disable,,,,,Generator
-generator_flagshipPicker_DP,Odds of a given lord chosing there flahship based of its DP,Double,1,,,0,100,Generator
+generator_flagshipPicker_Random,Odds of a given lord chosing there flahship randomly,Double,1,,,0,100,Generator
 generator_flagshipPicker_HP,Odds of a given lord chosing there flahship based of its HP,Double,1,,,0,100,Generator
 generator_flagshipPicker_Cost,Odds of a given lord chosing there flahship based of its cost,Double,1,,,0,100,Generator
 ,,,,,,,,

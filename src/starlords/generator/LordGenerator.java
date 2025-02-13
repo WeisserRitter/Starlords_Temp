@@ -28,7 +28,7 @@ public class LordGenerator {
     private static double isMaleChance;
     @Setter
     private static double[] personalityRatio = {};
-    private static String[] personalities = {
+    private static final String[] personalities = {
             "Quarrelsome",
             "Calculating",
             "Martial",
@@ -36,7 +36,7 @@ public class LordGenerator {
     };
     @Setter
     private static double[] battlePersonalityRatio = {};
-    private static String[] battlePersonalities = {
+    private static final String[] battlePersonalities = {
             "Timid",
             "Cautious",
             "Steady",
@@ -125,9 +125,8 @@ public class LordGenerator {
         int minShip = minShipRatio.getRandom();
         boolean useAllShips = oddsOfNonePriorityShips > Math.random();
         boolean useSelectedShipsForFlagship = oddsOfNoneSelectedFlagship > Math.random();
-        lord.shipPrefs=generateShips(factionID,useAllShips,minShip,maxShip,sizeratio,typeratio);
-        generateShips(factionID,useAllShips,minShip,maxShip,sizeratio,typeratio);
-        lord.flagShip = pickFlagship();
+        //lord.shipPrefs=generateShips(factionID,useAllShips,minShip,maxShip,sizeratio,typeratio);
+        generateShips(lord,factionID,useAllShips,minShip,maxShip,sizeratio,typeratio);
     }
     private static ArrayList<ShipData> getShips(AvailableShipData ships,int[] typeratio,int[] sizeratio,int targetShips){
         ArrayList<ShipData> output = new ArrayList<>();
@@ -188,7 +187,107 @@ public class LordGenerator {
         }
         return output;
     }
-    private static HashMap<String,Integer> generateShips(String factionID,boolean useAllShips,int minShip,int maxShip,int[] sizeratio,int[] typeratio){
+    private static int getIdTypes(String type){
+        String[] a = new String[]{
+            AvailableShipData.HULLTYPE_WARSHIP,
+            AvailableShipData.HULLTYPE_CARRIER,
+            AvailableShipData.HULLTYPE_PHASE
+        };
+        for (int b = 0; b < a.length; b++){
+            if (a[b].equals(type)) return b;
+        }
+        return -1;
+    }
+    private static int getIdSizes(String size){
+        String[] a = new String[]{
+            AvailableShipData.HULLSIZE_FRIGATE,
+            AvailableShipData.HULLSIZE_DESTROYER,
+            AvailableShipData.HULLSIZE_CRUISER,
+            AvailableShipData.HULLSIZE_CAPITALSHIP
+        };
+        for (int b = 0; b < a.length; b++){
+            if (a[b].equals(size)) return b;
+        }
+        return -1;
+    }
+    private static HashMap<String, Integer> assingFleetSpawnWeights(ArrayList<ShipData> shipDatas, int[] types, int[] sizes){
+        //int[] output = new int[shipDatas.size()];
+        HashMap<String,Integer> output = new HashMap<>();
+        ArrayList<Double> shipOdds = new ArrayList<>();
+        for(ShipData a : shipDatas) {
+            for (int b = 0; b < a.getSpawnWeight().size(); b++) {
+                //String vareantID = (String) a.getSpawnWeight().keySet().toArray()[b];
+                float weight = (float) a.getSpawnWeight().values().toArray()[b];//get(vareantID);
+                shipOdds.add((double) (weight*shipSpawnRatio.getRandom()));
+            }
+        }
+        double[] outputtemp = new double[shipOdds.size()];
+        double[] outputtemp2 = new double[shipOdds.size()];
+        double[] totalS = new double[4];
+        double[] totalT = new double[3];
+        int allS=0;
+        int allT=0;
+        int d = 0;
+        for(ShipData a : shipDatas){
+            for(int b = 0; b < a.getSpawnWeight().size(); b++) {
+                //String vareantID = (String) a.getSpawnWeight().keySet().toArray()[b];
+                double weight = shipOdds.get(d);//(float)a.getSpawnWeight().values().toArray()[b];//get(vareantID);
+                totalS[(int) getIdSizes(a.getHullSize())] += weight;
+                totalT[(int) getIdTypes(a.getHullType())] += weight;
+                allS++;
+                allT++;
+                d++;
+            }
+        }
+        double typeSize = types[0]+types[1]+types[2];
+        double sizeSize = sizes[0]+sizes[1]+sizes[2]+sizes[3];
+        double[] sizesMulti = new double[sizes.length];
+        for(int a = 0; a < sizes.length; a++){
+            double b = totalS[a] / allS;
+            double c = sizes[a] / sizeSize;
+            sizesMulti[a] = c/b;
+        }
+        d = 0;
+        for(ShipData a : shipDatas){
+            for(int b = 0; b < a.getSpawnWeight().size(); b++) {
+                double weight = shipOdds.get(d);//(float)a.getSpawnWeight().values().toArray()[b];//get(vareantID);
+                double t = (weight * sizesMulti[getIdSizes(a.getHullSize())]) * 10;
+                outputtemp[d] = t;
+                d++;
+            }
+        }
+
+        double[] typesMulti = new double[types.length];
+        for(int a = 0; a < types.length; a++){
+            double b = totalT[a] / allT;
+            double c = types[a] / typeSize;
+            typesMulti[a] = c/b;
+        }
+        d = 0;
+        for(ShipData a : shipDatas){
+            for(int b = 0; b < a.getSpawnWeight().size(); b++) {
+                double weight = shipOdds.get(d);//(float)a.getSpawnWeight().values().toArray()[b];//get(vareantID);
+                double t = (weight * typesMulti[getIdTypes(a.getHullType())]) * 10;
+                outputtemp[d] = t;
+                d++;
+            }
+        }
+        d=0;
+
+        for(ShipData a : shipDatas) {
+            Object[] keys = a.getSpawnWeight().keySet().toArray();
+            for (int b = 0; b < a.getSpawnWeight().size(); b++) {
+                String key = (String)keys[b];
+                output.put(key, (int)(outputtemp[d]+outputtemp2[d])/2);
+            }
+        }
+        /*for(int a = 0; a < output.size(); a++){
+            output[a] = (outputtemp[a]+outputtemp2[a])/2;
+        }*/
+
+        return output;
+    }
+    private static void generateShips(PosdoLordTemplate lord,String factionID,boolean useAllShips,int minShip,int maxShip,int[] sizeratio,int[] typeratio){
         HashMap<String,Integer> output = new HashMap<>();
         //generate possible ships
         AvailableShipData availableShipData = getAvailableShips(factionID,useAllShips);
@@ -222,10 +321,21 @@ public class LordGenerator {
         write an equation were I take x I's, and make it so the raitio of each respects -both- inserted weigts perfictly. the ratio of all item
 
          */
-        return output;
+        lord.shipPrefs = assingFleetSpawnWeights(ships,sizeratio,typeratio);
+        if (availableShipData.getUnorganizedShips().size() != 0 && oddsOfNonePriorityShips < Math.random()){
+            ships = new ArrayList<>();
+            for(Object a : availableShipData.getUnorganizedShips().values().toArray()){
+                ships.add((ShipData) a);
+            }
+
+        }
+        lord.flagShip = pickFlagship(ships);
     }
-    private static String pickFlagship(){
-        return "";
+    private static String pickFlagship(ArrayList<ShipData> ships){
+        if (flagshipPickerTypes.size() == 0){
+            return flagshipGeneratorBackup.pickFlagship(ships);
+        }
+        return flagshipPickerTypes.get(getValueFromWeight(flagshipPickerRatio)).pickFlagship(ships);
     }
 
     //gets availble ships to a faction (but only ones with default ship roles.). returns null if no matches

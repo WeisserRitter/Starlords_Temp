@@ -77,8 +77,9 @@
   "generator_fleetTemplates_system": 1,
   "generator_fleetTemplates_hullmod": 1,
   "generator_fleetTemplates_manufacture": 1,
+  "generator_fleetTemplates_random": 1,
 
   "generator_flagshipPicker_Cost": 1,
-  "generator_flagshipPicker_DP": 1,
+  "generator_flagshipPicker_Random": 1,
   "generator_flagshipPicker_HP": 1
 }

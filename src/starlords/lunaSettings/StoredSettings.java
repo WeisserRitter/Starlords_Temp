@@ -8,9 +8,11 @@ import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import starlords.generator.LordGenerator;
 import starlords.generator.support.AvailableShipData;
+import starlords.generator.types.flagship.LordFlagshipPickerBase;
 import starlords.generator.types.flagship.LordFlagshipPicker_Cost;
 import starlords.generator.types.flagship.LordFlagshipPicker_DP;
 import starlords.generator.types.flagship.LordFlagshipPicker_HP;
+import starlords.generator.types.fleet.LordFleetGeneratorBase;
 import starlords.generator.types.fleet.LordFleetGenerator_Desing;
 import starlords.generator.types.fleet.LordFleetGenerator_Hullmod;
 import starlords.generator.types.fleet.LordFleetGenerator_System;
@@ -69,9 +71,10 @@ public class StoredSettings {
         LordGenerator.addFleetGenerator(new LordFleetGenerator_System("system"),LunaSettings.getDouble(Constants.MOD_ID,"generator_fleetTemplates_system"));
         LordGenerator.addFleetGenerator(new LordFleetGenerator_Desing("Desing"),LunaSettings.getDouble(Constants.MOD_ID,"generator_fleetTemplates_hullmod"));
         LordGenerator.addFleetGenerator(new LordFleetGenerator_Hullmod("Hullmod"),LunaSettings.getDouble(Constants.MOD_ID,"generator_fleetTemplates_manufacture"));
+        LordGenerator.addFleetGenerator(new LordFleetGeneratorBase("random"),LunaSettings.getDouble(Constants.MOD_ID,"generator_fleetTemplates_random"));
 
         LordGenerator.addFlagshipPicker(new LordFlagshipPicker_Cost("cost"),LunaSettings.getDouble(Constants.MOD_ID,"generator_flagshipPicker_Cost"));
-        LordGenerator.addFlagshipPicker(new LordFlagshipPicker_DP("dp"),LunaSettings.getDouble(Constants.MOD_ID,"generator_flagshipPicker_DP"));
+        LordGenerator.addFlagshipPicker(new LordFlagshipPickerBase("random"),LunaSettings.getDouble(Constants.MOD_ID,"generator_flagshipPicker_Random"));
         LordGenerator.addFlagshipPicker(new LordFlagshipPicker_HP("hp"),LunaSettings.getDouble(Constants.MOD_ID,"generator_flagshipPicker_HP"));
 
 
@@ -124,9 +127,10 @@ public class StoredSettings {
         LordGenerator.addFleetGenerator(new LordFleetGenerator_System("system"),json.getDouble("generator_fleetTemplates_system"));
         LordGenerator.addFleetGenerator(new LordFleetGenerator_Desing("Desing"),json.getDouble("generator_fleetTemplates_hullmod"));
         LordGenerator.addFleetGenerator(new LordFleetGenerator_Hullmod("Hullmod"),json.getDouble("generator_fleetTemplates_manufacture"));
+        LordGenerator.addFleetGenerator(new LordFleetGeneratorBase("random"),json.getDouble("generator_fleetTemplates_random"));
 
         LordGenerator.addFlagshipPicker(new LordFlagshipPicker_Cost("cost"),json.getDouble("generator_flagshipPicker_Cost"));
-        LordGenerator.addFlagshipPicker(new LordFlagshipPicker_DP("dp"),json.getDouble("generator_flagshipPicker_DP"));
+        LordGenerator.addFlagshipPicker(new LordFlagshipPicker_DP("random"),json.getDouble("generator_flagshipPicker_Random"));
         LordGenerator.addFlagshipPicker(new LordFlagshipPicker_HP("hp"),json.getDouble("generator_flagshipPicker_HP"));
 
         LordGenerator.setShipSpawnRatio(getConfigWeightedRandom("generator_shipSpawnRatio",json));
