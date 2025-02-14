@@ -1,9 +1,12 @@
 package starlords.person;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import lombok.SneakyThrows;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import starlords.controllers.LordController;
+import starlords.lunaSettings.StoredSettings;
 
 import java.util.HashMap;
 import java.util.Iterator;

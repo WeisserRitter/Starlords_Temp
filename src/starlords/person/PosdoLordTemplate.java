@@ -18,7 +18,6 @@ public class PosdoLordTemplate {
     public int ranking;
     public String preferredItemId;
     public PosdoLordTemplate(){
-
     }
     public PosdoLordTemplate(String name,String factionId,String fleetName, boolean isMale, String personality, String flagShip, String lore, HashMap<String, Integer> shipPrefs,String fief,String portrait,int level,String battlePersonality,int ranking,String preferredItemId){
         this.name=name;
