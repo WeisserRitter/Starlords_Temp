@@ -116,6 +116,7 @@ public class LordGenerator {
         //lord.portrait=portrait;
         //lord.preferredItemId=prefurredITemId;
         lord.ranking=0;
+        lord.fief = "null";
         generateAllShipsForLord(lord,factionID);
         generatePerson(lord,factionID);
         return lord;
@@ -154,7 +155,7 @@ public class LordGenerator {
         int[] typeratio = {
                 typeRatio[0].getRandom(),
                 typeRatio[1].getRandom(),
-                typeRatio[2].getRandom(),
+                typeRatio[2].getRandom()
                 /*typeRatio[3].getRandom(),
                 typeRatio[4].getRandom(),
                 typeRatio[5].getRandom(),
@@ -173,7 +174,7 @@ public class LordGenerator {
         //lord.shipPrefs=generateShips(factionID,useAllShips,minShip,maxShip,sizeratio,typeratio);
         generateShips(lord,factionID,useAllShips,minShip,maxShip,sizeratio,typeratio);
     }
-    private static ArrayList<ShipData> getShips(AvailableShipData ships,int[] typeratio,int[] sizeratio,int targetShips){
+    private static ArrayList<ShipData> getShips(AvailableShipData ships,int[] sizeratio,int[] typeratio,int targetShips){
         ArrayList<ShipData> output = new ArrayList<>();
         String[] sizes = {
                 AvailableShipData.HULLSIZE_FRIGATE,
@@ -193,17 +194,21 @@ public class LordGenerator {
                 AvailableShipData.HULLTYPE_TUG,
                 AvailableShipData.HULLTYPE_UTILITY,*/
         };
+        Logger log = Global.getLogger(StoredSettings.class);;
         int[] tempSize = new int[sizeratio.length];
         int[] tempType = new int[typeratio.length];
+        log.info("DEBUG: tempSize.length, tempType.length: "+tempSize.length+", "+tempType.length);
         int maxLoops = targetShips * 5;
         while(ships.getUnorganizedShips().size() > 0 && output.size() < targetShips && maxLoops > 0){
             int s = getLowestNumberID(sizeratio,tempSize);
             int t = getLowestNumberID(typeratio,tempType);
+            log.info("  DEBUG: s,t targets: "+s+", "+t);
             ShipData ship = ships.getRandomShip(types[t],sizes[s]);
             if (ship == null) {
                 maxLoops--;
                 continue;
             }
+            log.info("      debug: adding ship is null? "+(ship == null));
             output.add(ship);
             ships.removeShip(ship.getHullID());
             maxLoops--;
@@ -223,6 +228,7 @@ public class LordGenerator {
                     if (ship == null) {
                         continue;
                     }
+                    log.info("      debug: adding ship is null? "+(ship == null));
                     output.add(ship);
                     ships.removeShip(ship.getHullID());
                     emergencyBreak = false;
@@ -255,7 +261,7 @@ public class LordGenerator {
         }
         return -1;
     }
-    private static HashMap<String, Integer> assingFleetSpawnWeights(ArrayList<ShipData> shipDatas, int[] types, int[] sizes){
+    private static HashMap<String, Integer> assingFleetSpawnWeights(ArrayList<ShipData> shipDatas, int[] sizes, int[] types){
         //int[] output = new int[shipDatas.size()];
         HashMap<String,Integer> output = new HashMap<>();
         ArrayList<Double> shipOdds = new ArrayList<>();
@@ -345,7 +351,7 @@ public class LordGenerator {
             ArrayList<ShipData> newShips = getShips(availableShipData,sizeratio,typeratio,maxShip);
             for (ShipData a : newShips){
                 ships.add(a);
-                availableShipData.removeShip(a.getHullID());
+                //availableShipData.removeShip(a.getHullID());//this already happens in getShips.
             }
             maxLoops--;
         }
@@ -355,7 +361,7 @@ public class LordGenerator {
             ArrayList<ShipData> newShips = getShips(availableShipData,sizeratio,typeratio,maxShip);
             for (ShipData a : newShips){
                 ships.add(a);
-                availableShipData.removeShip(a.getHullID());
+                //availableShipData.removeShip(a.getHullID());//this already happens in getShips.
             }
         }
         //final backup generator. only activates if I still don't have enough ships (signaling that my ship ratios cannot produce ships)
@@ -363,7 +369,7 @@ public class LordGenerator {
             ArrayList<ShipData> newShips = getShips(availableShipData,new int[]{1,1,1,1},new int[]{1,1,1},minShip);
             for (ShipData a : newShips){
                 ships.add(a);
-                availableShipData.removeShip(a.getHullID());
+                //availableShipData.removeShip(a.getHullID());//this already happens in getShips.
             }
         }
         //generate ship ratio
@@ -463,15 +469,19 @@ public class LordGenerator {
     }
     private static int getLowestNumberID(int[] list,int[] tempData){
         int out = 0;
+        int a2=0;
         while(true) {
-            for (int a = 0; a < tempData.length; a++) {
-                if (tempData[a] > out) out = tempData[a];
+            for (int a = 0; a < list.length; a++) {
+                if (tempData[a] > out){
+                    out = tempData[a];
+                    a2 = a;
+                }
             }
             if (out != 0) {
-                tempData[out]--;
-                return out;
+                tempData[a2]--;
+                return a2;
             }
-            for (int a = 0; a < tempData.length; a++) {
+            for (int a = 0; a < list.length; a++) {
                 tempData[a] = list[a];
             }
         }

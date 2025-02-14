@@ -28,6 +28,7 @@ public class AvailableShipData {
     //how this works, the first inputted string is the ship type (phase, carrier, extra), the second inputed string is the hullsize.
     @Getter
     private HashMap<String, HashMap<String,HashMap<String, ShipData>>> organizedShips = new HashMap<>();
+    private static Logger log = Global.getLogger(AvailableShipData.class);
     public AvailableShipData(){
         startupType(HULLTYPE_CARRIER);
         startupType(HULLTYPE_WARSHIP);
@@ -44,18 +45,16 @@ public class AvailableShipData {
         return getNewASD(hullIds,defaultShips);
     }
     public static AvailableShipData getNewASD(Set<String> hullIds,AvailableShipData AvailableShips){
-        Logger log = Global.getLogger(LordGenerator.class);
-        log.info("DEBUG: attempting to get a new ASD with hullIds, AvailableShips: "+hullIds.size()+", "+AvailableShips.getUnorganizedShips().size());
+        //log.info("DEBUG: attempting to get a new ASD with hullIds, AvailableShips: "+hullIds.size()+", "+AvailableShips.getUnorganizedShips().size());
         AvailableShipData b = new AvailableShipData();
         for (String a : hullIds){
-            log.info("Looking at a hull of ID: "+a);
+            //log.info("Looking at a hull of ID: "+a);
             ShipData c = AvailableShips.unorganizedShips.get(a);
             if (c != null){
-                log.info("  adding a new ShipData:");
+                //log.info("  adding a new ShipData:");
                 b.unorganizedShips.put(a,c);
                 b.organizedShips.get(c.getHullType()).get(c.getHullSize()).put(a,c);
             }
-            log.info("  NOT adding a new ship, because ship does not exist in inputted AvilableShipData");
         }
         return b;
 
@@ -141,8 +140,9 @@ public class AvailableShipData {
         for(String hullSize : sizes) {
             log.info("  DEBUG: getting ships of hullsize: " + hullSize);
             for (ShipData a : defaultShips.organizedShips.get(key).get(hullSize).values()) {
+                if (defaultShips.unorganizedShips.get(a.getHullID()) != null)log.info("      DEBUG: ship is in unorganizedShips list.");
                 for (int b = 0; b < a.getSpawnWeight().size(); b++) {
-                    log.info("      DEBUG: varient ID of : " + a.getSpawnWeight().keySet().toArray()[b] + " has a hull ID of: " + Global.getSettings().getVariant((String) a.getSpawnWeight().keySet().toArray()[b]).getHullSpec().getHullName());
+                    log.info("      DEBUG: varient ID of : " + a.getSpawnWeight().keySet().toArray()[b] + " has a hull ID of: " + Global.getSettings().getVariant((String) a.getSpawnWeight().keySet().toArray()[b]).getHullSpec().getHullId());
                 }
             }
         }
@@ -150,10 +150,9 @@ public class AvailableShipData {
     private static void test(String a){
         Logger log = Global.getLogger(StoredSettings.class);;
         ShipVariantAPI checked = Global.getSettings().getVariant(a);
-        log.info("DEBUG: varient ID of : " +a+" has a hull ID of: "+checked.getHullSpec().getHullName());
+        log.info("DEBUG: varient ID of : " +a+" has a hull ID of: "+checked.getHullSpec().getHullId());
     }
     public void addListShips(List[] list, String type){
-        //ShipAPI.HullSize.
         for (Object a : list){
             List b = (List)a;
             for(Object c : b) {
@@ -164,7 +163,7 @@ public class AvailableShipData {
         test2(type);
     }
     public void addShip(String vareantID,float weight/*,float FPCost*/,String type){
-        String hull = Global.getSettings().getVariant(vareantID).getHullSpec().getHullName();
+        String hull = Global.getSettings().getVariant(vareantID).getHullSpec().getHullId();
         String size = Global.getSettings().getVariant(vareantID).getHullSpec().getHullSize().name();
         ShipData a = unorganizedShips.get(hull);
         if(a == null){
@@ -183,7 +182,7 @@ public class AvailableShipData {
     public void removeShip(String hullID){
         ShipData a = unorganizedShips.get(hullID);
         unorganizedShips.remove(hullID);
-        organizedShips.get(a.getHullType()).get(a.getHullType()).remove(hullID);
+        organizedShips.get(a.getHullType()).get(a.getHullSize()).remove(hullID);
     }
 
 
