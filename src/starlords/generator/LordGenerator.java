@@ -1,12 +1,14 @@
 package starlords.generator;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.econ.MarketDemandAPI;
 import com.fs.starfarer.api.campaign.econ.MarketDemandDataAPI;
 import com.fs.starfarer.api.characters.FullName;
 import com.fs.starfarer.api.characters.PersonAPI;
 import com.fs.starfarer.api.impl.campaign.events.OfficerManagerEvent;
+import com.fs.starfarer.api.impl.campaign.ids.ShipRoles;
 import com.fs.starfarer.rpg.Person;
 import lombok.Getter;
 import lombok.Setter;
@@ -167,6 +169,29 @@ public class LordGenerator {
         }
         log.info("      fleet size composition: "+AvailableShipData.HULLSIZE_FRIGATE+": "+friget+", "+AvailableShipData.HULLSIZE_DESTROYER+": "+destroyer+", "+AvailableShipData.HULLSIZE_CRUISER+": "+cruiser+", "+AvailableShipData.HULLSIZE_CAPITALSHIP+": "+capital3);
         log.info("      fleet type composition: "+AvailableShipData.HULLTYPE_WARSHIP+": "+warship+", "+AvailableShipData.HULLTYPE_CARRIER+": "+carrier+", "+AvailableShipData.HULLTYPE_PHASE+": "+phaseship);
+
+        /*/
+        log.info("      getting temp possable ships of 'carrier large'");
+        Set<String> a = Global.getSector().getFaction(lord.factionId).getVariantsForRole(ShipRoles.CARRIER_LARGE);
+        for (String b : a){
+            log.info("          ship vareant ID, hull ID: "+b+", "+Global.getSettings().getVariant(b).getHullSpec().getHullId());
+        }
+        log.info("      getting temp possable ships of 'carrier small'");
+        a = Global.getSector().getFaction(lord.factionId).getVariantsForRole(ShipRoles.CARRIER_SMALL);
+        for (String b : a){
+            log.info("          ship vareant ID, hull ID: "+b+", "+Global.getSettings().getVariant(b).getHullSpec().getHullId());
+        }
+
+        log.info("      getting temp possible ships of 'warship capital'");
+        a = Global.getSector().getFaction(lord.factionId).getVariantsForRole(ShipRoles.COMBAT_CAPITAL);
+        for (String b : a){
+            log.info("          ship vareant ID, hull ID: "+b+", "+Global.getSettings().getVariant(b).getHullSpec().getHullId());
+        }
+        log.info("      getting temp possible ships of 'warship small'");
+        a = Global.getSector().getFaction(lord.factionId).getVariantsForRole(ShipRoles.COMBAT_SMALL);
+        for (String b : a){
+            log.info("          ship vareant ID, hull ID: "+b+", "+Global.getSettings().getVariant(b).getHullSpec().getHullId());
+        }/**/
     }
     private static String getFavCommodity(String factionID){
         List<MarketAPI> markets = Global.getSector().getEconomy().getMarketsCopy();
@@ -217,8 +242,8 @@ public class LordGenerator {
         }
         int maxShip = maxShipRatio.getRandom();
         int minShip = minShipRatio.getRandom();
+        maxShip = Math.max(maxShip,minShip);
         boolean useAllShips = oddsOfNonePriorityShips > Math.random();
-        boolean useSelectedShipsForFlagship = oddsOfNoneSelectedFlagship > Math.random();
         //lord.shipPrefs=generateShips(factionID,useAllShips,minShip,maxShip,sizeratio,typeratio);
         generateShips(lord,factionID,useAllShips,minShip,maxShip,sizeratio,typeratio);
     }
@@ -274,6 +299,7 @@ public class LordGenerator {
                     }
                     output.add(ship);
                     ships.removeShip(ship.getHullID());
+                    if (output.size() >= targetShips) break;
                     emergencyBreak = false;
                 }
             }
@@ -309,9 +335,9 @@ public class LordGenerator {
         HashMap<String,Integer> output = new HashMap<>();
         ArrayList<Double> shipOdds = new ArrayList<>();
         for(ShipData a : shipDatas) {
-            for (int b = 0; b < a.getSpawnWeight().size(); b++) {
+            for (Object b : a.getSpawnWeight().values().toArray()) {
                 //String vareantID = (String) a.getSpawnWeight().keySet().toArray()[b];
-                float weight = (float) a.getSpawnWeight().values().toArray()[b];//get(vareantID);
+                float weight = (float) b;//get(vareantID);
                 shipOdds.add((double) (weight*shipSpawnRatio.getRandom()));
             }
         }
@@ -362,17 +388,18 @@ public class LordGenerator {
             for(int b = 0; b < a.getSpawnWeight().size(); b++) {
                 double weight = shipOdds.get(d);//(float)a.getSpawnWeight().values().toArray()[b];//get(vareantID);
                 double t = (weight * typesMulti[getIdTypes(a.getHullType())]) * 10;
-                outputtemp[d] = t;
+                outputtemp2[d] = t;
                 d++;
             }
         }
-        d=0;
 
+        d=0;
         for(ShipData a : shipDatas) {
             Object[] keys = a.getSpawnWeight().keySet().toArray();
             for (int b = 0; b < a.getSpawnWeight().size(); b++) {
                 String key = (String)keys[b];
-                output.put(key, (int)(outputtemp[d]+outputtemp2[d])/2);
+                output.put(key, (int) Math.max((outputtemp[d]+outputtemp2[d])/2,1));
+                d++;
             }
         }
         /*for(int a = 0; a < output.size(); a++){
@@ -388,12 +415,15 @@ public class LordGenerator {
         ArrayList<ShipData> ships = new ArrayList<>();
         int maxLoops = 5;
         maxLoops = fleetGeneratorTypes.size()!=0 ? maxLoops : 0;
-        log.info("  attempting to generate ships...");
-        while (availableShipData.getUnorganizedShips().size() != 0 && ships.size() < maxShip && maxLoops > 0) {
+        int targetShip = (int) ((Math.random()*(maxShip-minShip)) + minShip);
+        log.info("  attempting to generate ships with a allShips, minShip, maxShip, targetShip of: "+useAllShips+", "+minShip+", "+maxShip+", "+targetShip);
+        log.info("  size ratio is: "+sizeratio[0]+", "+sizeratio[1]+", "+sizeratio[2]+", "+sizeratio[3]);
+        log.info("  type ratio is: "+typeratio[0]+", "+typeratio[1]+", "+typeratio[2]);
+        while (availableShipData.getUnorganizedShips().size() != 0 && ships.size() < targetShip && maxLoops > 0) {
             //so, since this is the stage were I get any ships I might want, lets ignore the max ship count here.
             AvailableShipData skimmedShips = fleetGeneratorTypes.get(getValueFromWeight(fleetGeneratorRatio)).skimPossibleShips(availableShipData);
             log.info("      got "+skimmedShips.getUnorganizedShips().size()+" ships from skiming..");
-            ArrayList<ShipData> newShips = getShips(skimmedShips,sizeratio,typeratio,maxShip);
+            ArrayList<ShipData> newShips = getShips(skimmedShips,sizeratio,typeratio,targetShip);
             log.info("      got "+newShips.size()+" ships after adjusting for sizes...");
             for (ShipData a : newShips){
                 ships.add(a);
@@ -407,7 +437,7 @@ public class LordGenerator {
             log.info("  attempting to generate ships using first backup...");
             AvailableShipData skimmedShips = fleetGeneratorBackup.skimPossibleShips(availableShipData);
             log.info("      got "+skimmedShips.getUnorganizedShips().size()+" ships from skiming..");
-            ArrayList<ShipData> newShips = getShips(skimmedShips,sizeratio,typeratio,maxShip);
+            ArrayList<ShipData> newShips = getShips(skimmedShips,sizeratio,typeratio,targetShip);
             log.info("      got "+newShips.size()+" ships after adjusting for sizes...");
             for (ShipData a : newShips){
                 ships.add(a);
@@ -450,12 +480,26 @@ public class LordGenerator {
         log.info("DEBUG: attempting to get available ships with a factionID, allShips of: "+factionID+", "+allShips);
         Set<String> a = null;
         AvailableShipData b=null;
+        //Global.getSector().getFaction("").ship
         if (!allShips) {
             log.info("DEBUG: attempting to get priority ships...");
-            a = Global.getSector().getFaction(factionID).getPriorityShips();
-            //a = Global.getSector().getFaction(factionID).getFactionSpec().getPriorityShips();
+            //a = Global.getSector().getFaction(factionID).getPriorityShips();//NOTE: this would only get ships that are prioritized. sounds great, but factions like the heg only have 5 prioritized ships...
+            a = Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.CARRIER_LARGE);
+            a.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.CARRIER_MEDIUM));
+            a.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.CARRIER_SMALL));
+
+            a.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.COMBAT_CAPITAL));
+            a.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.COMBAT_LARGE));
+            a.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.COMBAT_MEDIUM));
+            a.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.COMBAT_SMALL));
+            a.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.COMBAT_SMALL_FOR_SMALL_FLEET));
+
+            a.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.PHASE_CAPITAL));
+            a.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.PHASE_LARGE));
+            a.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.PHASE_MEDIUM));
+            a.addAll(Global.getSector().getFaction(factionID).getVariantsForRole(ShipRoles.PHASE_SMALL));
             if (a.size() != 0) {
-                b = AvailableShipData.getNewASD(a);
+                b = AvailableShipData.getNewASD(a,true);
                 log.info("DEBUG: got available ships ships (from priority) as: "+b.getUnorganizedShips().size());
             }
         }
@@ -464,7 +508,7 @@ public class LordGenerator {
             a = Global.getSector().getFaction(factionID).getKnownShips();
             //a = Global.getSector().getFaction(factionID).getFactionSpec().getKnownShips();
             if (a.size() != 0) {
-                b = AvailableShipData.getNewASD(a);
+                b = AvailableShipData.getNewASD(a,false);
                 log.info("DEBUG: got available ships ships (from all) as: "+b.getUnorganizedShips().size());
             }
         }

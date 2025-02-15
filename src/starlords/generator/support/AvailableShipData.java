@@ -6,12 +6,9 @@ import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.impl.campaign.ids.ShipRoles;
 import com.fs.starfarer.api.loading.RoleEntryAPI;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import org.apache.log4j.Logger;
-import starlords.generator.LordGenerator;
 import starlords.lunaSettings.StoredSettings;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -41,10 +38,26 @@ public class AvailableShipData {
         startupType(HULLTYPE_TUG);
         startupType(HULLTYPE_UTILITY);
     }
-    public static AvailableShipData getNewASD(Set<String> hullIds){
-        return getNewASD(hullIds,defaultShips);
+    public static AvailableShipData getNewASD(Set<String> hullIds,boolean vareants){
+        if (vareants) return getNewASDFromVariants(hullIds,defaultShips);
+        return getNewASDFromHulls(hullIds,defaultShips);
     }
-    public static AvailableShipData getNewASD(Set<String> hullIds,AvailableShipData AvailableShips){
+    public static AvailableShipData getNewASDFromVariants(Set<String> variantIDs, AvailableShipData AvailableShips){
+        //log.info("DEBUG: attempting to get a new ASD with hullIds, AvailableShips: "+hullIds.size()+", "+AvailableShips.getUnorganizedShips().size());
+        AvailableShipData b = new AvailableShipData();
+        for (String a : variantIDs){
+            //log.info("Looking at a hull of ID: "+a);
+            ShipData c = AvailableShips.unorganizedShips.get(Global.getSettings().getVariant(a).getHullSpec().getHullId());
+            if (c != null && c.getSpawnWeight().get(a) != null){
+                //todo: I don't know how to get this to respect a factions faction specific variants. I must fix this at a latter date
+                //log.info("  adding a new ShipData:");
+                b.addShip(a,c.getSpawnWeight().get(a),c.getHullType());
+            }
+        }
+        return b;
+
+    }
+    public static AvailableShipData getNewASDFromHulls(Set<String> hullIds, AvailableShipData AvailableShips){
         //log.info("DEBUG: attempting to get a new ASD with hullIds, AvailableShips: "+hullIds.size()+", "+AvailableShips.getUnorganizedShips().size());
         AvailableShipData b = new AvailableShipData();
         for (String a : hullIds){

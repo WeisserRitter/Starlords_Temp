@@ -21,6 +21,9 @@ public class ShipData {
         this.hullType=hullType;
     }
     public void addVariant(String id, float weight){
-       spawnWeight.put(id,weight);
+        if (spawnWeight.get(id) != null && spawnWeight.get(id) > weight){
+            return;
+        }
+        spawnWeight.put(id,weight);
     }
 }
