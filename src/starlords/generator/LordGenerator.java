@@ -19,7 +19,9 @@ import starlords.generator.support.AvailableShipData;
 import starlords.generator.support.ShipData;
 import starlords.generator.types.flagship.LordFlagshipPickerBase;
 import starlords.generator.types.fleet.LordFleetGeneratorBase;
+import starlords.listeners.LordGeneratorListener;
 import starlords.lunaSettings.StoredSettings;
+import starlords.person.Lord;
 import starlords.person.LordTemplate;
 import starlords.person.PosdoLordTemplate;
 import starlords.util.WeightedRandom;
@@ -93,20 +95,38 @@ public class LordGenerator {
     public static void createStarlord(String factionID){
         PosdoLordTemplate lord = generateStarlord(factionID);
         lord.preferredItemId = getFavCommodity(factionID);
+        LordGeneratorListener.runEditLord(lord);
         logLord(lord);
-        LordController.addLordMidGame(new LordTemplate(lord));
+
+        LordTemplate template = new LordTemplate(lord);
+        Lord currLord = new Lord(template);
+        LordGeneratorListener.runEditLordPersons(currLord.getLordAPI());
+
+        LordController.addLordMidGame(template,currLord);
     }
     public static void createStarlord(String factionID, com.fs.starfarer.api.campaign.SectorEntityToken system, float x, float y){
         PosdoLordTemplate lord = generateStarlord(factionID);
         lord.preferredItemId = getFavCommodity(factionID);
+        LordGeneratorListener.runEditLord(lord);
         logLord(lord);
-        LordController.addLordMidGame(new LordTemplate(lord),system,x,y);
+
+        LordTemplate template = new LordTemplate(lord);
+        Lord currLord = new Lord(template);
+        LordGeneratorListener.runEditLordPersons(currLord.getLordAPI());
+
+        LordController.addLordMidGame(template,currLord,system,x,y);
     }
     public static void createStarlord(String factionID,MarketAPI market){
         PosdoLordTemplate lord = generateStarlord(factionID);
         lord.preferredItemId = getFavCommodity(market);
+        LordGeneratorListener.runEditLord(lord);
         logLord(lord);
-        LordController.addLordMidGame(new LordTemplate(lord),market);
+
+        LordTemplate template = new LordTemplate(lord);
+        Lord currLord = new Lord(template);
+        LordGeneratorListener.runEditLordPersons(currLord.getLordAPI());
+
+        LordController.addLordMidGame(template,market,currLord);
     }
     @SneakyThrows
     public static PosdoLordTemplate generateStarlord(String factionID){
@@ -422,39 +442,39 @@ public class LordGenerator {
         while (availableShipData.getUnorganizedShips().size() != 0 && ships.size() < targetShip && maxLoops > 0) {
             //so, since this is the stage were I get any ships I might want, lets ignore the max ship count here.
             AvailableShipData skimmedShips = fleetGeneratorTypes.get(getValueFromWeight(fleetGeneratorRatio)).skimPossibleShips(availableShipData);
-            log.info("      got "+skimmedShips.getUnorganizedShips().size()+" ships from skiming..");
+            //log.info("      got "+skimmedShips.getUnorganizedShips().size()+" ships from skiming..");
             ArrayList<ShipData> newShips = getShips(skimmedShips,sizeratio,typeratio,targetShip);
-            log.info("      got "+newShips.size()+" ships after adjusting for sizes...");
+            //log.info("      got "+newShips.size()+" ships after adjusting for sizes...");
             for (ShipData a : newShips){
                 ships.add(a);
                 availableShipData.removeShip(a.getHullID());//this already happens in getShips.
             }
-            log.info("      got "+availableShipData.getUnorganizedShips().size()+" possible ships left to grab...");
+            //log.info("      got "+availableShipData.getUnorganizedShips().size()+" possible ships left to grab...");
             maxLoops--;
         }
         //backup generator. runs if I failed to reach the min number of ships I wanted with more picky generators.
         if(ships.size() < minShip){
             log.info("  attempting to generate ships using first backup...");
             AvailableShipData skimmedShips = fleetGeneratorBackup.skimPossibleShips(availableShipData);
-            log.info("      got "+skimmedShips.getUnorganizedShips().size()+" ships from skiming..");
+            //log.info("      got "+skimmedShips.getUnorganizedShips().size()+" ships from skiming..");
             ArrayList<ShipData> newShips = getShips(skimmedShips,sizeratio,typeratio,targetShip);
-            log.info("      got "+newShips.size()+" ships after adjusting for sizes...");
+            //log.info("      got "+newShips.size()+" ships after adjusting for sizes...");
             for (ShipData a : newShips){
                 ships.add(a);
                 availableShipData.removeShip(a.getHullID());//this already happens in getShips.
             }
-            log.info("      got "+availableShipData.getUnorganizedShips().size()+" possible ships left to grab...");
+            //log.info("      got "+availableShipData.getUnorganizedShips().size()+" possible ships left to grab...");
         }
         //final backup generator. only activates if I still don't have enough ships (signaling that my ship ratios cannot produce ships)
         if (ships.size() < minShip){
             log.info("  attempting to generate ships using final backup...");
             ArrayList<ShipData> newShips = getShips(availableShipData,new int[]{1,1,1,1},new int[]{1,1,1},minShip);
-            log.info("      got "+newShips.size()+" ships from size with no skimming...");
+            //log.info("      got "+newShips.size()+" ships from size with no skimming...");
             for (ShipData a : newShips){
                 ships.add(a);
                 availableShipData.removeShip(a.getHullID());//this already happens in getShips.
             }
-            log.info("      got "+availableShipData.getUnorganizedShips().size()+" possible ships left to grab...");
+            //log.info("      got "+availableShipData.getUnorganizedShips().size()+" possible ships left to grab...");
         }
         //generate ship ratio
         lord.shipPrefs = assingFleetSpawnWeights(ships,sizeratio,typeratio);

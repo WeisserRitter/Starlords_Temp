@@ -10,6 +10,7 @@ import starlords.controllers.*;
 import starlords.ai.LordAI;
 import starlords.faction.LawProposal;
 import starlords.faction.Lawset;
+import starlords.generator.NewGameLordPicker;
 import starlords.listeners.BattleListener;
 import starlords.listeners.MarketStateChangeListener;
 import starlords.listeners.MarketStateChangeNexListener;
@@ -20,6 +21,7 @@ import starlords.person.Lord;
 import starlords.person.LordEvent;
 import starlords.scripts.ActionCompleteScript;
 import starlords.ui.*;
+import starlords.util.Constants;
 import starlords.util.Utils;
 
 import java.util.HashMap;
@@ -89,6 +91,11 @@ public class LordsModPlugin extends BaseModPlugin {
             sector.getListenerManager().addListener(new MarketStateChangeNexListener(), true);
         }
         sector.registerPlugin(new LordsCampaignPlugin());
+
+        if (newGame && Constants.ENABLE_NEW_LORDS_ON_GAME_START){
+            NewGameLordPicker.instance.addAll();
+        }
+        NewGameLordPicker.instance = null;
     }
 
 

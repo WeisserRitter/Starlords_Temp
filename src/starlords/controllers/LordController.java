@@ -15,6 +15,7 @@ import com.fs.starfarer.api.impl.campaign.ids.*;
 import lombok.Getter;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import starlords.listeners.LordGeneratorListener;
 import starlords.person.Lord;
 import starlords.person.LordTemplate;
 import starlords.ui.LordsIntelPlugin;
@@ -59,10 +60,16 @@ public class LordController {
         return lordsMap.get(id);
     }
 
-    public static CampaignFleetAPI addLordMidGame(LordTemplate template,MarketAPI lordMarket) {
-        //'add lord' copied code was removed, do to it already being ran by default.
-        Lord currLord = new Lord(template);
-
+    public static CampaignFleetAPI addLordMidGame(LordTemplate template,Lord currLord) {
+        return addLordMidGame(template, (MarketAPI) null,currLord);
+    }
+    public static CampaignFleetAPI addLordMidGame(LordTemplate template,Lord currLord,com.fs.starfarer.api.campaign.SectorEntityToken system, float x, float y) {
+        CampaignFleetAPI fleet = addLordMidGame(template,currLord);
+        system.getContainingLocation().addEntity(fleet);
+        fleet.setLocation(x, y);
+        return fleet;
+    }
+    public static CampaignFleetAPI addLordMidGame(LordTemplate template,MarketAPI lordMarket,Lord currLord) {
         //decided the lords spawn.
         if (lordMarket == null) {
             if (currLord.getFiefs().isEmpty()) {
@@ -115,14 +122,18 @@ public class LordController {
 
         return fleet;
     }
+    public static CampaignFleetAPI addLordMidGame(LordTemplate template,MarketAPI lordMarket) {
+        //'add lord' copied code was removed, do to it already being ran by default.
+        Lord currLord = new Lord(template);
+        return addLordMidGame(template,lordMarket,currLord);
+    }
     public static CampaignFleetAPI addLordMidGame(LordTemplate template,com.fs.starfarer.api.campaign.SectorEntityToken system, float x, float y) {
-        CampaignFleetAPI fleet = addLordMidGame(template);
-        system.getContainingLocation().addEntity(fleet);
-        fleet.setLocation(x, y);
-        return fleet;
+        Lord currLord = new Lord(template);
+        return addLordMidGame(template,currLord,system,x,y);
     }
     public static CampaignFleetAPI addLordMidGame(LordTemplate template){
-        return addLordMidGame(template,null);
+        Lord currLord = new Lord(template);
+        return addLordMidGame(template, currLord);
     }
     public static void removeLordMidGame(Lord lord){
         //attempt to remove a saved lord memory, provided it exists (I don't understand memory.)

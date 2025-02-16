@@ -1,4 +1,33 @@
 fieldID,fieldName,fieldType,defaultValue,secondaryValue,fieldDescription,minValue,maxValue,tab
+Header_MainSettings,,Header,Fetures,,,,,Fetures
+text_MainSettings,,Text,This is the area were you can enable / disable fetures.,,,,,Fetures
+fetures_newLordsInNewGame,Enable additonal lords on startup,Boolean,false,,"If set to true, when starting a new game factions will create there own randomly generated starlords, provided they do not already have any (changable in the _ settings)",,,Fetures
+,,,,,,,,
+,,,,,,,,
+EL_EnableAdditionalLords,Enable additonal lords for all faction,Boolean,false,,"if set to true, every faction will beable to gain additional starlords. regardless of if they already have starlords or not",,,Exstra Lords
+,,,,,,,,
+Header_LordsPerSize,,Header,Lords Per faction Size,,,,,Exstra Lords
+text_LordsPerSize,,Text,This handles the number of lords generated per total market size of a given faction. ,,,,,Exstra Lords
+EL_T0PerSize,Tier 0 starlords per size,Double,0.0589,,,0,1,Exstra Lords
+EL_T1PerSize,Tier 1 starlords per size,Double,0.1333,,,0,1,Exstra Lords
+EL_T2PerSize,Tier 2 starlords per size,Double,0,,,0,1,Exstra Lords
+,,,,,,,,
+Header_LordsAdditional,,Header,Additional Lords,,,,,Exstra Lords
+text_LordsAdditional,,Text,This handles the number of additonal lords generated in each faction. this is a static amount,,,,,Exstra Lords
+EL_T0Additional,Additional tier 0 starlords,Double,0,,,0,1,Exstra Lords
+EL_T1Additional,Additional tier 1 starlords,Double,0,,,0,1,Exstra Lords
+EL_T2Additional,Additional tier 2 starlords,Double,1,,,0,1,Exstra Lords
+,,,,,,,,
+Header_LordsOddsOfFief,,Header,Odds Of fief,,,,,Exstra Lords
+text_LordsOddsOfFief,,Text,"This handles the odds of a given starlord of a given tier having a fief at game start.
+please keep in mind that if to many starlords are selected for a fief, some starlords will be compleatly unable to gain a fief, regardless of how high you set this setting",,,,,Exstra Lords
+EL_T0OddsOfFief,Odds of fief for tier 0 starlords,Double,0.589,,,0,1,Exstra Lords
+EL_T1OddsOfFief,Odds of fief for tier 1 starlords,Double,0.9,,,0,1,Exstra Lords
+EL_T2OddsOfFief,Odds of fief for tier 2 starlords,Double,1,,,0,1,Exstra Lords
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
 Header_LordLevel,,Header,Lord level ratio,,,,,Generator
 text_lordLevel,,Text,This handles the ratio of possable lord levels,,,,,Generator
 generator_lordLevel_min,Mim lord level,Int,1,,,1,100,Generator

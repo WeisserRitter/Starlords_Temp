@@ -7,6 +7,7 @@ import lunalib.lunaSettings.LunaSettings;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import starlords.generator.LordGenerator;
+import starlords.generator.NewGameLordPicker;
 import starlords.generator.support.AvailableShipData;
 import starlords.generator.types.flagship.LordFlagshipPickerBase;
 import starlords.generator.types.flagship.LordFlagshipPicker_Cost;
@@ -18,6 +19,8 @@ import starlords.generator.types.fleet.LordFleetGenerator_Hullmod;
 import starlords.generator.types.fleet.LordFleetGenerator_System;
 import starlords.util.Constants;
 import starlords.util.WeightedRandom;
+
+import java.util.Iterator;
 
 public class StoredSettings {
     public static void getSettings(){
@@ -32,8 +35,10 @@ public class StoredSettings {
         if (!Global.getSettings().getModManager().isModEnabled("lunalib")) return;
         LunaSettings.addSettingsListener(new ApplySettingsOnChange());
     }
+    @SneakyThrows
     private static void getLunaSettings(){
-        Logger log = Global.getLogger(StoredSettings.class);;
+        Logger log = Global.getLogger(StoredSettings.class);
+        //lord generator settings
         log.info("DEBUG: attempting to get lunaSettings");
         LordGenerator.setStarlordLevelRatio(getLunaWeightedRandom("generator_lordLevel"));
         LordGenerator.setSizeRatio(new WeightedRandom[]{
@@ -81,16 +86,40 @@ public class StoredSettings {
         LordGenerator.setShipSpawnRatio(getLunaWeightedRandom("generator_shipSpawnRatio"));
         LordGenerator.setMaxShipRatio(getLunaWeightedRandom("generator_maxShipSpawnRatio"));
         LordGenerator.setMinShipRatio(getLunaWeightedRandom("generator_minShipSpawnRatio"));
-        //LordGenerator.setMinShipRatio(getLunaWeightedRandom("generator_lordLevel"));
-        //LordGenerator.setMaxShipRatio(getLunaWeightedRandom("generator_lordLevel"));
 
+
+        //lord 'add additional lords to startup' settings
+        NewGameLordPicker picker = new NewGameLordPicker();
+        picker.setAllowAdditionalLords(LunaSettings.getBoolean(Constants.MOD_ID,"EL_EnableAdditionalLords"));
+
+        picker.setT0PerSize(LunaSettings.getDouble(Constants.MOD_ID,"EL_T0PerSize"));
+        picker.setT0Addition(LunaSettings.getDouble(Constants.MOD_ID,"EL_T0Additional"));
+        picker.setT0oddsOfFief(LunaSettings.getDouble(Constants.MOD_ID,"EL_T0OddsOfFief"));
+
+        picker.setT1PerSize(LunaSettings.getDouble(Constants.MOD_ID,"EL_T1PerSize"));
+        picker.setT1Addition(LunaSettings.getDouble(Constants.MOD_ID,"EL_T1Additional"));
+        picker.setT1oddsOfFief(LunaSettings.getDouble(Constants.MOD_ID,"EL_T1OddsOfFief"));
+
+        picker.setT2PerSize(LunaSettings.getDouble(Constants.MOD_ID,"EL_T2PerSize"));
+        picker.setT2Addition(LunaSettings.getDouble(Constants.MOD_ID,"EL_T2Additional"));
+        picker.setT2oddsOfFief(LunaSettings.getDouble(Constants.MOD_ID,"EL_T2OddsOfFief"));
+
+
+        JSONObject json = Global.getSettings().getMergedJSONForMod("data/generator/starlord_generaterSettings.json",Constants.MOD_ID);
+        JSONObject exscludedFactions = json.getJSONObject("excluded_factions");
+        for (Iterator it = exscludedFactions.keys(); it.hasNext(); ) {
+            String key = (String) it.next();
+            NewGameLordPicker.getExcludeFactions().add(exscludedFactions.getString(key));
+        }
+        Constants.ENABLE_NEW_LORDS_ON_GAME_START = LunaSettings.getBoolean(Constants.MOD_ID,"fetures_newLordsInNewGame");
+        NewGameLordPicker.instance = picker;
         log.info("DEBUG: luna settings loaded successfully.");
     }
     @SneakyThrows
     private static void getConfigSettings(){
-        JSONObject json = Global.getSettings().getMergedJSONForMod("data/generator/starlord_generaterSettings.json",Constants.MOD_ID);
-        //LordGenerator.set getConfigWeightedRandom("",json);
         Logger log = Global.getLogger(StoredSettings.class);;
+        //lord generator settings
+        JSONObject json = Global.getSettings().getMergedJSONForMod("data/generator/starlord_generaterSettings.json",Constants.MOD_ID);
         log.info("DEBUG: attempting to get normal config settings");
         LordGenerator.setStarlordLevelRatio(getConfigWeightedRandom("generator_lordLevel",json));
         LordGenerator.setSizeRatio(new WeightedRandom[]{
@@ -138,8 +167,39 @@ public class StoredSettings {
         LordGenerator.setMinShipRatio(getConfigWeightedRandom("generator_minShipSpawnRatio",json));
 
         LordGenerator.setShipSpawnRatio(getConfigWeightedRandom("generator_shipSpawnRatio",json));
+
+
+
+        //lord 'add additional lords to startup' settings
+        NewGameLordPicker picker = new NewGameLordPicker();
+        picker.setAllowAdditionalLords(json.getBoolean("EL_EnableAdditionalLords"));
+
+        picker.setT0PerSize(json.getDouble("EL_T0PerSize"));
+        picker.setT0Addition(json.getDouble("EL_T0Additional"));
+        picker.setT0oddsOfFief(json.getDouble("EL_T0OddsOfFief"));
+
+        picker.setT1PerSize(json.getDouble("EL_T1PerSize"));
+        picker.setT1Addition(json.getDouble("EL_T1Additional"));
+        picker.setT1oddsOfFief(json.getDouble("EL_T1OddsOfFief"));
+
+        picker.setT2PerSize(json.getDouble("EL_T2PerSize"));
+        picker.setT2Addition(json.getDouble("EL_T2Additional"));
+        picker.setT2oddsOfFief(json.getDouble("EL_T2OddsOfFief"));
+
+        JSONObject exscludedFactions = json.getJSONObject("excluded_factions");
+        for (Iterator it = exscludedFactions.keys(); it.hasNext(); ) {
+            String key = (String) it.next();
+            NewGameLordPicker.getExcludeFactions().add(exscludedFactions.getString(key));
+        }
+        Constants.ENABLE_NEW_LORDS_ON_GAME_START = json.getBoolean("fetures_newLordsInNewGame");
+        NewGameLordPicker.instance = picker;
+        log.info("DEBUG: luna settings loaded successfully.");
+
         log.info("DEBUG: normal config settings loaded successfully.");
     }
+
+
+
 
     private static WeightedRandom getLunaWeightedRandom(String name){
         int min = LunaSettings.getInt(Constants.MOD_ID,name+"_min");
