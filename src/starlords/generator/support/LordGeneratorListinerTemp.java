@@ -9,6 +9,6 @@ public class LordGeneratorListinerTemp extends LordGeneratorListener {
     @Override
     public void editLord(PosdoLordTemplate lord) {
         lord.ranking=tier;
-        lord.fief=null;
+        lord.fief=fief;
     }
 }

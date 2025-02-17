@@ -96,7 +96,7 @@
   "generator_flagshipPicker_HP": 1,
 
   "excluded_factions": {
-    #"0": "player",
+    "0": "player",
     "1": "derelict"
   },
 

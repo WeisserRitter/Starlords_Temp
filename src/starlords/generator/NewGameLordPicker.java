@@ -23,6 +23,9 @@ public class NewGameLordPicker {
     @Setter
     @Getter
     private static ArrayList<String> excludeFactions = new ArrayList<>();
+    @Getter
+    @Setter
+    private static HashMap<String,Double> bonusFactionLordSize = new HashMap<>();
     @Setter
     private double T0PerSize;
     @Setter
@@ -80,7 +83,8 @@ public class NewGameLordPicker {
         log.info("DEBUG: got "+factionMarkets.size()+" diffrent factions to add lords to...");
         LordGeneratorListinerTemp listiner = new LordGeneratorListinerTemp();
         for (Object factionID : factionMarkets.keySet().toArray()){
-            addFaction((String) factionID, factionMarkets.get((String) factionID),factionLords.get((String)factionID) ,factionSize.get((String)factionID),listiner);
+            int size = factionSize.get((String)factionID);
+            addFaction((String) factionID, factionMarkets.get((String) factionID),factionLords.get((String)factionID) ,size,listiner);
         }
         LordGeneratorListener.removeListener(listiner);
     }
@@ -90,6 +94,11 @@ public class NewGameLordPicker {
         int T0Lords = (int) ((size*T0PerSize)+T0Addition);
         int T1Lords = (int) ((size*T1PerSize)+T1Addition);
         int T2Lords = (int) ((size*T2PerSize)+T2Addition);
+        double multi = 1;
+        if (bonusFactionLordSize.get((String)factionID) != null)multi= bonusFactionLordSize.get((String) factionID);
+        T0Lords*=multi;
+        T1Lords*=multi;
+        T2Lords*=multi;
         log.info("DEBUG: got t0,t1,t2 target lords: "+T0Lords+", "+T1Lords+", "+T2Lords);
         for (Lord a: lords){
             switch (a.getRanking()){
@@ -108,8 +117,8 @@ public class NewGameLordPicker {
         log.info("DEBUG: adding T2 lords... ");
         listiner.tier = 2;
         for (int a = 0; a < T2Lords; a++) {
-            listiner.fief=null;
-            if (markets.size() != 0 && T2oddsOfFief < Math.random()){
+            listiner.fief="null";
+            if (markets.size() > 0 && T2oddsOfFief < Math.random()){
                 int id = (int) (Math.random()*markets.size());
                 listiner.fief = markets.get(id).getId();
                 markets.remove(id);
@@ -120,8 +129,8 @@ public class NewGameLordPicker {
         log.info("DEBUG: adding T1 lords... ");
         listiner.tier = 1;
         for (int a = 0; a < T1Lords; a++) {
-            listiner.fief=null;
-            if (markets.size() != 0 && T1oddsOfFief < Math.random()){
+            listiner.fief="null";
+            if (markets.size() > 0 && T1oddsOfFief < Math.random()){
                 int id = (int) (Math.random()*markets.size());
                 listiner.fief = markets.get(id).getId();
                 markets.remove(id);
@@ -132,8 +141,8 @@ public class NewGameLordPicker {
         log.info("DEBUG: adding T0 lords... ");
         listiner.tier = 0;
         for (int a = 0; a < T0Lords; a++) {
-            listiner.fief=null;
-            if (markets.size() != 0 && T0oddsOfFief < Math.random()){
+            listiner.fief="null";
+            if (markets.size() > 0 && T0oddsOfFief < Math.random()){
                 int id = (int) (Math.random()*markets.size());
                 listiner.fief = markets.get(id).getId();
                 markets.remove(id);
