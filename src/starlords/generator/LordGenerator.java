@@ -1,15 +1,11 @@
 package starlords.generator;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.econ.MarketDemandAPI;
-import com.fs.starfarer.api.campaign.econ.MarketDemandDataAPI;
 import com.fs.starfarer.api.characters.FullName;
 import com.fs.starfarer.api.characters.PersonAPI;
-import com.fs.starfarer.api.impl.campaign.events.OfficerManagerEvent;
 import com.fs.starfarer.api.impl.campaign.ids.ShipRoles;
-import com.fs.starfarer.rpg.Person;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -19,8 +15,7 @@ import starlords.generator.support.AvailableShipData;
 import starlords.generator.support.ShipData;
 import starlords.generator.types.flagship.LordFlagshipPickerBase;
 import starlords.generator.types.fleet.LordFleetGeneratorBase;
-import starlords.listeners.LordGeneratorListener;
-import starlords.lunaSettings.StoredSettings;
+import starlords.listeners.LordGeneratorListener_base;
 import starlords.person.Lord;
 import starlords.person.LordTemplate;
 import starlords.person.PosdoLordTemplate;
@@ -79,8 +74,9 @@ public class LordGenerator {
     @Setter
     private static double oddsOfNoneSelectedFlagship;
 
-    private static final Logger log = Global.getLogger(LordGenerator.class);;
-
+    private static final Logger log = Global.getLogger(LordGenerator.class);
+    @Getter
+    private static Random random = new Random();
 
     public static void tempTest(){
         Logger log = Global.getLogger(LordGenerator.class);;
@@ -95,36 +91,36 @@ public class LordGenerator {
     public static void createStarlord(String factionID){
         PosdoLordTemplate lord = generateStarlord(factionID);
         lord.preferredItemId = getFavCommodity(factionID);
-        LordGeneratorListener.runEditLord(lord);
+        LordGeneratorListener_base.runEditLord(lord);
         logLord(lord);
 
         LordTemplate template = new LordTemplate(lord);
         Lord currLord = new Lord(template);
-        LordGeneratorListener.runEditLordPersons(currLord.getLordAPI());
+        LordGeneratorListener_base.runEditLordPersons(currLord.getLordAPI());
 
         LordController.addLordMidGame(template,currLord);
     }
     public static void createStarlord(String factionID, com.fs.starfarer.api.campaign.SectorEntityToken system, float x, float y){
         PosdoLordTemplate lord = generateStarlord(factionID);
         lord.preferredItemId = getFavCommodity(factionID);
-        LordGeneratorListener.runEditLord(lord);
+        LordGeneratorListener_base.runEditLord(lord);
         logLord(lord);
 
         LordTemplate template = new LordTemplate(lord);
         Lord currLord = new Lord(template);
-        LordGeneratorListener.runEditLordPersons(currLord.getLordAPI());
+        LordGeneratorListener_base.runEditLordPersons(currLord.getLordAPI());
 
         LordController.addLordMidGame(template,currLord,system,x,y);
     }
     public static void createStarlord(String factionID,MarketAPI market){
         PosdoLordTemplate lord = generateStarlord(factionID);
         lord.preferredItemId = getFavCommodity(market);
-        LordGeneratorListener.runEditLord(lord);
+        LordGeneratorListener_base.runEditLord(lord);
         logLord(lord);
 
         LordTemplate template = new LordTemplate(lord);
         Lord currLord = new Lord(template);
-        LordGeneratorListener.runEditLordPersons(currLord.getLordAPI());
+        LordGeneratorListener_base.runEditLordPersons(currLord.getLordAPI());
 
         LordController.addLordMidGame(template,market,currLord);
     }
@@ -220,17 +216,17 @@ public class LordGenerator {
             if (a.getFactionId().equals(factionID)) factionMarkets.add(a);
         }
         if (factionMarkets.size() != 0){
-            return getFavCommodity(factionMarkets.get((int) (Math.random()*factionMarkets.size())));
+            return getFavCommodity(factionMarkets.get((int) (random.nextInt(factionMarkets.size()))));
         }
         if (markets.size() != 0){
-            return getFavCommodity(markets.get((int) (Math.random()*markets.size())));
+            return getFavCommodity(markets.get((int) (random.nextInt(markets.size()))));
         }
         return null;
     }
     private static String getFavCommodity(MarketAPI market){
         List<MarketDemandAPI> a = market.getDemandData().getDemandList();
         if (a.size() == 0) return null;
-        return a.get((int) (Math.random()*a.size())).getBaseCommodity().getId();
+        return a.get((int) (random.nextInt(a.size()))).getBaseCommodity().getId();
     }
 
     private static void generateAllShipsForLord(PosdoLordTemplate lord, String factionID){
@@ -241,7 +237,7 @@ public class LordGenerator {
                 sizeRatio[3].getRandom()
         };
         if (sizeratio[0] == 0 && sizeratio[1] == 0 && sizeratio[2] == 0 && sizeratio[3] == 0){
-            sizeratio[(int)(Math.random() * 4)] = 1;
+            sizeratio[(int)(random.nextInt(4))] = 1;
         }
         int[] typeratio = {
                 typeRatio[0].getRandom(),
@@ -258,12 +254,12 @@ public class LordGenerator {
         log.info("  sizeRatio: "+sizeratio[0]+", "+sizeratio[1]+", "+sizeratio[2]+", "+sizeratio[3]);
         log.info("  typeRatio: "+typeratio[0]+", "+typeratio[1]+", "+typeratio[2]);
         if (typeratio[0] == 0 && typeratio[1] == 0 && typeratio[2] == 0){
-            typeratio[(int)(Math.random() * 3)] = 1;
+            typeratio[(int)(random.nextInt(3))] = 1;
         }
         int maxShip = maxShipRatio.getRandom();
         int minShip = minShipRatio.getRandom();
         maxShip = Math.max(maxShip,minShip);
-        boolean useAllShips = oddsOfNonePriorityShips > Math.random();
+        boolean useAllShips = oddsOfNonePriorityShips > random.nextDouble();
         //lord.shipPrefs=generateShips(factionID,useAllShips,minShip,maxShip,sizeratio,typeratio);
         generateShips(lord,factionID,useAllShips,minShip,maxShip,sizeratio,typeratio);
     }
@@ -435,7 +431,7 @@ public class LordGenerator {
         ArrayList<ShipData> ships = new ArrayList<>();
         int maxLoops = 5;
         maxLoops = fleetGeneratorTypes.size()!=0 ? maxLoops : 0;
-        int targetShip = (int) ((Math.random()*(maxShip-minShip)) + minShip);
+        int targetShip = (int) ((random.nextDouble() * (maxShip-minShip)) + minShip);
         log.info("  attempting to generate ships with a allShips, minShip, maxShip, targetShip of: "+useAllShips+", "+minShip+", "+maxShip+", "+targetShip);
         log.info("  size ratio is: "+sizeratio[0]+", "+sizeratio[1]+", "+sizeratio[2]+", "+sizeratio[3]);
         log.info("  type ratio is: "+typeratio[0]+", "+typeratio[1]+", "+typeratio[2]);
@@ -480,7 +476,7 @@ public class LordGenerator {
         lord.shipPrefs = assingFleetSpawnWeights(ships,sizeratio,typeratio);
 
         //get unselected ship for possible flagship if required.
-        if (availableShipData.getUnorganizedShips().size() != 0 && oddsOfNoneSelectedFlagship < Math.random()){
+        if (availableShipData.getUnorganizedShips().size() != 0 && oddsOfNoneSelectedFlagship < random.nextDouble()){
             ships = new ArrayList<>();
             for(Object a : availableShipData.getUnorganizedShips().values().toArray()){
                 ships.add((ShipData) a);
@@ -544,7 +540,7 @@ public class LordGenerator {
     }
 
     public static void generatePerson(PosdoLordTemplate lord,String factionID){
-        lord.isMale=isMaleChance < Math.random();
+        lord.isMale=isMaleChance < random.nextDouble();
         FullName.Gender gender = FullName.Gender.FEMALE;
         if (lord.isMale) gender = FullName.Gender.MALE;
 
@@ -556,7 +552,7 @@ public class LordGenerator {
 
     private static int getValueFromWeight(ArrayList<Double> weight){
         double totalValue = 0;
-        double randomValue = Math.random();
+        double randomValue = random.nextDouble();
         for (double a : weight){
             totalValue+=a;
         }
@@ -570,7 +566,7 @@ public class LordGenerator {
     }
     private static int getValueFromWeight(double[] weight){
         double totalValue = 0;
-        double randomValue = Math.random();
+        double randomValue = random.nextDouble();
         for (double a : weight){
             totalValue+=a;
         }

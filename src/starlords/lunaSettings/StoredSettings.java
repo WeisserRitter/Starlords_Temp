@@ -111,6 +111,11 @@ public class StoredSettings {
             String key = (String) it.next();
             NewGameLordPicker.getExcludeFactions().add(exscludedFactions.getString(key));
         }
+        JSONObject factionMultiplyer = json.getJSONObject("faction_multipliers");
+        for (Iterator it = factionMultiplyer.keys(); it.hasNext(); ) {
+            String key = (String) it.next();
+            NewGameLordPicker.getBonusFactionLordSize().put(key,factionMultiplyer.getDouble(key));
+        }
         Constants.ENABLE_NEW_LORDS_ON_GAME_START = LunaSettings.getBoolean(Constants.MOD_ID,"fetures_newLordsInNewGame");
         NewGameLordPicker.instance = picker;
         log.info("DEBUG: luna settings loaded successfully.");
@@ -190,6 +195,11 @@ public class StoredSettings {
         for (Iterator it = exscludedFactions.keys(); it.hasNext(); ) {
             String key = (String) it.next();
             NewGameLordPicker.getExcludeFactions().add(exscludedFactions.getString(key));
+        }
+        JSONObject factionMultiplyer = json.getJSONObject("faction_multipliers");
+        for (Iterator it = factionMultiplyer.keys(); it.hasNext(); ) {
+            String key = (String) it.next();
+            NewGameLordPicker.getBonusFactionLordSize().put(key,factionMultiplyer.getDouble(key));
         }
         Constants.ENABLE_NEW_LORDS_ON_GAME_START = json.getBoolean("fetures_newLordsInNewGame");
         NewGameLordPicker.instance = picker;

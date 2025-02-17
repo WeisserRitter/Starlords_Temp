@@ -1,9 +1,9 @@
 package starlords.generator.support;
 
-import starlords.listeners.LordGeneratorListener;
+import starlords.listeners.LordGeneratorListener_base;
 import starlords.person.PosdoLordTemplate;
 
-public class LordGeneratorListinerTemp extends LordGeneratorListener {
+public class LordGeneratorListinerTemp extends LordGeneratorListener_base {
     public int tier = 0;
     public String fief=null;
     @Override

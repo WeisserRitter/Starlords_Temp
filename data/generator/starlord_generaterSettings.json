@@ -97,7 +97,11 @@
 
   "excluded_factions": {
     "0": "player",
-    "1": "derelict"
+    "1": "derelict",
+    "2": "independent"
+  },
+  "faction_multipliers": {
+    "derelict": 1#1X derelict generated lords, for example.
   },
 
   "EL_EnableAdditionalLords": false,

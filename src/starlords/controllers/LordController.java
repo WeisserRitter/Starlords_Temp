@@ -1,6 +1,5 @@
 package starlords.controllers;
 
-import com.fs.starfarer.api.characters.PersonAPI;
 import starlords.ai.LordStrategicModule;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
@@ -15,7 +14,6 @@ import com.fs.starfarer.api.impl.campaign.ids.*;
 import lombok.Getter;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
-import starlords.listeners.LordGeneratorListener;
 import starlords.person.Lord;
 import starlords.person.LordTemplate;
 import starlords.ui.LordsIntelPlugin;

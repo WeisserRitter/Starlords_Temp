@@ -18,12 +18,12 @@ public class LordFleetGenerator_Hullmod extends LordFleetGeneratorBase{
         while(maxLoops > 0 && target == null) {
             ShipData a = input.getRandomShip();
             Object[] b = a.getSpawnWeight().keySet().toArray();
-            b = Global.getSettings().getVariant((String) b[(int) Math.random() * b.length]).getHullMods().toArray();
+            b = Global.getSettings().getVariant((String) b[LordGenerator.getRandom().nextInt(b.length)]).getHullMods().toArray();
             if (b.length == 0){
                 maxLoops--;
                 continue;
             }
-            target = (String) b[(int) Math.random() * b.length];
+            target = (String) b[(int) LordGenerator.getRandom().nextInt(b.length)];
             return super.skimPossibleShips(input);
             //target = Global.getSettings().getHullSpec(a.getHullID());
         }

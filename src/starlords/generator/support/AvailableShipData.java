@@ -7,6 +7,7 @@ import com.fs.starfarer.api.impl.campaign.ids.ShipRoles;
 import com.fs.starfarer.api.loading.RoleEntryAPI;
 import lombok.Getter;
 import org.apache.log4j.Logger;
+import starlords.generator.LordGenerator;
 import starlords.lunaSettings.StoredSettings;
 
 import java.util.HashMap;
@@ -202,7 +203,7 @@ public class AvailableShipData {
     public ShipData getRandomShip(){
         Object[] a = this.unorganizedShips.values().toArray();
         if (a.length == 0) return null;
-        return (ShipData) a[(int)(Math.random()*a.length)];
+        return (ShipData) a[(int)(LordGenerator.getRandom().nextInt(a.length))];
     }
     /*public ShipData getRandomShip(int[] types, int[] sizes){
         Object[] a = this.organizedShips.get(type).get(size).values().toArray();
@@ -212,6 +213,6 @@ public class AvailableShipData {
     public ShipData getRandomShip(String type,String size){
         Object[] a = this.organizedShips.get(type).get(size).values().toArray();
         if (a.length == 0) return null;
-        return (ShipData) a[(int)(Math.random()*a.length)];
+        return (ShipData) a[(int)(LordGenerator.getRandom().nextInt(a.length))];
     }
 }

@@ -1,6 +1,7 @@
 package starlords.generator.types.flagship;
 
 import com.fs.starfarer.api.Global;
+import starlords.generator.LordGenerator;
 import starlords.generator.support.ShipData;
 
 import java.util.ArrayList;
@@ -23,6 +24,6 @@ public class LordFlagshipPicker_HP extends LordFlagshipPickerBase{
             }
         }
         Object[] a = ship.getSpawnWeight().keySet().toArray();
-        return (String)a[(int) (Math.random()*a.length)];
+        return (String)a[(int) (LordGenerator.getRandom().nextInt(a.length))];
     }
 }
