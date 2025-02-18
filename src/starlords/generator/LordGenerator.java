@@ -564,7 +564,7 @@ public class LordGenerator {
         }
         return -1;//force a crash because I did something wrong and need to fix this.
     }
-    private static int getValueFromWeight(double[] weight){
+    public static int getValueFromWeight(double[] weight){
         double totalValue = 0;
         double randomValue = random.nextDouble();
         for (double a : weight){

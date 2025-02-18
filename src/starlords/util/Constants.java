@@ -4,6 +4,7 @@ import java.awt.*;
 
 public class Constants {
     public static boolean ENABLE_NEW_LORDS_ON_GAME_START;
+    public static boolean ENABLE_LIFE_AND_DEATH_SYSTEM;
     // How much wealth each lord gains as a baseline per month.
     // Lords are intended to gain most of their wealth through trade/governance,
     // this is just to make sure they can build something.

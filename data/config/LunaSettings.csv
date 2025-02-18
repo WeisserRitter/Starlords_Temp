@@ -14,8 +14,8 @@ EL_T2PerSize,Tier 2 starlords per size,Double,0,,,0,1,Exstra Lords
 ,,,,,,,,
 Header_LordsAdditional,,Header,Additional Lords,,,,,Exstra Lords
 text_LordsAdditional,,Text,This handles the number of additonal lords generated in each faction. this is a static amount,,,,,Exstra Lords
-EL_T0Additional,Additional tier 0 starlords,Double,0,,,0,1,Exstra Lords
-EL_T1Additional,Additional tier 1 starlords,Double,0,,,0,1,Exstra Lords
+EL_T0Additional,Additional tier 0 starlords,Double,0,,,0,1000,Exstra Lords
+EL_T1Additional,Additional tier 1 starlords,Double,0,,,0,1000,Exstra Lords
 EL_T2Additional,Additional tier 2 starlords,Double,1,,,0,1,Exstra Lords
 ,,,,,,,,
 Header_LordsOddsOfFief,,Header,Odds Of fief,,,,,Exstra Lords
@@ -25,7 +25,42 @@ EL_T0OddsOfFief,Odds of fief for tier 0 starlords,Double,0.589,,,0,1,Exstra Lord
 EL_T1OddsOfFief,Odds of fief for tier 1 starlords,Double,0.9,,,0,1,Exstra Lords
 EL_T2OddsOfFief,Odds of fief for tier 2 starlords,Double,1,,,0,1,Exstra Lords
 ,,,,,,,,
+Header_LAD_Fetures,,Header,Fetures,,,,,Life And Death
+Text_LAD_Fetures,,Text,Enable or disable parts of this feture here (only works if life and death is enabled),,,,,Life And Death
+LAD_AllowExstremests,Allow exstremests,Boolean,true,,,,,Life And Death
+LAD_AllowLife,Allow new lords to spawn,Boolean,true,,,,,Life And Death
+LAD_AllowDeath,Allow lords to die,Boolean,true,,,,,Life And Death
 ,,,,,,,,
+Header_LAD_HardLimits,,Header,Hard Limits,,,,,Life And Death
+Text_LAD_HardLimits,,Text,This is the limits to spawn amounts (the life and death system will not allow lords to spawn or be killed when past thease values),,,,,Life And Death
+LAD_hardMax,Maximum number of lords,Int,500,,,1,10000,Life And Death
+LAD_hardMin,Minimum number of lords,Int,20,,,1,10000,Life And Death
+,,,,,,,,
+Header_LAD_SoftLimits,,Header,Soft Limits,,,,,Life And Death
+Text_LAD_SoftLimits,,Text,this is the limits to spawn amounts (lord spawn / death raits will be modified by the _ values when past the soft min and max values),,,,,Life And Death
+LAD_softMax,Soft maximum number of lords,Int,400,,,1,10000,Life And Death
+LAD_softMin,Soft minimum number of lords,Int,100,,,1,10000,Life And Death
+LAD_softMax,Speedup per lord under max,Double,0.1,,,1,100,Life And Death
+LAD_softMin,Slowdown per lord over max,Double,0.1,,,1,100,Life And Death
+,,,,,,,,
+Header_LAD_PointGains,,Header,Lord Spawn Requirements And Gains,,,,,Life And Death
+Text_LAD_PointGains,,Text,"This controls the number of 'ponits' a market needs to generate to spawn a lord, as well as how quickly each market can generate ponits
+each market holds its own store of 'ponits' it uses to generate starlords. ponits are gained every month
+the equation used is ((size X multi per size) + (exspodent per size^size)) X stability loss
+",,,,,Life And Death
+LAD_PonitsRequired,Ponits required to generate lord,Int,400,,,1,10000,Life And Death
+LAD_PonitsSizeMulti,multi Per Size,Double,1,,,1,100,Life And Death
+LAD_PonitsSizeExscpoment,Power per size,Double,1,,,1,100,Life And Death
+LAD_PontsLostPerStability,Loss per missing stability,Double,0.2,,,1,100,Life And Death
+,,,,,,,,
+Header_LAD_SoftLimits,,Header,Odds Of Exstreamests,,,,,Life And Death
+Text_LAD_ponitsRequired,,Text,"this feture, if enabled, allows for 'exstreamests' to spawn (such as pirates, to luddic path) instead of the factions own starlord if stability is low enouth.",,,,,Life And Death
+LAD_StabilityforExstremests,Stability required for exstreamests,Int,3,,,0,10,Life And Death
+LAD_OddsOfExstremestsPerMissingStability,Odss of exstreamests per missing stability below par,Double,0.1,,,0,1,Life And Death
+,,,,,,,,
+Header_LAD_DeathChance,,Header,Death chance,,,,,Life And Death
+Text_LAD_ponitsRequired,,Text,This controls the chance a lord will upfront die in a given battle,,,,,Life And Death
+LAD_BaseOddsOfDeath,Base odds,Double,0.0001,,,0,1,Life And Death
 ,,,,,,,,
 ,,,,,,,,
 Header_LordLevel,,Header,Lord level ratio,,,,,Generator
