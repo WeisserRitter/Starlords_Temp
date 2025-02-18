@@ -144,7 +144,7 @@ public class LordController {
         RelationController.removeLord(lord);
         QuestController.removeLord(lord);
         PoliticsController.removeLord(lord);
-
+        EventController.removeFromAllEvents(lord);
         //remove the lord from the lists
         lordsList.remove(lord);
         lordsMap.remove(lord);

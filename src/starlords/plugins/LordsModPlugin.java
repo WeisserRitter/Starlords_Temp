@@ -83,8 +83,8 @@ public class LordsModPlugin extends BaseModPlugin {
         QuestController.getInstance(true);
         RelationController.getInstance(true);
         PoliticsController.getInstance(true);
+        LifeAndDeathController.getInstance(true);
 
-        RelationController.tryToAddlordMapMidGame();
         StoredSettings.attemptEnableLunalib();
         StoredSettings.getSettings();
         if (Utils.nexEnabled()) {

@@ -6,85 +6,106 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.log4j.Logger;
 import starlords.generator.LordGenerator;
+import starlords.lunaSettings.StoredSettings;
 import starlords.person.Lord;
 import starlords.util.Constants;
+import starlords.util.StringUtil;
 import starlords.util.WeightedRandom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static starlords.util.Constants.CATEGORY_UI;
+
 public class LifeAndDeathController extends BaseIntelPlugin{
     //no longer going to put this into the quest controler. it can stand on its own to feet. hopefully.
     private static LifeAndDeathController instance = null;
     private HashMap<MarketAPI,Double> markets = new HashMap<>();
+    public static boolean ENABLE_LIFE;
+    public static boolean ENABLE_DEATH;
+    public static boolean ENABLE_EXTREMISTS;
+    @Setter
     @Getter
-    private ArrayList<String> excludedFaction = new ArrayList<>();
+    private static ArrayList<String> excludedFactions = new ArrayList<>();
     @Getter
-    private HashMap<String,Double> extremestFactions = new HashMap<>();
     @Setter
-    private double gainPerSizeMulti;
+    private static HashMap<String,Double> extremestFactions = new HashMap<>();
     @Setter
-    private double gainPerSizeExponent;
+    private static double gainPerSizeMulti;
     @Setter
-    private double stabilityLossMulti;
+    private static double gainPerSizeExponent;
+    @Setter
+    private static double stabilityLossMulti;
 
     @Setter
-    private int maxLords;
+    private static int maxLords;
     @Setter
-    private int minLords;
+    private static int minLords;
 
     @Setter
-    private int softMaxLords;
+    private static int softMaxLords;
     @Setter
-    private int softMinLords;
+    private static int softMinLords;
     @Setter
-    private double slowDownPerExtraLord;
+    private static double slowDownPerExtraLord;
     @Setter
-    private double speedUpPerExtraLord;
+    private static double speedUpPerMissingLord;
 
     @Setter
-    private int stabilityReqForExtremists;
+    private static int stabilityReqForExtremists;
     @Setter
-    private double oddsOfExtremistsPerStabilityLoss;
-
-    private WeightedRandom pointsOnMarketCreation;
+    private static double oddsOfExtremistsPerStabilityLoss;
 
     @Setter
-    private double oddsOfDeath;
+    private static WeightedRandom pointsOnMarketCreation;
+
     @Setter
-    private int requiredPoints;
+    private static double oddsOfDeath;
+    @Setter
+    private static int requiredPoints;
+
+    private static Logger log = Global.getLogger(LifeAndDeathController.class);
     private LifeAndDeathController(){
-        for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()){
-            String a = market.getId();
-            addMarket(Global.getSector().getEconomy().getMarket(a));
-        }
+        setHidden(true);
     }
     public boolean attemptToKillStalord(Lord lord){
-        if (!Constants.ENABLE_LIFE_AND_DEATH_SYSTEM ||
+        //todo: after a starlord is killed, make they who liked the dead dislike the killer.
+        if (!ENABLE_DEATH ||
+            !Constants.ENABLE_LIFE_AND_DEATH_SYSTEM ||
             LordController.getLordsList().size() <= minLords ||
-            LordGenerator.getRandom().nextDouble() < oddsOfDeath ||
+            LordGenerator.getRandom().nextDouble() >= oddsOfDeath ||
             lord.getLordAPI().hasTag(Lord.TAG_IMMORTAL)) return false;
-        //todo: make this so it puts out a intel saying they are dead.
+        log.info("DEBUG: killing a starlord. poor soul");
         LordController.removeLordMidGame(lord);
         return true;
     }
     public void runMonth(){
-        if (!Constants.ENABLE_LIFE_AND_DEATH_SYSTEM || LordController.getLordsList().size() >= maxLords) return;
+        log.info("DEBUG: attempting to acquire additional starlords from time... with a value of: "+!ENABLE_LIFE +", "+!Constants.ENABLE_LIFE_AND_DEATH_SYSTEM+", "+(LordController.getLordsList().size()+" >= "+maxLords));
+        if (!ENABLE_LIFE || !Constants.ENABLE_LIFE_AND_DEATH_SYSTEM || LordController.getLordsList().size() >= maxLords) return;
+        log.info("DEBUG: data enabled. continueing...");
+        //lord generator settings
         for(MarketAPI a : Global.getSector().getEconomy().getMarketsCopy()){
             MarketAPI market = Global.getSector().getEconomy().getMarket(a.getId());
-            if (excludedFaction.contains(market.getFactionId())) continue;
+            if (excludedFactions.contains(market.getFactionId())) continue;
             if (markets.get(market) == null) addMarket(market);
             addMarketsMonthlyPonits( market);
             attemptToSpawnLord( market);
+            log.info("  market "+market.getId()+" has "+getPonits(market)+" points so far...");
         }
     }
     public void attemptToSpawnLord(MarketAPI market){
         while(markets.get(market) >= requiredPoints){
             markets.put(market,markets.get(market)-requiredPoints);
             LordGenerator.createStarlord(getSpawnedLordFaction(market),market);
-            //todo: put the intell here to saw that a new lord has been spawned. how does that even work again?
+            Lord lord = LordController.getLordsList().get(LordController.getLordsList().size()-1);
+            Global.getSector().getCampaignUI().addMessage(
+                    StringUtil.getString(CATEGORY_UI, "lord_spawned",
+                            lord.getTitle() + " " + lord.getLordAPI().getNameString(),
+                            lord.getFaction().getDisplayName()),
+                    lord.getFaction().getBaseUIColor());
         }
     }
     private String getSpawnedLordFaction(MarketAPI market){
@@ -92,7 +113,7 @@ public class LifeAndDeathController extends BaseIntelPlugin{
         //short circlet this loop if lord is guaranteed to be part of the main faction.
         if (stab > stabilityReqForExtremists) return market.getFactionId();
         //get extremest faction if required
-        if (LordGenerator.getRandom().nextDouble() > ((stabilityReqForExtremists+1) - stab) * oddsOfExtremistsPerStabilityLoss){
+        if (ENABLE_EXTREMISTS && LordGenerator.getRandom().nextDouble() > ((stabilityReqForExtremists+1) - stab) * oddsOfExtremistsPerStabilityLoss){
             double totalWeight = 0;
             for (String a : extremestFactions.keySet()){
                 totalWeight+=extremestFactions.get(a);
@@ -114,10 +135,10 @@ public class LifeAndDeathController extends BaseIntelPlugin{
     public double getGainedPonits(MarketAPI market){
         double multi = 1;
         if (LordController.getLordsList().size() > softMaxLords) multi -= (LordController.getLordsList().size()-softMaxLords)*slowDownPerExtraLord;
-        if (LordController.getLordsList().size() < softMinLords) multi += (softMinLords-LordController.getLordsList().size())*speedUpPerExtraLord;
+        if (LordController.getLordsList().size() < softMinLords) multi += (softMinLords-LordController.getLordsList().size())* speedUpPerMissingLord;
         int stab = market.getStability().getModifiedInt();
         int size = market.getSize();
-        double output = (size*gainPerSizeMulti) + (Math.pow(gainPerSizeExponent,size))*((10-stab)*stabilityLossMulti);
+        double output = (size*gainPerSizeMulti) + (Math.pow(gainPerSizeExponent,size))-((10-stab)*stabilityLossMulti);
         output*=multi;
         return output;
     }

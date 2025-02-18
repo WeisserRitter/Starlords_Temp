@@ -4,10 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.util.Misc;
-import starlords.controllers.EventController;
-import starlords.controllers.LordController;
-import starlords.controllers.PoliticsController;
-import starlords.controllers.RelationController;
+import starlords.controllers.*;
 import starlords.person.Lord;
 import starlords.person.LordAction;
 import starlords.util.LordFleetFactory;
@@ -141,7 +138,14 @@ public class BattleListener extends BaseCampaignEventListener {
             for (FleetMemberAPI toDestroy : defeated.getFleet().getMembersWithFightersCopy()) {
                 if (!toDestroy.isFighterWing()) defeated.getFleet().removeFleetMemberWithDestructionFlash(toDestroy);
             }
-
+            if (LifeAndDeathController.getInstance().attemptToKillStalord(defeated)){
+                Global.getSector().getCampaignUI().addMessage(
+                        StringUtil.getString(CATEGORY_UI, "lord_defeated_killed",
+                                defeated.getTitle() + " " + defeated.getLordAPI().getNameString(),
+                                primaryWinner.getFaction().getDisplayName()),
+                        defeated.getFaction().getBaseUIColor());
+                continue;
+            }
             if (canCapture && rand.nextInt(100) < LORD_CAPTURE_CHANCE) {
                 // capture lord. If player is winner, player captures all lords. Else allocates prisoners randomly
                 boolean freed = false;

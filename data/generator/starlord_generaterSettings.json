@@ -1,4 +1,5 @@
 {
+  "fetures_newLordsInNewGame": false,
   "generator_lordLevel": {
     "min": 1,
     "max": 15,

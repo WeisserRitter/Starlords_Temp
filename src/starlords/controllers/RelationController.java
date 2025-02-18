@@ -117,19 +117,16 @@ public class RelationController extends BaseIntelPlugin {
                 instance.lordRelations[a][b] = tempa[a][b];
             }*/
             for (int b = index+1; b < tempa[a].length; b++){
-                instance.lordRelations[a][b-1] = tempa[a][b];
+                instance.factionRelations[a][b-1] = tempa[a][b];
             }
         }
         //finally, removes the lord from the hashmap. never to be seen again...
         instance.lordMap.remove(lord.getLordAPI().getId());
-    }
-    public static void tryToAddlordMapMidGame(){
-        if (instance.lordMap != null) return;
-        instance.lordMap = new HashMap<>();
-        int a = 0;
-        for (Lord lord : LordController.getLordsList()) {
-            instance.lordMap.put(lord.getLordAPI().getId(),a);
-            a++;
+        for (Object a : instance.lordMap.keySet().toArray()){
+            int id = instance.lordMap.get((String)a);
+            if (id > index){
+                instance.lordMap.put((String) a,id-1);
+            }
         }
     }
 

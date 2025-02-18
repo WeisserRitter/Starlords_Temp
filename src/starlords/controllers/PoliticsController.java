@@ -90,6 +90,14 @@ public class PoliticsController implements EveryFrameScript {
                 }
             }
         }
+        if (getInstance().factionLawsMap.get(lord.getFaction().getId()).getMarshal().equals(lord.getLordAPI().getId())) getInstance().factionLawsMap.get(lord.getFaction().getId()).setMarshal(null);
+        /*
+        for(Object a : getInstance().factionLawsMap.values().toArray()){
+            Lawset laws = (Lawset) a;
+            if(laws.getMarshal().equals(lord.getLordAPI().getId())){
+                laws.setMarshal(null);
+            }
+        }*/
     }
     @Override
     public void advance(float amount) {

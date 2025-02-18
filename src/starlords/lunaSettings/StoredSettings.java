@@ -1,11 +1,11 @@
 package starlords.lunaSettings;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.FactionAPI;
 import lombok.SneakyThrows;
 import lunalib.lunaSettings.LunaSettings;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import starlords.controllers.LifeAndDeathController;
 import starlords.generator.LordGenerator;
 import starlords.generator.NewGameLordPicker;
 import starlords.generator.support.AvailableShipData;
@@ -20,6 +20,8 @@ import starlords.generator.types.fleet.LordFleetGenerator_System;
 import starlords.util.Constants;
 import starlords.util.WeightedRandom;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 public class StoredSettings {
@@ -104,20 +106,65 @@ public class StoredSettings {
         picker.setT2Addition(LunaSettings.getDouble(Constants.MOD_ID,"EL_T2Additional"));
         picker.setT2oddsOfFief(LunaSettings.getDouble(Constants.MOD_ID,"EL_T2OddsOfFief"));
 
-
         JSONObject json = Global.getSettings().getMergedJSONForMod("data/generator/starlord_generaterSettings.json",Constants.MOD_ID);
         JSONObject exscludedFactions = json.getJSONObject("excluded_factions");
+        NewGameLordPicker.setExcludeFactions(new ArrayList<>());
         for (Iterator it = exscludedFactions.keys(); it.hasNext(); ) {
             String key = (String) it.next();
             NewGameLordPicker.getExcludeFactions().add(exscludedFactions.getString(key));
         }
         JSONObject factionMultiplyer = json.getJSONObject("faction_multipliers");
+        NewGameLordPicker.setBonusFactionLordSize(new HashMap<>());
         for (Iterator it = factionMultiplyer.keys(); it.hasNext(); ) {
             String key = (String) it.next();
             NewGameLordPicker.getBonusFactionLordSize().put(key,factionMultiplyer.getDouble(key));
         }
         Constants.ENABLE_NEW_LORDS_ON_GAME_START = LunaSettings.getBoolean(Constants.MOD_ID,"fetures_newLordsInNewGame");
         NewGameLordPicker.instance = picker;
+
+
+        //'life and death' settings
+        Constants.ENABLE_LIFE_AND_DEATH_SYSTEM = LunaSettings.getBoolean(Constants.MOD_ID,"fetures_lifeAndDeathSystem");
+
+        LifeAndDeathController.ENABLE_LIFE = LunaSettings.getBoolean(Constants.MOD_ID,"LAD_AllowLife");
+        LifeAndDeathController.ENABLE_DEATH = LunaSettings.getBoolean(Constants.MOD_ID,"LAD_AllowDeath");
+        LifeAndDeathController.ENABLE_EXTREMISTS = LunaSettings.getBoolean(Constants.MOD_ID,"LAD_AllowExstremests");
+
+        LifeAndDeathController.setMaxLords(LunaSettings.getInt(Constants.MOD_ID,"LAD_hardMax"));
+        LifeAndDeathController.setMinLords(LunaSettings.getInt(Constants.MOD_ID,"LAD_hardMin"));
+
+        LifeAndDeathController.setSoftMaxLords(LunaSettings.getInt(Constants.MOD_ID,"LAD_softMax"));
+        LifeAndDeathController.setSoftMinLords(LunaSettings.getInt(Constants.MOD_ID,"LAD_softMin"));
+        LifeAndDeathController.setSlowDownPerExtraLord(LunaSettings.getDouble(Constants.MOD_ID,"LAD_softSpeedup"));
+        LifeAndDeathController.setSpeedUpPerMissingLord(LunaSettings.getDouble(Constants.MOD_ID,"LAD_softSlowdown"));
+
+        LifeAndDeathController.setRequiredPoints(LunaSettings.getInt(Constants.MOD_ID,"LAD_PonitsRequired"));
+        LifeAndDeathController.setGainPerSizeMulti(LunaSettings.getDouble(Constants.MOD_ID,"LAD_PonitsSizeMulti"));
+        LifeAndDeathController.setGainPerSizeExponent(LunaSettings.getDouble(Constants.MOD_ID,"LAD_PonitsSizeExscpoment"));
+        LifeAndDeathController.setStabilityLossMulti(LunaSettings.getDouble(Constants.MOD_ID,"LAD_PontsLostPerStability"));
+
+        LifeAndDeathController.setStabilityReqForExtremists(LunaSettings.getInt(Constants.MOD_ID,"LAD_StabilityforExstremests"));
+        LifeAndDeathController.setOddsOfExtremistsPerStabilityLoss(LunaSettings.getDouble(Constants.MOD_ID,"LAD_OddsOfExstremestsPerMissingStability"));
+
+        LifeAndDeathController.setOddsOfDeath(LunaSettings.getDouble(Constants.MOD_ID,"LAD_BaseOddsOfDeath"));
+
+        LifeAndDeathController.setPointsOnMarketCreation(getLunaWeightedRandom("LAD_StartingPonits"));
+
+        json = Global.getSettings().getMergedJSONForMod("data/generator/starlord_LifeAndDeathSettings.json",Constants.MOD_ID);
+        exscludedFactions = json.getJSONObject("excluded_factions");
+        LifeAndDeathController.setExcludedFactions(new ArrayList<>());
+        for (Iterator it = exscludedFactions.keys(); it.hasNext(); ) {
+            String key = (String) it.next();
+            LifeAndDeathController.getExcludedFactions().add(exscludedFactions.getString(key));
+        }
+        factionMultiplyer = json.getJSONObject("extremist_factions");
+        LifeAndDeathController.setExtremestFactions(new HashMap<>());
+        for (Iterator it = factionMultiplyer.keys(); it.hasNext(); ) {
+            String key = (String) it.next();
+            LifeAndDeathController.getExtremestFactions().put(key,factionMultiplyer.getDouble(key));
+        }
+
+
         log.info("DEBUG: luna settings loaded successfully.");
     }
     @SneakyThrows
@@ -192,18 +239,61 @@ public class StoredSettings {
         picker.setT2oddsOfFief(json.getDouble("EL_T2OddsOfFief"));
 
         JSONObject exscludedFactions = json.getJSONObject("excluded_factions");
+        NewGameLordPicker.setExcludeFactions(new ArrayList<>());
         for (Iterator it = exscludedFactions.keys(); it.hasNext(); ) {
             String key = (String) it.next();
             NewGameLordPicker.getExcludeFactions().add(exscludedFactions.getString(key));
         }
         JSONObject factionMultiplyer = json.getJSONObject("faction_multipliers");
+        NewGameLordPicker.setBonusFactionLordSize(new HashMap<>());
         for (Iterator it = factionMultiplyer.keys(); it.hasNext(); ) {
             String key = (String) it.next();
             NewGameLordPicker.getBonusFactionLordSize().put(key,factionMultiplyer.getDouble(key));
         }
         Constants.ENABLE_NEW_LORDS_ON_GAME_START = json.getBoolean("fetures_newLordsInNewGame");
         NewGameLordPicker.instance = picker;
-        log.info("DEBUG: luna settings loaded successfully.");
+
+        //'life and death' settings
+        json = Global.getSettings().getMergedJSONForMod("data/generator/starlord_LifeAndDeathSettings.json",Constants.MOD_ID);
+
+        Constants.ENABLE_LIFE_AND_DEATH_SYSTEM = json.getBoolean("fetures_lifeAndDeathSystem");
+
+        LifeAndDeathController.ENABLE_LIFE = json.getBoolean("LAD_AllowLife");
+        LifeAndDeathController.ENABLE_DEATH = json.getBoolean("LAD_AllowDeath");
+        LifeAndDeathController.ENABLE_EXTREMISTS = json.getBoolean("LAD_AllowExstremests");
+
+        LifeAndDeathController.setMaxLords(json.getInt("LAD_hardMax"));
+        LifeAndDeathController.setMinLords(json.getInt("LAD_hardMin"));
+
+        LifeAndDeathController.setSoftMaxLords(json.getInt("LAD_softMax"));
+        LifeAndDeathController.setSoftMinLords(json.getInt("LAD_softMin"));
+        LifeAndDeathController.setSlowDownPerExtraLord(json.getDouble("LAD_softSpeedup"));
+        LifeAndDeathController.setSpeedUpPerMissingLord(json.getDouble("LAD_softSlowdown"));
+
+        LifeAndDeathController.setRequiredPoints(json.getInt("LAD_PonitsRequired"));
+        LifeAndDeathController.setGainPerSizeMulti(json.getDouble("LAD_PonitsSizeMulti"));
+        LifeAndDeathController.setGainPerSizeExponent(json.getDouble("LAD_PonitsSizeExscpoment"));
+        LifeAndDeathController.setStabilityLossMulti(json.getDouble("LAD_PontsLostPerStability"));
+
+        LifeAndDeathController.setStabilityReqForExtremists(json.getInt("LAD_StabilityforExstremests"));
+        LifeAndDeathController.setOddsOfExtremistsPerStabilityLoss(json.getDouble("LAD_OddsOfExstremestsPerMissingStability"));
+
+        LifeAndDeathController.setOddsOfDeath(json.getDouble("LAD_BaseOddsOfDeath"));
+
+        LifeAndDeathController.setPointsOnMarketCreation(getConfigWeightedRandom("LAD_StartingPonits",json));
+
+        exscludedFactions = json.getJSONObject("excluded_factions");
+        LifeAndDeathController.setExcludedFactions(new ArrayList<>());
+        for (Iterator it = exscludedFactions.keys(); it.hasNext(); ) {
+            String key = (String) it.next();
+            LifeAndDeathController.getExcludedFactions().add(exscludedFactions.getString(key));
+        }
+        factionMultiplyer = json.getJSONObject("extremist_factions");
+        LifeAndDeathController.setExtremestFactions(new HashMap<>());
+        for (Iterator it = factionMultiplyer.keys(); it.hasNext(); ) {
+            String key = (String) it.next();
+            LifeAndDeathController.getExtremestFactions().put(key,factionMultiplyer.getDouble(key));
+        }
 
         log.info("DEBUG: normal config settings loaded successfully.");
     }

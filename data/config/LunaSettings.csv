@@ -1,8 +1,8 @@
 fieldID,fieldName,fieldType,defaultValue,secondaryValue,fieldDescription,minValue,maxValue,tab
 Header_MainSettings,,Header,Fetures,,,,,Fetures
 text_MainSettings,,Text,This is the area were you can enable / disable fetures.,,,,,Fetures
-fetures_newLordsInNewGame,Enable additonal lords on startup,Boolean,false,,"If set to true, when starting a new game factions will create there own randomly generated starlords, provided they do not already have any (changable in the _ settings)",,,Fetures
-,,,,,,,,
+fetures_newLordsInNewGame,Enable additonal lords on startup,Boolean,false,,"If set to true, when starting a new game factions will create there own randomly generated starlords, provided said faction does not already have any",,,Fetures
+fetures_lifeAndDeathSystem,Enable life and death system,Boolean,false,,"If set to true, starlord will beable to die. in additional, new starlords will enter the game as time goes on",,,Fetures
 ,,,,,,,,
 EL_EnableAdditionalLords,Enable additonal lords for all faction,Boolean,false,,"if set to true, every faction will beable to gain additional starlords. regardless of if they already have starlords or not",,,Exstra Lords
 ,,,,,,,,
@@ -40,18 +40,18 @@ Header_LAD_SoftLimits,,Header,Soft Limits,,,,,Life And Death
 Text_LAD_SoftLimits,,Text,this is the limits to spawn amounts (lord spawn / death raits will be modified by the _ values when past the soft min and max values),,,,,Life And Death
 LAD_softMax,Soft maximum number of lords,Int,400,,,1,10000,Life And Death
 LAD_softMin,Soft minimum number of lords,Int,100,,,1,10000,Life And Death
-LAD_softMax,Speedup per lord under max,Double,0.1,,,1,100,Life And Death
-LAD_softMin,Slowdown per lord over max,Double,0.1,,,1,100,Life And Death
+LAD_softSpeedup,Speedup per lord under max,Double,0.1,,,1,100,Life And Death
+LAD_softSlowdown,Slowdown per lord over max,Double,0.1,,,1,100,Life And Death
 ,,,,,,,,
 Header_LAD_PointGains,,Header,Lord Spawn Requirements And Gains,,,,,Life And Death
 Text_LAD_PointGains,,Text,"This controls the number of 'ponits' a market needs to generate to spawn a lord, as well as how quickly each market can generate ponits
 each market holds its own store of 'ponits' it uses to generate starlords. ponits are gained every month
-the equation used is ((size X multi per size) + (exspodent per size^size)) X stability loss
+the equation used is ((size X multi per size) + (exspodent per size^size)) - (missing stability X stability loss)
 ",,,,,Life And Death
 LAD_PonitsRequired,Ponits required to generate lord,Int,400,,,1,10000,Life And Death
 LAD_PonitsSizeMulti,multi Per Size,Double,1,,,1,100,Life And Death
-LAD_PonitsSizeExscpoment,Power per size,Double,1,,,1,100,Life And Death
-LAD_PontsLostPerStability,Loss per missing stability,Double,0.2,,,1,100,Life And Death
+LAD_PonitsSizeExscpoment,Power per size,Double,1,,,1,10,Life And Death
+LAD_PontsLostPerStability,Loss per missing stability,Double,0.5,,,0,100,Life And Death
 ,,,,,,,,
 Header_LAD_SoftLimits,,Header,Odds Of Exstreamests,,,,,Life And Death
 Text_LAD_ponitsRequired,,Text,"this feture, if enabled, allows for 'exstreamests' to spawn (such as pirates, to luddic path) instead of the factions own starlord if stability is low enouth.",,,,,Life And Death
@@ -60,7 +60,15 @@ LAD_OddsOfExstremestsPerMissingStability,Odss of exstreamests per missing stabil
 ,,,,,,,,
 Header_LAD_DeathChance,,Header,Death chance,,,,,Life And Death
 Text_LAD_ponitsRequired,,Text,This controls the chance a lord will upfront die in a given battle,,,,,Life And Death
-LAD_BaseOddsOfDeath,Base odds,Double,0.0001,,,0,1,Life And Death
+LAD_BaseOddsOfDeath,Base odds,Double,0.001,,,0,1,Life And Death
+,,,,,,,,
+Header_LAD_StartingPoints,,Header,Market Starting Ponit Ratio Chances,,,,,Life And Death
+text_LAD_StartingPoints,,Text,This handles all the ratio of a given markets 'starting ponits'. (as such allowing vareance of when lords start to spawn on new game),,,,,Life And Death
+LAD_StartingPonits_min,Min starting ponits,Int,0,,,0,10000,Life And Death
+LAD_StartingPonits_max,Max starting ponits,Int,400,,,0,10000,Life And Death
+LAD_StartingPonits_target,Target starting ponits,Int,50,,,0,10000,Life And Death
+LAD_StartingPonits_i,Weight,Double,1.05,,"The higher this value, the less vareance from the target level there will be.
+the equadtion used resalts in 1 : weight - 1 raitio of numbers at the current target, to numbers off by each point",1,5,Life And Death
 ,,,,,,,,
 ,,,,,,,,
 Header_LordLevel,,Header,Lord level ratio,,,,,Generator
@@ -151,7 +159,7 @@ generator_flagshipPicker_HP,Odds of a given lord chosing there flahship based of
 generator_flagshipPicker_Cost,Odds of a given lord chosing there flahship based of its cost,Double,1,,,0,100,Generator
 ,,,,,,,,
 Header_GeneratorMisc,,Header,Misc options,,,,,Generator
-generator_isMaleChance,Male chance,double,0.5,,"The odds of a given lord being male. set to 0 for every lord to be female, set to 1 for every lord to be male",0,1,Generator
+generator_isMaleChance,Male chance,Double,0.5,,"The odds of a given lord being male. set to 0 for every lord to be female, set to 1 for every lord to be male",0,1,Generator
 generator_fleetAdjective,Fleet adjective,String,'s fleet,,The word that goes on the end of a given lords fleet for example: with a value of ''s fleet' a lords fleet might be called Aderson Jaksons's fleet,,,Generator
 generator_oddsOfNonePriorityShips,Chance of using all ships,Double,0.05,,The odds of any given lord using ships that are not prioritized by there faction,0,1,Generator
 generator_oddsOfNoneSelectedFlagship,Chance of random flahship,Double,0.05,,The odds of any given lord using a flahship that is not present in there fleet in any other way,0,1,Generator
