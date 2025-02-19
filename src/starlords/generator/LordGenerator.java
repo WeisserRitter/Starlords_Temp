@@ -91,36 +91,36 @@ public class LordGenerator {
     public static void createStarlord(String factionID){
         PosdoLordTemplate lord = generateStarlord(factionID);
         lord.preferredItemId = getFavCommodity(factionID);
-        LordGeneratorListener_base.runEditLord(lord);
+        LordGeneratorListener_base.runEditLord(lord,null,null,0,0);
         logLord(lord);
 
         LordTemplate template = new LordTemplate(lord);
         Lord currLord = new Lord(template);
-        LordGeneratorListener_base.runEditLordPersons(currLord.getLordAPI());
+        LordGeneratorListener_base.runEditLordPersons(currLord.getLordAPI(),null,null,0,0);
 
         LordController.addLordMidGame(template,currLord);
     }
     public static void createStarlord(String factionID, com.fs.starfarer.api.campaign.SectorEntityToken system, float x, float y){
         PosdoLordTemplate lord = generateStarlord(factionID);
         lord.preferredItemId = getFavCommodity(factionID);
-        LordGeneratorListener_base.runEditLord(lord);
+        LordGeneratorListener_base.runEditLord(lord,null,system,x,y);
         logLord(lord);
 
         LordTemplate template = new LordTemplate(lord);
         Lord currLord = new Lord(template);
-        LordGeneratorListener_base.runEditLordPersons(currLord.getLordAPI());
+        LordGeneratorListener_base.runEditLordPersons(currLord.getLordAPI(),null,system,x,y);
 
         LordController.addLordMidGame(template,currLord,system,x,y);
     }
     public static void createStarlord(String factionID,MarketAPI market){
         PosdoLordTemplate lord = generateStarlord(factionID);
         lord.preferredItemId = getFavCommodity(market);
-        LordGeneratorListener_base.runEditLord(lord);
+        LordGeneratorListener_base.runEditLord(lord,market,null,0,0);
         logLord(lord);
 
         LordTemplate template = new LordTemplate(lord);
         Lord currLord = new Lord(template);
-        LordGeneratorListener_base.runEditLordPersons(currLord.getLordAPI());
+        LordGeneratorListener_base.runEditLordPersons(currLord.getLordAPI(),market,null,0,0);
 
         LordController.addLordMidGame(template,market,currLord);
     }
@@ -473,8 +473,8 @@ public class LordGenerator {
             ArrayList<ShipData> newShips = getShips(availableShipData,new int[]{1,1,1,1},new int[]{1,1,1},minShip);
             //log.info("      got "+newShips.size()+" ships from size with no skimming...");
             for (ShipData a : newShips){
+                //this does not edit availableShipData because its already edited in getships
                 ships.add(a);
-                availableShipData.removeShip(a.getHullID());//this already happens in getShips.
             }
             //log.info("      got "+availableShipData.getUnorganizedShips().size()+" possible ships left to grab...");
         }

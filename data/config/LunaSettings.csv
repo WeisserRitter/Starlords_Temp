@@ -40,8 +40,8 @@ Header_LAD_SoftLimits,,Header,Soft Limits,,,,,Life And Death
 Text_LAD_SoftLimits,,Text,this is the limits to spawn amounts (lord spawn / death raits will be modified by the _ values when past the soft min and max values),,,,,Life And Death
 LAD_softMax,Soft maximum number of lords,Int,400,,,1,10000,Life And Death
 LAD_softMin,Soft minimum number of lords,Int,100,,,1,10000,Life And Death
-LAD_softSpeedup,Speedup per lord under max,Double,0.1,,,1,100,Life And Death
-LAD_softSlowdown,Slowdown per lord over max,Double,0.1,,,1,100,Life And Death
+LAD_softSpeedup,Speedup per lord under min,Double,0.1,,calculates speed up as a multiplyer equal to 1 + (Speedup per lord under min X missing lords),0,1,Life And Death
+LAD_softSlowdown,Slowdown per lord over max,Double,0.9,,calculates speed up as a multiplyer equal to Slowdown per lord over max ^ exstra lords,0,1,Life And Death
 ,,,,,,,,
 Header_LAD_PointGains,,Header,Lord Spawn Requirements And Gains,,,,,Life And Death
 Text_LAD_PointGains,,Text,"This controls the number of 'ponits' a market needs to generate to spawn a lord, as well as how quickly each market can generate ponits

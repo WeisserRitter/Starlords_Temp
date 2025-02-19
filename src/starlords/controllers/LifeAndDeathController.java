@@ -89,11 +89,16 @@ public class LifeAndDeathController extends BaseIntelPlugin{
         if (!ENABLE_LIFE || !Constants.ENABLE_LIFE_AND_DEATH_SYSTEM || LordController.getLordsList().size() >= maxLords) return;
         //log.info("DEBUG: data enabled. continueing...");
         //lord generator settings
+        double multi = 1;
+        if (LordController.getLordsList().size() > softMaxLords) multi *= Math.pow(slowDownPerExtraLord,LordController.getLordsList().size()-softMaxLords);
+        //log.info("-temp: multi is now:"+multi+" with a a ^ b of: "+slowDownPerExtraLord+"^"+(LordController.getLordsList().size()-softMaxLords));
+        if (LordController.getLordsList().size() < softMinLords) multi *= 1+(speedUpPerMissingLord*(softMinLords-LordController.getLordsList().size()));
+        //log.info("-temp: multi is now:"+multi+" with a a ^ b of: "+speedUpPerMissingLord+"^"+(softMinLords-LordController.getLordsList().size()));
         for(MarketAPI a : Global.getSector().getEconomy().getMarketsCopy()){
             MarketAPI market = Global.getSector().getEconomy().getMarket(a.getId());
             if (excludedFactions.contains(market.getFactionId())) continue;
             if (markets.get(market) == null) addMarket(market);
-            addMarketsMonthlyPonits( market);
+            addMarketsMonthlyPonits( market,multi);
             attemptToSpawnLord( market);
             //log.info("  market "+market.getId()+" has "+getPonits(market)+" points so far...");
         }
@@ -133,13 +138,10 @@ public class LifeAndDeathController extends BaseIntelPlugin{
         }
         return market.getFactionId();
     }
-    public void addMarketsMonthlyPonits(MarketAPI market){
-        addPonits(market,getGainedPonits(market));
+    public void addMarketsMonthlyPonits(MarketAPI market,double multi){
+        addPonits(market,getGainedPonits(market,multi));
     }
-    public double getGainedPonits(MarketAPI market){
-        double multi = 1;
-        if (LordController.getLordsList().size() > softMaxLords) multi -= (LordController.getLordsList().size()-softMaxLords)*slowDownPerExtraLord;
-        if (LordController.getLordsList().size() < softMinLords) multi += (softMinLords-LordController.getLordsList().size())* speedUpPerMissingLord;
+    public double getGainedPonits(MarketAPI market,double multi){
         int stab = market.getStability().getModifiedInt();
         stab = Math.min(stab,10);
         int size = market.getSize();
