@@ -2,50 +2,50 @@
   "fetures_newLordsInNewGame": false,
   "generator_lordLevel": {
     "min": 1,
-    "max": 15,
+    "max": 20,
     "target": 10,
-    "i": 1.5
+    "i": 1.75
   },
   "generator_frigateRatio": {
-    "min": 1,
+    "min": 0,
     "max": 15,
     "target": 10,
     "i": 1.5
   },
   "generator_destroyerRatio": {
-    "min": 1,
+    "min": 0,
     "max": 15,
-    "target": 10,
+    "target": 9,
     "i": 1.5
   },
   "generator_cruiserRatio": {
-    "min": 1,
+    "min": 0,
     "max": 15,
-    "target": 10,
+    "target": 8,
     "i": 1.5
   },
   "generator_captialRatio": {
-    "min": 1,
+    "min": 0,
     "max": 15,
-    "target": 10,
+    "target": 7,
     "i": 1.5
   },
   "generator_warshipRatio": {
-    "min": 1,
+    "min": 0,
     "max": 15,
-    "target": 10,
+    "target": 7,
     "i": 1.5
   },
   "generator_carrierRatio": {
-    "min": 1,
+    "min": 0,
     "max": 15,
-    "target": 10,
+    "target": 7,
     "i": 1.5
   },
   "generator_phaseRatio": {
-    "min": 1,
+    "min": 0,
     "max": 15,
-    "target": 10,
+    "target": 7,
     "i": 1.5
   },
   "generator_shipSpawnRatio": {
@@ -90,10 +90,10 @@
   "generator_fleetTemplates_system": 1,
   "generator_fleetTemplates_hullmod": 1,
   "generator_fleetTemplates_manufacture": 1,
-  "generator_fleetTemplates_random": 1,
+  "generator_fleetTemplates_random": 0.1,
 
   "generator_flagshipPicker_Cost": 1,
-  "generator_flagshipPicker_Random": 1,
+  "generator_flagshipPicker_Random": 0.5,
   "generator_flagshipPicker_HP": 1,
 
   "excluded_factions": {
@@ -107,11 +107,11 @@
 
   "EL_EnableAdditionalLords": false,
 
-  "EL_T0PerSize": 0.0589,
+  "EL_T0PerSize": 0.1333,
   "EL_T0Additional": 0,
   "EL_T0OddsOfFief": 0.589,
 
-  "EL_T1PerSize": 0.1333,
+  "EL_T1PerSize": 0.0589,
   "EL_T1Additional": 0,
   "EL_T1OddsOfFief": 0.9,
 

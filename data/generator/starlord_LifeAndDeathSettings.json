@@ -5,7 +5,7 @@
   "LAD_AllowDeath": true,
   "LAD_AllowExstremests": true,
 
-  "LAD_hardMax": 500,
+  "LAD_hardMax": 1000,
   "LAD_hardMin": 20,
 
   "LAD_softMax": 400,
@@ -21,7 +21,7 @@
   "LAD_StabilityforExstremests": 3,
   "LAD_OddsOfExstremestsPerMissingStability": 0.1,
 
-  "LAD_BaseOddsOfDeath": 0.001,
+  "LAD_BaseOddsOfDeath": 0.005,
 
   "LAD_StartingPonits": {
     "min": 0,

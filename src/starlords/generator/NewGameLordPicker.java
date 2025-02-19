@@ -57,7 +57,6 @@ public class NewGameLordPicker {
         //getting faction sizes and possible fiefs.
         for (MarketAPI market : markets){
             String faction = market.getFactionId();
-            log.info("DEBUG: checking a market of id, faction, size: "+market.getId()+", "+market.getFactionId()+", "+market.getSize());
             factionMarkets.putIfAbsent(faction,new ArrayList<>());
             if (FiefController.getOwner(market) != null){
                 factionMarkets.get(faction).add(market);
@@ -79,7 +78,6 @@ public class NewGameLordPicker {
                 factionSize.remove(remove);
             }
         }
-        log.info("DEBUG: got "+factionMarkets.size()+" diffrent factions to add lords to...");
         Random ran = new Random();
         LordGeneratorListinerTemp listiner = new LordGeneratorListinerTemp();
         for (Object factionID : factionMarkets.keySet().toArray()){

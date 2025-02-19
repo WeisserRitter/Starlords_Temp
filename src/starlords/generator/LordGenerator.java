@@ -251,8 +251,8 @@ public class LordGenerator {
                 typeRatio[8].getRandom(),
                 typeRatio[9].getRandom()*/
         };
-        log.info("  sizeRatio: "+sizeratio[0]+", "+sizeratio[1]+", "+sizeratio[2]+", "+sizeratio[3]);
-        log.info("  typeRatio: "+typeratio[0]+", "+typeratio[1]+", "+typeratio[2]);
+        //log.info("  sizeRatio: "+sizeratio[0]+", "+sizeratio[1]+", "+sizeratio[2]+", "+sizeratio[3]);
+        //log.info("  typeRatio: "+typeratio[0]+", "+typeratio[1]+", "+typeratio[2]);
         if (typeratio[0] == 0 && typeratio[1] == 0 && typeratio[2] == 0){
             typeratio[(int)(random.nextInt(3))] = 1;
         }
@@ -425,16 +425,22 @@ public class LordGenerator {
         return output;
     }
     private static void generateShips(PosdoLordTemplate lord,String factionID,boolean useAllShips,int minShip,int maxShip,int[] sizeratio,int[] typeratio){
-        HashMap<String,Integer> output = new HashMap<>();
         //generate possible ships
         AvailableShipData availableShipData = getAvailableShips(factionID,useAllShips);
         ArrayList<ShipData> ships = new ArrayList<>();
+        if (availableShipData == null){
+            log.info("WARNING: was forced to use the final emergency fleet generator for a starlords fleet");
+            String finalBackup = "kite_pirates_Raider";//the ultimate weapon of the final war
+            lord.shipPrefs.put(finalBackup,1);
+            lord.flagShip = finalBackup;
+            return;
+        }
         int maxLoops = 5;
         maxLoops = fleetGeneratorTypes.size()!=0 ? maxLoops : 0;
         int targetShip = (int) ((random.nextDouble() * (maxShip-minShip)) + minShip);
         log.info("  attempting to generate ships with a allShips, minShip, maxShip, targetShip of: "+useAllShips+", "+minShip+", "+maxShip+", "+targetShip);
-        log.info("  size ratio is: "+sizeratio[0]+", "+sizeratio[1]+", "+sizeratio[2]+", "+sizeratio[3]);
-        log.info("  type ratio is: "+typeratio[0]+", "+typeratio[1]+", "+typeratio[2]);
+        //log.info("  size ratio is: "+sizeratio[0]+", "+sizeratio[1]+", "+sizeratio[2]+", "+sizeratio[3]);
+        //log.info("  type ratio is: "+typeratio[0]+", "+typeratio[1]+", "+typeratio[2]);
         while (availableShipData.getUnorganizedShips().size() != 0 && ships.size() < targetShip && maxLoops > 0) {
             //so, since this is the stage were I get any ships I might want, lets ignore the max ship count here.
             AvailableShipData skimmedShips = fleetGeneratorTypes.get(getValueFromWeight(fleetGeneratorRatio)).skimPossibleShips(availableShipData);
@@ -493,7 +499,7 @@ public class LordGenerator {
     }
     public static AvailableShipData getAvailableShips(String factionID,boolean allShips){
         Logger log = Global.getLogger(LordGenerator.class);
-        log.info("DEBUG: attempting to get available ships with a factionID, allShips of: "+factionID+", "+allShips);
+        //log.info("DEBUG: attempting to get available ships with a factionID, allShips of: "+factionID+", "+allShips);
         Set<String> a = null;
         AvailableShipData b=null;
         //Global.getSector().getFaction("").ship
@@ -520,22 +526,22 @@ public class LordGenerator {
             }
         }
         if (allShips || a == null || a.size() == 0 || b == null || b.getUnorganizedShips().size() == 0){
-            log.info("DEBUG: attempting to get all ships...");
+            //log.info("DEBUG: attempting to get all ships...");
             a = Global.getSector().getFaction(factionID).getKnownShips();
             //a = Global.getSector().getFaction(factionID).getFactionSpec().getKnownShips();
             if (a.size() != 0) {
                 b = AvailableShipData.getNewASD(a,false);
-                log.info("DEBUG: got available ships ships (from all) as: "+b.getUnorganizedShips().size());
+                //log.info("DEBUG: got available ships ships (from all) as: "+b.getUnorganizedShips().size());
             }
         }
         if (a == null){
-            log.info("DEBUG: failed to get any ships at all. returning null");
+            //log.info("DEBUG: failed to get any ships at all. returning null");
             return null;
         }
-        log.info("DEBUG: got "+a.size()+" ships");
-        log.info("DEBUG: got "+b.getUnorganizedShips().size()+" electable ships");
+        //log.info("DEBUG: got "+a.size()+" ships");
+        //log.info("DEBUG: got "+b.getUnorganizedShips().size()+" electable ships");
         if (b.getUnorganizedShips().size() == 0) return null;
-        log.info("DEBUG: successfully got all ships. returning...");
+        //log.info("DEBUG: successfully got all ships. returning...");
         return b;
     }
 

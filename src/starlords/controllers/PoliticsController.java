@@ -75,22 +75,26 @@ public class PoliticsController implements EveryFrameScript {
         instance.lordTimestampMap.remove(lord.getLordAPI().getId());
         instance.lordProposalsMap.remove(lord.getLordAPI().getId());
         for(int a = instance.lordProposalsMap.size()-1; a >= 0; a--){
-            ArrayList<String> b = ((LawProposal)instance.lordProposalsMap.values().toArray()[a]).getOpposers();
-            for(int c = 0; c < b.size(); c++){
-                if (b.get(c).equals(lord.getLordAPI().getId())){
-                    b.remove(c);
-                    break;
+            if (((LawProposal)instance.lordProposalsMap.values().toArray()[a])!= null) {
+                ArrayList<String> b = ((LawProposal) instance.lordProposalsMap.values().toArray()[a]).getOpposers();
+                for (int c = 0; c < b.size(); c++) {
+                    if (b.get(c).equals(lord.getLordAPI().getId())) {
+                        b.remove(c);
+                        break;
+                    }
                 }
             }
-            b = ((LawProposal)instance.lordProposalsMap.values().toArray()[a]).getSupporters();
-            for(int c = 0; c < b.size(); c++){
-                if (b.get(c).equals(lord.getLordAPI().getId())){
-                    b.remove(c);
-                    break;
+            if(((LawProposal) instance.lordProposalsMap.values().toArray()[a]) != null) {
+                ArrayList<String> b = ((LawProposal) instance.lordProposalsMap.values().toArray()[a]).getSupporters();
+                for (int c = 0; c < b.size(); c++) {
+                    if (b.get(c).equals(lord.getLordAPI().getId())) {
+                        b.remove(c);
+                        break;
+                    }
                 }
             }
         }
-        if (getInstance().factionLawsMap.get(lord.getFaction().getId()).getMarshal().equals(lord.getLordAPI().getId())) getInstance().factionLawsMap.get(lord.getFaction().getId()).setMarshal(null);
+        if (getInstance().factionLawsMap.get(lord.getFaction().getId()).getMarshal() != null && getInstance().factionLawsMap.get(lord.getFaction().getId()).getMarshal().equals(lord.getLordAPI().getId())) getInstance().factionLawsMap.get(lord.getFaction().getId()).setMarshal(null);
         /*
         for(Object a : getInstance().factionLawsMap.values().toArray()){
             Lawset laws = (Lawset) a;

@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.log4j.Logger;
 import starlords.generator.LordGenerator;
+import starlords.generator.support.LifeAndDeath_LordGeneratorListiner;
+import starlords.listeners.LordGeneratorListener_base;
 import starlords.lunaSettings.StoredSettings;
 import starlords.person.Lord;
 import starlords.util.Constants;
@@ -83,9 +85,9 @@ public class LifeAndDeathController extends BaseIntelPlugin{
         return true;
     }
     public void runMonth(){
-        log.info("DEBUG: attempting to acquire additional starlords from time... with a value of: "+!ENABLE_LIFE +", "+!Constants.ENABLE_LIFE_AND_DEATH_SYSTEM+", "+(LordController.getLordsList().size()+" >= "+maxLords));
+        //log.info("DEBUG: attempting to acquire additional starlords from time... with a value of: "+!ENABLE_LIFE +", "+!Constants.ENABLE_LIFE_AND_DEATH_SYSTEM+", "+(LordController.getLordsList().size()+" >= "+maxLords));
         if (!ENABLE_LIFE || !Constants.ENABLE_LIFE_AND_DEATH_SYSTEM || LordController.getLordsList().size() >= maxLords) return;
-        log.info("DEBUG: data enabled. continueing...");
+        //log.info("DEBUG: data enabled. continueing...");
         //lord generator settings
         for(MarketAPI a : Global.getSector().getEconomy().getMarketsCopy()){
             MarketAPI market = Global.getSector().getEconomy().getMarket(a.getId());
@@ -93,14 +95,16 @@ public class LifeAndDeathController extends BaseIntelPlugin{
             if (markets.get(market) == null) addMarket(market);
             addMarketsMonthlyPonits( market);
             attemptToSpawnLord( market);
-            log.info("  market "+market.getId()+" has "+getPonits(market)+" points so far...");
+            //log.info("  market "+market.getId()+" has "+getPonits(market)+" points so far...");
         }
     }
     public void attemptToSpawnLord(MarketAPI market){
         while(markets.get(market) >= requiredPoints){
             markets.put(market,markets.get(market)-requiredPoints);
+            LifeAndDeath_LordGeneratorListiner listiner = new LifeAndDeath_LordGeneratorListiner();
             LordGenerator.createStarlord(getSpawnedLordFaction(market),market);
-            Lord lord = LordController.getLordsList().get(LordController.getLordsList().size()-1);
+            Lord lord = LordController.getLordById(listiner.person.getId());
+            LordGeneratorListener_base.removeListener(listiner);
             Global.getSector().getCampaignUI().addMessage(
                     StringUtil.getString(CATEGORY_UI, "lord_spawned",
                             lord.getTitle() + " " + lord.getLordAPI().getNameString(),
@@ -137,10 +141,15 @@ public class LifeAndDeathController extends BaseIntelPlugin{
         if (LordController.getLordsList().size() > softMaxLords) multi -= (LordController.getLordsList().size()-softMaxLords)*slowDownPerExtraLord;
         if (LordController.getLordsList().size() < softMinLords) multi += (softMinLords-LordController.getLordsList().size())* speedUpPerMissingLord;
         int stab = market.getStability().getModifiedInt();
+        stab = Math.min(stab,10);
         int size = market.getSize();
-        double output = (size*gainPerSizeMulti) + (Math.pow(gainPerSizeExponent,size))-((10-stab)*stabilityLossMulti);
+        multi *= 1-((10-stab)*stabilityLossMulti);
+        double output = (size*gainPerSizeMulti) + (Math.pow(gainPerSizeExponent,size));
+        //log.info("      DEBUG: calculating gained points with a data stab, size, output(before multi), multi of: "+stab+", "+size+", "+output+", "+multi);
+        //log.info("      DEBUG: exstra data: lords, softmax, softmin, slowdown, speedup"+LordController.getLordsList().size()+", "+softMaxLords+", "+softMinLords+", "+speedUpPerMissingLord+", "+slowDownPerExtraLord);
         output*=multi;
-        return output;
+
+        return Math.max(0,output);
     }
     public void addMarket(MarketAPI market){
         markets.putIfAbsent(market,pointsOnMarketCreation.getRandom()*1d);

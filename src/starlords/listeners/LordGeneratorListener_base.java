@@ -1,6 +1,9 @@
 package starlords.listeners;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.characters.PersonAPI;
+import org.apache.log4j.Logger;
+import starlords.lunaSettings.StoredSettings;
 import starlords.person.PosdoLordTemplate;
 
 import java.util.ArrayList;
