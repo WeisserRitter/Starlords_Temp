@@ -10,7 +10,7 @@
 
   "LAD_softMax": 400,
   "LAD_softMin": 100,
-  "LAD_softSpeedup": 0.1,
+  "LAD_softSpeedup": 1.1,
   "LAD_softSlowdown": 0.1,
 
   "LAD_PonitsRequired": 400,

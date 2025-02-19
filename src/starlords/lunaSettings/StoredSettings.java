@@ -135,8 +135,8 @@ public class StoredSettings {
 
         LifeAndDeathController.setSoftMaxLords(LunaSettings.getInt(Constants.MOD_ID,"LAD_softMax"));
         LifeAndDeathController.setSoftMinLords(LunaSettings.getInt(Constants.MOD_ID,"LAD_softMin"));
-        LifeAndDeathController.setSlowDownPerExtraLord(LunaSettings.getDouble(Constants.MOD_ID,"LAD_softSpeedup"));
-        LifeAndDeathController.setSpeedUpPerMissingLord(LunaSettings.getDouble(Constants.MOD_ID,"LAD_softSlowdown"));
+        LifeAndDeathController.setSlowDownPerExtraLord(LunaSettings.getDouble(Constants.MOD_ID,"LAD_softSlowdown"));
+        LifeAndDeathController.setSpeedUpPerMissingLord(LunaSettings.getDouble(Constants.MOD_ID,"LAD_softSpeedup"));
 
         LifeAndDeathController.setRequiredPoints(LunaSettings.getInt(Constants.MOD_ID,"LAD_PonitsRequired"));
         LifeAndDeathController.setGainPerSizeMulti(LunaSettings.getDouble(Constants.MOD_ID,"LAD_PonitsSizeMulti"));
@@ -268,7 +268,7 @@ public class StoredSettings {
         LifeAndDeathController.setSoftMaxLords(json.getInt("LAD_softMax"));
         LifeAndDeathController.setSoftMinLords(json.getInt("LAD_softMin"));
         LifeAndDeathController.setSlowDownPerExtraLord(json.getDouble("LAD_softSpeedup"));
-        LifeAndDeathController.setSpeedUpPerMissingLord(json.getDouble("LAD_softSlowdown"));
+        LifeAndDeathController.setSpeedUpPerMissingLord(json.getDouble("LAD_softSpeedup"));
 
         LifeAndDeathController.setRequiredPoints(json.getInt("LAD_PonitsRequired"));
         LifeAndDeathController.setGainPerSizeMulti(json.getDouble("LAD_PonitsSizeMulti"));
