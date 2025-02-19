@@ -8,6 +8,8 @@ import com.fs.starfarer.api.campaign.comm.IntelInfoPlugin;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
 import com.fs.starfarer.api.util.Misc;
+import org.apache.log4j.Logger;
+import starlords.lunaSettings.StoredSettings;
 import starlords.person.Lord;
 
 import java.util.*;
@@ -41,6 +43,7 @@ public class FiefController extends BaseIntelPlugin {
     public static void stripLord(Lord lord){
         String id = lord.getLordAPI().getId();
         for (int a = 0; a < instance.fiefOwner.size(); a++){
+            if(instance.fiefOwner.values().toArray()[a] == null) continue;
             if(instance.fiefOwner.values().toArray()[a].toString().equals(id)){
                 MarketAPI marketTemp = (MarketAPI)instance.fiefOwner.keySet().toArray()[a];
                 setOwner(marketTemp,null);

@@ -246,7 +246,9 @@
     "laws_feast_law_3": "365 Day Feast Cooldown",
     "laws_feast_law_4": "Feasts Banned",
     "laws_feast_law_tooltip": "Regulates how often lords may take time off their duties to feast",
-    "laws_tooltip": "Displays the laws of your faction. You can also choose to propose various legislation. Your proposal will be added alongside everyone else's and voted on in order of popularity in the council."
+    "laws_tooltip": "Displays the laws of your faction. You can also choose to propose various legislation. Your proposal will be added alongside everyone else's and voted on in order of popularity in the council.",
+    "lord_defeated_killed": "$string was killed in battle fighting against $string forces.",
+    "lord_spawned": "A new starlord by the name of $string has appeared and joined the $string"
   },
   "starlords_title": {
     "title_default_0": "Lord",

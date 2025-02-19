@@ -62,6 +62,8 @@ public class EventController extends BaseIntelPlugin {
         setHidden(true);
     }
 
+
+
     public static long getLastFeastTime(FactionAPI faction) {
         if (!getInstance().feastCounter.containsKey(faction.getId())) return 0;
         return getInstance().feastCounter.get(faction.getId());

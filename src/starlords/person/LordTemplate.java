@@ -1,9 +1,12 @@
 package starlords.person;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import lombok.SneakyThrows;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import starlords.controllers.LordController;
+import starlords.lunaSettings.StoredSettings;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -77,5 +80,52 @@ public final class LordTemplate {
             String key = (String) it.next();
             shipPrefs.put(key, prefJson.getInt(key));
         }
+    }
+    @SneakyThrows
+    public LordTemplate(PosdoLordTemplate template) {
+        this.name = template.name;
+        switch (template.factionId.toLowerCase()) {
+            case "hegemony":
+                factionId = Factions.HEGEMONY;
+                break;
+            case "sindrian_diktat":
+                factionId = Factions.DIKTAT;
+                break;
+            case "tritachyon":
+                factionId = Factions.TRITACHYON;
+                break;
+            case "persean":
+                factionId = Factions.PERSEAN;
+                break;
+            case "luddic_church":
+                factionId = Factions.LUDDIC_CHURCH;
+                break;
+            case "pirates":
+                factionId = Factions.PIRATES;
+                break;
+            case "luddic_path":
+                factionId = Factions.LUDDIC_PATH;
+                break;
+            default:
+                factionId = template.factionId;
+        }
+        fleetName = template.fleetName;
+        isMale = template.isMale;
+        personality = LordPersonality.valueOf(template.personality.toUpperCase());
+        flagShip = template.flagShip;
+        lore = template.lore;
+        portrait = template.portrait;
+        if (template.preferredItemId != null && !template.preferredItemId.equals("")) {
+            preferredItemId = template.preferredItemId;
+        } else {  // everyone likes butter by default
+            preferredItemId = "food";
+        }
+        // What kind of parser maps null to the string null???
+        String fief = template.fief.toLowerCase();  // TODO this could be case-sensitive
+        this.fief = fief.equals("null") ? null : fief;
+        battlePersonality = template.battlePersonality.toLowerCase();
+        level = template.level;
+        ranking = template.ranking;
+        shipPrefs = template.shipPrefs;
     }
 }

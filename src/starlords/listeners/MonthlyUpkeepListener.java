@@ -6,10 +6,7 @@ import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.Pair;
-import starlords.controllers.FiefController;
-import starlords.controllers.LordController;
-import starlords.controllers.PoliticsController;
-import starlords.controllers.QuestController;
+import starlords.controllers.*;
 import org.apache.log4j.Logger;
 import starlords.person.Lord;
 import starlords.person.LordAction;
@@ -59,6 +56,7 @@ public class MonthlyUpkeepListener extends BaseCampaignEventListener {
             lord.addWealth(-1 * cost);
             //log.info("DEBUG: Lord " + lord.getLordAPI().getNameString() + " incurred expenses of " + cost);
         }
+        LifeAndDeathController.getInstance().runMonth();
         FiefController.onMonthPass();
         QuestController.getInstance().resetQuests();
         // check for lord betrayal
