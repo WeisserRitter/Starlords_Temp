@@ -88,7 +88,7 @@ public class NewGameLordPicker {
         LordGeneratorListener_base.removeListener(listiner);
     }
     public void addFaction(String factionID,ArrayList<MarketAPI> markets,ArrayList<Lord> lords, int size,LordGeneratorListinerTemp listiner,Random ran){
-        if (!allowAdditionalLords && lords.size() != 0) return;
+        if (!allowAdditionalLords && (lords != null && lords.size() != 0)) return;
         log.info("DEBUG: attempting to add lords to "+(String)factionID+" with a size of "+size+" and "+markets.size()+" number of markets.");
         int T0Lords = (int) ((size*T0PerSize)+T0Addition);
         int T1Lords = (int) ((size*T1PerSize)+T1Addition);
