@@ -1,8 +1,10 @@
 package starlords.generator;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.econ.MarketDemandAPI;
+import com.fs.starfarer.api.campaign.econ.MutableCommodityQuantity;
 import com.fs.starfarer.api.characters.FullName;
 import com.fs.starfarer.api.characters.PersonAPI;
 import com.fs.starfarer.api.impl.campaign.ids.ShipRoles;
@@ -224,9 +226,22 @@ public class LordGenerator {
         return null;
     }
     private static String getFavCommodity(MarketAPI market){
-        List<MarketDemandAPI> a = market.getDemandData().getDemandList();
-        if (a.size() == 0) return null;
-        return a.get((int) (random.nextInt(a.size()))).getBaseCommodity().getId();
+        List<Industry> a = market.getIndustries();
+        ArrayList<String> items = new ArrayList<>();
+        for (Industry b : a){
+            for (MutableCommodityQuantity c : b.getAllDemand()) {
+                if (c.getQuantity().getModifiedValue() >= 1 && !items.contains(c.getCommodityId()) && !c.getCommodityId().equals("ships")) {
+                    items.add(c.getCommodityId());
+                }
+            }
+            for (MutableCommodityQuantity c : b.getAllSupply()) {
+                if (c.getQuantity().getModifiedValue() >= 1 && !items.contains(c.getCommodityId()) && !c.getCommodityId().equals("ships")) {
+                    items.add(c.getCommodityId());
+                }
+            }
+        }
+        if (items.size() == 0) return null;
+        return items.get((int) (random.nextInt(items.size())));
     }
 
     private static void generateAllShipsForLord(PosdoLordTemplate lord, String factionID){
