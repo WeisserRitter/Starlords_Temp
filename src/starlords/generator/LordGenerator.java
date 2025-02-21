@@ -446,8 +446,10 @@ public class LordGenerator {
         if (availableShipData == null){
             log.info("WARNING: was forced to use the final emergency fleet generator for a starlords fleet");
             String finalBackup = "kite_pirates_Raider";//the ultimate weapon of the final war
+            lord.shipPrefs = new HashMap<>();
             lord.shipPrefs.put(finalBackup,1);
             lord.flagShip = finalBackup;
+            lord.lore="Every time you so mush as think of this terrifying individual, you shudder in fear. you don't know what they are, or who sent them, but you do know they exist. and they are angry.";
             return;
         }
         int maxLoops = 5;
@@ -549,7 +551,7 @@ public class LordGenerator {
                 //log.info("DEBUG: got available ships ships (from all) as: "+b.getUnorganizedShips().size());
             }
         }
-        if (a == null){
+        if (a.size() == 0){
             //log.info("DEBUG: failed to get any ships at all. returning null");
             return null;
         }
