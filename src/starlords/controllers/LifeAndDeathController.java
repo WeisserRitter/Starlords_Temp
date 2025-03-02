@@ -88,6 +88,7 @@ public class LifeAndDeathController extends BaseIntelPlugin{
         //log.info("DEBUG: attempting to acquire additional starlords from time... with a value of: "+!ENABLE_LIFE +", "+!Constants.ENABLE_LIFE_AND_DEATH_SYSTEM+", "+(LordController.getLordsList().size()+" >= "+maxLords));
         if (!ENABLE_LIFE || !Constants.ENABLE_LIFE_AND_DEATH_SYSTEM || LordController.getLordsList().size() >= maxLords) return;
         //log.info("DEBUG: data enabled. continueing...");
+        log.info("DEUBG: adding starlord spawn points to worlds....");
         //lord generator settings
         double multi = 1;
         if (LordController.getLordsList().size() > softMaxLords) multi *= Math.pow(slowDownPerExtraLord,LordController.getLordsList().size()-softMaxLords);
