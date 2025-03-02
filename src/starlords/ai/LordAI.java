@@ -1038,6 +1038,29 @@ public class LordAI implements EveryFrameScript {
         if (respawnPoint == null) {
             respawnPoint = Misc.findNearestPlanetTo(fleet, false, true);
         }
+        //added defenses against there being no planets left in a system. if everything here fails, its because there is nothing in a sector. no planets or markets. its done.
+        if (respawnPoint == null) {
+            List<MarketAPI> a = Global.getSector().getEconomy().getMarketsCopy();
+            for (MarketAPI b : a){
+                if (b.getPlanetEntity() != null && b.getFaction().getRelationshipLevel(lord.getFaction()).isAtWorst(RepLevel.SUSPICIOUS)){
+                    respawnPoint = b.getPlanetEntity();
+                    break;
+                }
+            }
+            if (respawnPoint == null && a.size() != 0){
+                respawnPoint = a.get(0).getPlanetEntity();
+
+            }
+        }
+        if (respawnPoint == null){
+            List<StarSystemAPI> a = Global.getSector().getStarSystems();
+            for (StarSystemAPI b : a){
+                if(b.getPlanets().size() != 0){
+                    respawnPoint = b.getPlanets().get(0);
+                    break;
+                }
+            }
+        }
         respawnPoint.getContainingLocation().addEntity(fleet);
         fleet.setLocation(respawnPoint.getLocation().x, respawnPoint.getLocation().y);
         LordFleetFactory.addToLordFleet(new ShipRolePick(lord.getTemplate().flagShip), fleet, new Random());
