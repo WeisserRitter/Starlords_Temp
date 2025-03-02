@@ -1,3 +1,5 @@
+V0.3.6:
+    randomly fixed a issue that could rarely happen when a faction was completely destroyed, and would cause crashes do to a lack of respawn points
 V0.3.5:
     added a temp version file, because its really hard to tell whenever I ad a fix into my branch of starlords.
     fixes:
