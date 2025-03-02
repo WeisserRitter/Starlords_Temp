@@ -1,0 +1,4 @@
+V0.3.5:
+    added a temp version file, because its really hard to tell whenever I ad a fix into my branch of starlords.
+    fixes:
+        fixed the java version of this mod to only require java 8. so hopefully that helps everyone?
