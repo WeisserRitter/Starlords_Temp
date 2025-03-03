@@ -13,6 +13,7 @@ import starlords.person.LordAction;
 import starlords.util.Constants;
 import starlords.util.DefectionUtils;
 import starlords.util.LordFleetFactory;
+import starlords.util.Utils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -44,7 +45,7 @@ public class MonthlyUpkeepListener extends BaseCampaignEventListener {
 
             Pair<Float, Float> result = PoliticsController.getBaseIncomeMultipliers(lord.getFaction());
             // give pirates some more base money since they can't own fiefs
-            if (Misc.isPirateFaction(lord.getFaction())) result.one *= 2f;
+            if (Utils.isMinorFaction(lord.getFaction())) result.one *= 2f;
             lord.addWealth(result.one * Constants.LORD_MONTHLY_INCOME
                     + result.two * lord.getRanking() * Constants.LORD_MONTHLY_INCOME);
             CampaignFleetAPI fleet = lord.getLordAPI().getFleet();

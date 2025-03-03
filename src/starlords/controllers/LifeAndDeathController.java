@@ -13,6 +13,7 @@ import starlords.listeners.LordGeneratorListener_base;
 import starlords.lunaSettings.StoredSettings;
 import starlords.person.Lord;
 import starlords.util.Constants;
+import starlords.util.LordTags;
 import starlords.util.StringUtil;
 import starlords.util.WeightedRandom;
 
@@ -79,7 +80,7 @@ public class LifeAndDeathController extends BaseIntelPlugin{
             !Constants.ENABLE_LIFE_AND_DEATH_SYSTEM ||
             LordController.getLordsList().size() <= minLords ||
             LordGenerator.getRandom().nextDouble() >= oddsOfDeath ||
-            lord.getLordAPI().hasTag(Lord.TAG_IMMORTAL)) return false;
+            lord.getLordAPI().hasTag(LordTags.TAG_IMMORTAL)) return false;
         log.info("DEBUG: killing a starlord. poor soul");
         LordController.removeLordMidGame(lord);
         return true;

@@ -11,6 +11,7 @@ import com.fs.starfarer.api.util.Misc;
 import org.apache.log4j.Logger;
 import starlords.lunaSettings.StoredSettings;
 import starlords.person.Lord;
+import starlords.util.Utils;
 
 import java.util.*;
 
@@ -146,7 +147,7 @@ public class FiefController extends BaseIntelPlugin {
         for (MarketAPI market : allMarkets) {
             if (market.getFaction().isAtWorst(lord.getLordAPI().getFaction(), RepLevel.NEUTRAL)
                     && !market.getFaction().equals(lord.getLordAPI().getFaction())
-                    && !Misc.isPirateFaction(market.getFaction())) {
+                    && !Utils.isMinorFaction(market.getFaction())) {
                 options.add(market);
                 weights.add((int) getTrade(market));
                 totalWeight += weights.get(weights.size() - 1);

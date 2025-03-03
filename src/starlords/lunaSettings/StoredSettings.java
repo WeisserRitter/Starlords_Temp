@@ -18,10 +18,12 @@ import starlords.generator.types.fleet.LordFleetGenerator_Desing;
 import starlords.generator.types.fleet.LordFleetGenerator_Hullmod;
 import starlords.generator.types.fleet.LordFleetGenerator_System;
 import starlords.util.Constants;
+import starlords.util.Utils;
 import starlords.util.WeightedRandom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 
 public class StoredSettings {
@@ -40,6 +42,56 @@ public class StoredSettings {
     @SneakyThrows
     private static void getLunaSettings(){
         Logger log = Global.getLogger(StoredSettings.class);
+
+
+        //get weather or not a given faction has a overridden possibility of lords being a minor faction, allowed diplomacy, or allowed to be attacked / preform campaigns
+        JSONObject json = Global.getSettings().getMergedJSONForMod("data/config/starlords_factionSettings.json",Constants.MOD_ID);
+        JSONObject jsonTemp = json.getJSONObject("canBeAttackedOverride");
+        HashSet<String> hashSetTempForced = new HashSet<>();
+        HashSet<String> hashSetTempNoForced = new HashSet<>();
+        for (Iterator it = jsonTemp.keys(); it.hasNext(); ) {
+            String key = (String) it.next();
+            boolean type = jsonTemp.getBoolean(key);
+            if (type){
+                hashSetTempForced.add(key);
+                continue;
+            }
+            hashSetTempNoForced.add(key);
+        }
+        Utils.setForcedAttack(hashSetTempForced);
+        Utils.setForcedNoAttack(hashSetTempNoForced);
+
+        jsonTemp = json.getJSONObject("isMinorFactionOverride");
+        hashSetTempForced = new HashSet<>();
+        hashSetTempNoForced = new HashSet<>();
+        for (Iterator it = jsonTemp.keys(); it.hasNext(); ) {
+            String key = (String) it.next();
+            boolean type = jsonTemp.getBoolean(key);
+            if (type){
+                hashSetTempForced.add(key);
+                continue;
+            }
+            hashSetTempNoForced.add(key);
+        }
+        Utils.setForcedMinorFaction(hashSetTempForced);
+        Utils.setForcedNotMinorFaction(hashSetTempNoForced);
+
+        jsonTemp = json.getJSONObject("haveRelationsOverride");
+        hashSetTempForced = new HashSet<>();
+        hashSetTempNoForced = new HashSet<>();
+        for (Iterator it = jsonTemp.keys(); it.hasNext(); ) {
+            String key = (String) it.next();
+            boolean type = jsonTemp.getBoolean(key);
+            if (type){
+                hashSetTempForced.add(key);
+                continue;
+            }
+            hashSetTempNoForced.add(key);
+        }
+        Utils.setForcedRelations(hashSetTempForced);
+        Utils.setForcedNoRelations(hashSetTempNoForced);
+
+
         //lord generator settings
         log.info("DEBUG: attempting to get lunaSettings");
         LordGenerator.setStarlordLevelRatio(getLunaWeightedRandom("generator_lordLevel"));
@@ -94,6 +146,9 @@ public class StoredSettings {
         NewGameLordPicker picker = new NewGameLordPicker();
         picker.setAllowAdditionalLords(LunaSettings.getBoolean(Constants.MOD_ID,"EL_EnableAdditionalLords"));
 
+        picker.setAllowMaximumLords(LunaSettings.getBoolean(Constants.MOD_ID,"EL_EnableMaxLords"));
+        picker.setMaxLords(LunaSettings.getInt(Constants.MOD_ID,"EL_MaxGeneratedLords"));
+
         picker.setT0PerSize(LunaSettings.getDouble(Constants.MOD_ID,"EL_T0PerSize"));
         picker.setT0Addition(LunaSettings.getDouble(Constants.MOD_ID,"EL_T0Additional"));
         picker.setT0oddsOfFief(LunaSettings.getDouble(Constants.MOD_ID,"EL_T0OddsOfFief"));
@@ -106,7 +161,7 @@ public class StoredSettings {
         picker.setT2Addition(LunaSettings.getDouble(Constants.MOD_ID,"EL_T2Additional"));
         picker.setT2oddsOfFief(LunaSettings.getDouble(Constants.MOD_ID,"EL_T2OddsOfFief"));
 
-        JSONObject json = Global.getSettings().getMergedJSONForMod("data/generator/starlord_generaterSettings.json",Constants.MOD_ID);
+        json = Global.getSettings().getMergedJSONForMod("data/generator/starlord_generaterSettings.json",Constants.MOD_ID);
         JSONObject exscludedFactions = json.getJSONObject("excluded_factions");
         NewGameLordPicker.setExcludeFactions(new ArrayList<>());
         for (Iterator it = exscludedFactions.keys(); it.hasNext(); ) {
@@ -169,9 +224,58 @@ public class StoredSettings {
     }
     @SneakyThrows
     private static void getConfigSettings(){
-        Logger log = Global.getLogger(StoredSettings.class);;
+        Logger log = Global.getLogger(StoredSettings.class);
+
+        //get weather or not a given faction has a overridden possibility of lords being a minor faction, allowed diplomacy, or allowed to be attacked / preform campaigns
+        JSONObject json = Global.getSettings().getMergedJSONForMod("data/config/starlords_factionSettings.json",Constants.MOD_ID);
+        JSONObject jsonTemp = json.getJSONObject("canBeAttackedOverride");
+        HashSet<String> hashSetTempForced = new HashSet<>();
+        HashSet<String> hashSetTempNoForced = new HashSet<>();
+        for (Iterator it = jsonTemp.keys(); it.hasNext(); ) {
+            String key = (String) it.next();
+            boolean type = jsonTemp.getBoolean(key);
+            if (type){
+                hashSetTempForced.add(key);
+                continue;
+            }
+            hashSetTempNoForced.add(key);
+        }
+        Utils.setForcedAttack(hashSetTempForced);
+        Utils.setForcedNoAttack(hashSetTempNoForced);
+
+        jsonTemp = json.getJSONObject("isMinorFactionOverride");
+        hashSetTempForced = new HashSet<>();
+        hashSetTempNoForced = new HashSet<>();
+        for (Iterator it = jsonTemp.keys(); it.hasNext(); ) {
+            String key = (String) it.next();
+            boolean type = jsonTemp.getBoolean(key);
+            if (type){
+                hashSetTempForced.add(key);
+                continue;
+            }
+            hashSetTempNoForced.add(key);
+        }
+        Utils.setForcedMinorFaction(hashSetTempForced);
+        Utils.setForcedNotMinorFaction(hashSetTempNoForced);
+
+        jsonTemp = json.getJSONObject("haveRelationsOverride");
+        hashSetTempForced = new HashSet<>();
+        hashSetTempNoForced = new HashSet<>();
+        for (Iterator it = jsonTemp.keys(); it.hasNext(); ) {
+            String key = (String) it.next();
+            boolean type = jsonTemp.getBoolean(key);
+            if (type){
+                hashSetTempForced.add(key);
+                continue;
+            }
+            hashSetTempNoForced.add(key);
+        }
+        Utils.setForcedRelations(hashSetTempForced);
+        Utils.setForcedNoRelations(hashSetTempNoForced);
+
+
         //lord generator settings
-        JSONObject json = Global.getSettings().getMergedJSONForMod("data/generator/starlord_generaterSettings.json",Constants.MOD_ID);
+         json = Global.getSettings().getMergedJSONForMod("data/generator/starlord_generaterSettings.json",Constants.MOD_ID);
         log.info("DEBUG: attempting to get normal config settings");
         LordGenerator.setStarlordLevelRatio(getConfigWeightedRandom("generator_lordLevel",json));
         LordGenerator.setSizeRatio(new WeightedRandom[]{
@@ -225,6 +329,9 @@ public class StoredSettings {
         //lord 'add additional lords to startup' settings
         NewGameLordPicker picker = new NewGameLordPicker();
         picker.setAllowAdditionalLords(json.getBoolean("EL_EnableAdditionalLords"));
+
+        picker.setAllowMaximumLords(json.getBoolean("EL_EnableMaxLords"));
+        picker.setMaxLords(json.getInt("EL_MaxGeneratedLords"));
 
         picker.setT0PerSize(json.getDouble("EL_T0PerSize"));
         picker.setT0Addition(json.getDouble("EL_T0Additional"));
@@ -294,6 +401,7 @@ public class StoredSettings {
             String key = (String) it.next();
             LifeAndDeathController.getExtremestFactions().put(key,factionMultiplyer.getDouble(key));
         }
+
 
         log.info("DEBUG: normal config settings loaded successfully.");
     }

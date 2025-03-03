@@ -1138,7 +1138,7 @@ public class LordInteractionDialogPluginImpl implements InteractionDialogPlugin 
                 textPanel.addParagraph(StringUtil.getString(CATEGORY, "ask_raid_location"));
                 options.clearOptions();
                 for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
-                    if (!Misc.isPirateFaction(market.getFaction())
+                    if (Utils.canBeAttacked(market.getFaction())
                             && market.getFaction().isHostileTo(targetLord.getFaction())) {
                         options.addOption(market.getName(), market.getId());
                     }

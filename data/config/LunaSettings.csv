@@ -5,6 +5,8 @@ fetures_newLordsInNewGame,Enable additonal lords on startup,Boolean,false,,"If s
 fetures_lifeAndDeathSystem,Enable life and death system,Boolean,false,,"If set to true, starlord will beable to die. in additional, new starlords will enter the game as time goes on",,,Fetures
 ,,,,,,,,
 EL_EnableAdditionalLords,Enable additonal lords for all faction,Boolean,false,,"if set to true, every faction will beable to gain additional starlords. regardless of if they already have starlords or not",,,Exstra Lords
+EL_EnableMaxLords,Enable a maximum number of lords that the generator will allow,Boolean,true,,"if set to true, starlords will not be generated past the maximum amount. instead, the game will attempt to reduce everyfactions generated starlords so a number around the max amount is generated",,,Exstra Lords
+EL_MaxGeneratedLords,The maximum number of lords that will be generated.,Int,1000,,"please keep in mind: this will calulate each tier of lords indevidualy. it will also round down for that. so if this triggers, you will very rarely get the max number of lords. will only trigger if the calculated number of lords to generate is greater then this value",1,10000,Exstra Lords
 ,,,,,,,,
 Header_LordsPerSize,,Header,Lords Per faction Size,,,,,Exstra Lords
 text_LordsPerSize,,Text,This handles the number of lords generated per total market size of a given faction. ,,,,,Exstra Lords

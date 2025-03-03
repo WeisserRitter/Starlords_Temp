@@ -76,6 +76,9 @@ public class LordsModPlugin extends BaseModPlugin {
             log.info(LordController.getLordsList().size() + " Lords found");
         }
 
+        StoredSettings.attemptEnableLunalib();
+        StoredSettings.getSettings();
+
         FiefController.getInstance(true);
         EventController.getInstance(true);
         LawsIntelPlugin.getInstance(true);
@@ -85,8 +88,6 @@ public class LordsModPlugin extends BaseModPlugin {
         PoliticsController.getInstance(true);
         LifeAndDeathController.getInstance(true);
 
-        StoredSettings.attemptEnableLunalib();
-        StoredSettings.getSettings();
         if (Utils.nexEnabled()) {
             sector.getListenerManager().addListener(new MarketStateChangeNexListener(), true);
         }

@@ -82,7 +82,7 @@ public class LawsIntelPlugin extends BaseIntelPlugin {
         TooltipMakerAPI header = panel.createUIElement(width, headerHeight, false);
         Color uiColor = Global.getSettings().getBasePlayerColor();
         faction = Misc.getCommissionFaction();
-        if (faction == null || Misc.isPirateFaction(faction)) {
+        if (faction == null || Utils.isMinorFaction(faction)) {
             if (PoliticsController.playerFactionHasLaws()) {
                 faction = Global.getSector().getPlayerFaction();
             } else {
@@ -351,7 +351,7 @@ public class LawsIntelPlugin extends BaseIntelPlugin {
             for (FactionAPI faction : LordController.getFactionsWithLords()) {
                 if (faction.equals(this.faction)) continue;
                 if (faction.equals(Global.getSector().getPlayerFaction())) continue;
-                if (Misc.isPirateFaction(faction)) continue;
+                if (!Utils.canHaveRelations(faction)) continue;
                 if (faction.isHostileTo(this.faction) != (buttonId == DECLARE_WAR_BUTTON)) {
                     options.add(faction.getDisplayName());
                     retVals.add(faction.getId());

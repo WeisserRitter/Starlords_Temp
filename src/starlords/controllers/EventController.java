@@ -275,8 +275,8 @@ public class EventController extends BaseIntelPlugin {
         if (!currCampaign.isDefensive()) {
             for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
                 FactionAPI otherFaction = market.getFaction();
-                if (!Misc.isPirateFaction(otherFaction) && (LordController.getFactionsWithLords().contains(otherFaction) || otherFaction.isPlayerFaction())
-                        && otherFaction.isHostileTo(faction)) {
+                if (Utils.canBeAttacked(otherFaction) && (LordController.getFactionsWithLords().contains(otherFaction) || otherFaction.isPlayerFaction())
+                        && otherFaction.isHostileTo(faction) && Utils.canBeAttacked(market)) {
                     int weight = 15000 - (int) Utils.getHyperspaceDistance(market.getPrimaryEntity(), lord.getLordAPI().getFleet());
                     if (weight > preferredWeight) {
                         preferred = market;
@@ -351,7 +351,7 @@ public class EventController extends BaseIntelPlugin {
         }
         for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
             if (!market.getFaction().isHostileTo(lord.getLordAPI().getFaction())) continue;
-            if (Misc.isPirateFaction(market.getFaction())) continue;
+            if (!Utils.canBeAttacked(market.getFaction())) continue;
             if (seen.contains(market)) continue;
             if (Misc.getDaysSinceLastRaided(market) < RAID_COOLDOWN) continue;
             int currWeight = getMilitaryOpWeight(lord, market, null, false);
@@ -453,12 +453,12 @@ public class EventController extends BaseIntelPlugin {
     public static int getStartCampaignWeight(Lord lord) {
         // no campaigns for LP/pirates
         FactionAPI faction = lord.getLordAPI().getFaction();
-        if (Misc.isPirateFaction(faction)) return 0;
+        if (!Utils.canBeAttacked(faction)) return 0;
         boolean isAtWar = false;
         for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
             FactionAPI otherFaction = market.getFaction();
             if (LordController.getFactionsWithLords().contains(otherFaction)
-                    && !Misc.isPirateFaction(otherFaction) && faction.isHostileTo(otherFaction)) {
+                    && Utils.canBeAttacked(otherFaction) && faction.isHostileTo(otherFaction)) {
                 isAtWar = true;
                 break;
             }
