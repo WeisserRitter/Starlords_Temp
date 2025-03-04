@@ -308,8 +308,8 @@ public class Utils {
         HashSet<String> prevented = forcedNoAttack;
         if (forced.contains(faction.getId())) return true;
         if (prevented.contains(faction.getId())) return false;
-        if (isMinorFaction(faction)) return false;
-        if (!Global.getSettings().getModManager().isModEnabled("nexerelin")) return true;
+        //if (isMinorFaction(faction)) return false;
+        if (!Global.getSettings().getModManager().isModEnabled("nexerelin")) return isMinorFaction(faction);
         return NexerlinUtilitys.canBeAttacked(faction);
     }
     //determines if a faction can have there relations change. (aka, pirates don't have relationship changes. nore do some modded content.)
@@ -323,8 +323,8 @@ public class Utils {
         HashSet<String> prevented = forcedNoRelations;
         if (forced.contains(faction.getId())) return true;
         if (prevented.contains(faction.getId())) return false;
-        if (isMinorFaction(faction)) return false;
-        if (!Global.getSettings().getModManager().isModEnabled("nexerelin")) return true;
+        //if (isMinorFaction(faction)) return false;
+        if (!Global.getSettings().getModManager().isModEnabled("nexerelin")) return isMinorFaction(faction);//return true;
         return NexerlinUtilitys.canChangeRelations(faction);
     }
     //prevents some factions from having war / peace declared, engaging/getting in invasions, and being raided (like pirates, for not pirates)
@@ -338,9 +338,8 @@ public class Utils {
         HashSet<String> prevented = forcedNotMinorFaction;
         if (forced.contains(faction.getId())) return true;
         if (prevented.contains(faction.getId())) return false;
-        if (Misc.isPirateFaction(faction)) return true;
-        if (!Global.getSettings().getModManager().isModEnabled("nexerelin")) return false;
+        if (!Global.getSettings().getModManager().isModEnabled("nexerelin")) return Misc.isPirateFaction(faction);
         //to do: use nexerlin to determine if a faction is a minor faction.
-        return false;
+        return NexerlinUtilitys.isMinorFaction(faction);
     }
 }
