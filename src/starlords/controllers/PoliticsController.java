@@ -56,7 +56,7 @@ public class PoliticsController implements EveryFrameScript {
         lordTimestampMap = new HashMap<>();
         factionLastCouncilMap = new HashMap<>();
         for (FactionAPI faction : Global.getSector().getAllFactions()) {
-            if (Misc.isPirateFaction(faction)) continue;
+            if (!Utils.canHaveRelations(faction)) continue;
             addFaction(faction);
         }
         Random rand = new Random();
@@ -117,7 +117,7 @@ public class PoliticsController implements EveryFrameScript {
         // checks if councils convene
         for (String factionStr : factionCouncilMap.keySet()) {
             FactionAPI faction = Global.getSector().getFaction(factionStr);
-            if (Misc.isPirateFaction(faction)) continue;
+            if (!Utils.canHaveRelations(faction)) continue;
             if (getTimeRemainingDays(faction) < 0) {
                 checkProposalValidity(faction);
                 if (factionCouncilMap.get(factionStr) == null) {
@@ -157,7 +157,7 @@ public class PoliticsController implements EveryFrameScript {
         // submit new proposals
         // TODO ruler proposal submission
         for (Lord lord : LordController.getLordsList()) {
-            if (Misc.isPirateFaction(lord.getFaction())) continue;
+            if (!Utils.canHaveRelations(lord.getFaction())) continue;
             if (Utils.getDaysSince(lordTimestampMap.get(lord.getLordAPI().getId())) < LORD_THINK_INTERVAL) continue;
             lordTimestampMap.put(lord.getLordAPI().getId(), Global.getSector().getClock().getTimestamp());
             lord.setSwayed(false);
@@ -239,11 +239,11 @@ public class PoliticsController implements EveryFrameScript {
 
         // declare war
         int weight = 0;
-        int numEnemies = Utils.getNumMajorEnemies(faction);
+        int numEnemies = Utils.getNumMajorEnemiesForDiplomacy(faction);
         if (numEnemies == 0 && lord.getPersonality() == LordPersonality.MARTIAL) {
             weight += 30 + rand.nextInt(    10);
         }
-        if (weight > bestWeight) {
+        if (weight > bestWeight && Utils.canHaveRelations(lord.getFaction())) {
             // declare war on least liked faction
             int worstRelations = 100;
             String targetFaction = null;
@@ -271,10 +271,10 @@ public class PoliticsController implements EveryFrameScript {
         }
         // sue for peace
         weight = 18 * numEnemies;
-        if (weight > bestWeight && rand.nextBoolean()) {
+        if (weight > bestWeight && rand.nextBoolean() && Utils.canHaveRelations(lord.getFaction())) {
             ArrayList<String> options = new ArrayList<>();
             for (FactionAPI faction2 : LordController.getFactionsWithLords()) {
-                if (faction2.isHostileTo(faction) && !Misc.isPirateFaction(faction2)) options.add(faction2.getId());
+                if (faction2.isHostileTo(faction) && Utils.canHaveRelations(faction2)) options.add(faction2.getId());
             }
             if (!options.isEmpty()) {
                 bestWeight = weight;
@@ -708,7 +708,7 @@ public class PoliticsController implements EveryFrameScript {
                 break;
             case DECLARE_WAR:
             case SUE_FOR_PEACE:
-                int numEnemies = Utils.getNumMajorEnemies(faction);
+                int numEnemies = Utils.getNumMajorEnemiesForDiplomacy(faction);
                 int sign = 1;
                 if (proposal.law == Lawset.LawType.DECLARE_WAR) {
                     delta = 20 * (2 - numEnemies);
@@ -913,7 +913,7 @@ public class PoliticsController implements EveryFrameScript {
                 if (itemized && delta != 0) auxReasons.add(addPlus(delta) + " Personal military strength");
 
                 // # existing enemies
-                numEnemies = Utils.getNumMajorEnemies(faction) - 1;
+                numEnemies = Utils.getNumMajorEnemiesForDiplomacy(faction) - 1;
                 // martial wants more enemies
                 if (lord.getPersonality() == LordPersonality.MARTIAL) numEnemies -= 1;
                 delta = -20 * numEnemies;
@@ -954,7 +954,7 @@ public class PoliticsController implements EveryFrameScript {
                     if (itemized) auxReasons.add(addPlus(delta) + " Hegemony Imperialism");
                 }
                 // # existing enemies
-                numEnemies = Utils.getNumMajorEnemies(faction) - 1;
+                numEnemies = Utils.getNumMajorEnemiesForDiplomacy(faction) - 1;
                 // martial wants more enemies
                 if (lord.getPersonality() == LordPersonality.MARTIAL) numEnemies -= 1;
                 delta = 20 * numEnemies;

@@ -31,7 +31,6 @@ import static starlords.util.Constants.LORD_TABLE_KEY;
 
 @Getter
 public class Lord {
-    public static final String TAG_IMMORTAL = "STARLORD_IMMORTAL";
     // Data stored in this dict will be persistent.
     @Getter(AccessLevel.NONE)
     private Map<String, Object> persistentData;

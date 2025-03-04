@@ -1,5 +1,9 @@
 {
   "fetures_newLordsInNewGame": false,
+
+  "EL_EnableMaxLords": true,
+  "EL_MaxGeneratedLords": 1000,
+
   "generator_lordLevel": {
     "min": 1,
     "max": 20,

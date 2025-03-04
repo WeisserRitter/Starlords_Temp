@@ -10,6 +10,7 @@ import com.fs.starfarer.api.combat.StatBonus;
 import com.fs.starfarer.api.impl.campaign.CoreReputationPlugin;
 import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.util.Misc;
+import lombok.Setter;
 import starlords.controllers.LordController;
 import starlords.person.Lord;
 
@@ -210,14 +211,29 @@ public class Utils {
 
     // gets number of major faction enemies of specified faction
     // ignores pirate and lordless factions
-    public static int getNumMajorEnemies(FactionAPI faction) {
+
+    public static int getNumMajorEnemies(FactionAPI faction) {return 0;}
+    /*public static int getNumMajorEnemies(FactionAPI faction) {
         int numEnemies = 0;
         for (FactionAPI faction2 : LordController.getFactionsWithLords()) {
             if (!Misc.isPirateFaction(faction2) && faction.isHostileTo(faction2)) numEnemies += 1;
         }
         return numEnemies;
+    }*/
+    public static int getNumMajorEnemiesForAttacks(FactionAPI faction){
+        int numEnemies = 0;
+        for (FactionAPI faction2 : LordController.getFactionsWithLords()) {
+            if (Utils.canBeAttacked(faction2) && faction.isHostileTo(faction2)) numEnemies += 1;
+        }
+        return numEnemies;
     }
-
+    public static int getNumMajorEnemiesForDiplomacy(FactionAPI faction){
+        int numEnemies = 0;
+        for (FactionAPI faction2 : LordController.getFactionsWithLords()) {
+            if (Utils.canHaveRelations(faction2) && faction.isHostileTo(faction2)) numEnemies += 1;
+        }
+        return numEnemies;
+    }
     public static PersonAPI getLeader(FactionAPI faction) {
         switch (faction.getId()) {
             case Factions.PIRATES:
@@ -273,5 +289,57 @@ public class Utils {
         clone.setRankId(person.getRankId());
         clone.getStats().setLevel(person.getStats().getLevel());
         return clone;
+    }
+
+    //determines if a given market can be attacked (some markets should be be attacked. like, hidden dustkeeper markets darn it.)
+    @Setter
+    private static HashSet<String> forcedAttack;
+    @Setter
+    private static HashSet<String> forcedNoAttack;
+    public static boolean canBeAttacked(MarketAPI market) {
+        if (!canBeAttacked(market.getFaction())) return false;
+        if (!Global.getSettings().getModManager().isModEnabled("nexerelin")) return true;
+        return NexerlinUtilitys.canBeAttacked(market);
+    }
+    //determines if a faction can be attacked at all. (pirates cant be raided for example. (or at least I think so))
+
+    public static boolean canBeAttacked(FactionAPI faction){
+        HashSet<String> forced = forcedAttack;
+        HashSet<String> prevented = forcedNoAttack;
+        if (forced.contains(faction.getId())) return true;
+        if (prevented.contains(faction.getId())) return false;
+        //if (isMinorFaction(faction)) return false;
+        if (!Global.getSettings().getModManager().isModEnabled("nexerelin")) return isMinorFaction(faction);
+        return NexerlinUtilitys.canBeAttacked(faction);
+    }
+    //determines if a faction can have there relations change. (aka, pirates don't have relationship changes. nore do some modded content.)
+
+    @Setter
+    private static HashSet<String> forcedRelations;
+    @Setter
+    private static HashSet<String> forcedNoRelations;
+    public static boolean canHaveRelations(FactionAPI faction){
+        HashSet<String> forced = forcedRelations;
+        HashSet<String> prevented = forcedNoRelations;
+        if (forced.contains(faction.getId())) return true;
+        if (prevented.contains(faction.getId())) return false;
+        //if (isMinorFaction(faction)) return false;
+        if (!Global.getSettings().getModManager().isModEnabled("nexerelin")) return isMinorFaction(faction);//return true;
+        return NexerlinUtilitys.canChangeRelations(faction);
+    }
+    //prevents some factions from having war / peace declared, engaging/getting in invasions, and being raided (like pirates, for not pirates)
+
+    @Setter
+    private static HashSet<String> forcedMinorFaction;
+    @Setter
+    private static HashSet<String> forcedNotMinorFaction;
+    public static boolean isMinorFaction(FactionAPI faction){
+        HashSet<String> forced = forcedMinorFaction;
+        HashSet<String> prevented = forcedNotMinorFaction;
+        if (forced.contains(faction.getId())) return true;
+        if (prevented.contains(faction.getId())) return false;
+        if (!Global.getSettings().getModManager().isModEnabled("nexerelin")) return Misc.isPirateFaction(faction);
+        //to do: use nexerlin to determine if a faction is a minor faction.
+        return NexerlinUtilitys.isMinorFaction(faction);
     }
 }

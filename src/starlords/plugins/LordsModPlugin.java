@@ -76,6 +76,9 @@ public class LordsModPlugin extends BaseModPlugin {
             log.info(LordController.getLordsList().size() + " Lords found");
         }
 
+        StoredSettings.attemptEnableLunalib();
+        StoredSettings.getSettings();
+
         FiefController.getInstance(true);
         EventController.getInstance(true);
         LawsIntelPlugin.getInstance(true);
@@ -85,8 +88,6 @@ public class LordsModPlugin extends BaseModPlugin {
         PoliticsController.getInstance(true);
         LifeAndDeathController.getInstance(true);
 
-        StoredSettings.attemptEnableLunalib();
-        StoredSettings.getSettings();
         if (Utils.nexEnabled()) {
             sector.getListenerManager().addListener(new MarketStateChangeNexListener(), true);
         }
@@ -96,6 +97,18 @@ public class LordsModPlugin extends BaseModPlugin {
             NewGameLordPicker.instance.addAll();
         }
         NewGameLordPicker.instance = null;
+        /*/String[] factionsTemp = {
+                "HIVER",
+                "pirates",
+                "tritachyon",
+                "remnant"
+        };
+        for (String a : factionsTemp){
+            log.info("can the "+a+" go to go and fight ?"+Utils.canBeAttacked(Global.getSector().getFaction(a)));
+            log.info("can the "+a+" try to make peace ?"+Utils.canHaveRelations(Global.getSector().getFaction(a)));
+            log.info("is the "+a+" a minor faction? "+Utils.isMinorFaction(Global.getSector().getFaction(a)));
+            //log.info("is the "+a+" playable? "+ NexConfig.getFactionConfig(a).playableFaction);
+        }/**/
     }
 
 

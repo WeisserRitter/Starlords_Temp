@@ -100,7 +100,7 @@ public class BattleListener extends BaseCampaignEventListener {
                 levelUpWithChance(winner, 200 * killsFP / totalFP);
 
                 // pirates get happier about being pirates when they kill stuff
-                if (Misc.isPirateFaction(lord.getFaction()) && Utils.rand.nextFloat() < ((float) killsFP) / totalFP) {
+                if (Utils.isMinorFaction(lord.getFaction()) && Utils.rand.nextFloat() < ((float) killsFP) / totalFP) {
                     RelationController.modifyLoyalty(lord, 1);
                 }
             }
@@ -252,7 +252,7 @@ public class BattleListener extends BaseCampaignEventListener {
             }
 
             // Faction marshal gets controversy for lord being defeated
-            if (!Misc.isPirateFaction(defeated.getFaction())) {
+            if (!Utils.isMinorFaction(defeated.getFaction())) {
                 Lord marshal = LordController.getLordOrPlayerById(
                         PoliticsController.getLaws(defeated.getFaction()).getMarshal());
                 if (marshal != null) {

@@ -117,13 +117,15 @@ public class DefectionUtils {
         FactionAPI preferredFaction = Global.getSector().getFaction(Factions.PIRATES);
         int preferredWeight = 25;
         for (FactionAPI faction : Global.getSector().getAllFactions()) {
+            //todo: If i get the time, i really really need to make it so lords can offer to defect over to the player faction. please I beg of you let that happen. I waited for nearly 4 cycles for one to join me and now I learn that is not a thing and this can cause a issue with large number of lords were you cant get any up to the required reputation and this bugs me. plz fix.
             if (Misc.getCommissionFaction() != null && faction.isPlayerFaction()) continue;
             if (faction.isPlayerFaction() && lord.getLordAPI().getRelToPlayer().isAtBest(RepLevel.WELCOMING)) continue;
             if (faction.isPlayerFaction() && !LordController.getFactionsWithLords().contains(faction)) continue;
             if (faction.equals(lord.getFaction())) continue;
+            //todo: switch this from 'independents' to a function that sees if this faction does not allow lords.
             if (faction.getId().equals(Factions.INDEPENDENT)) continue;
             int weight = RelationController.getLoyalty(lord, faction.getId());
-            if (!Misc.isPirateFaction(faction)) {
+            if (!Utils.isMinorFaction(faction)) {
                 if (marketValues.containsKey(faction.getId())) {
                     weight += marketValues.get(faction.getId());
                 }
@@ -161,7 +163,8 @@ public class DefectionUtils {
             RelationController.modifyLoyalty(lord, MIN_STARTING_LOYALTY_DEFECTION - newLoyalty);
         }
         // fiefs defect with the lord as long as they aren't turning pirate
-        if (!Misc.isPirateFaction(faction)) {
+        // changed this into faction that can be attacked. I considered this for all minor factions, but some of them can be attacked, and such can get back there markets so...
+        if (!Utils.canBeAttacked(faction)) {
             for (SectorEntityToken fief : lord.getFiefs()) {
                 fief.getMarket().setFactionId(faction.getId());
                 fief.setFaction(faction.getId());
