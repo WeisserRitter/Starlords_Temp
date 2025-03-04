@@ -12,6 +12,7 @@ public class NexerlinUtilitys {
     public static boolean canBeAttacked(FactionAPI faction){
         if (NexConfig.getFactionConfig(faction.getId()).pirateFaction) return false;
         if (!NexConfig.getFactionConfig(faction.getId()).canInvade) return false;
+        if (!NexConfig.getFactionConfig(faction.getId()).playableFaction) return false;
         return true;
     }
     public static boolean canBeAttacked(MarketAPI market){

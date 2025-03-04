@@ -97,7 +97,7 @@ public class LordsModPlugin extends BaseModPlugin {
             NewGameLordPicker.instance.addAll();
         }
         NewGameLordPicker.instance = null;
-        /*String[] factionsTemp = {
+        /*/String[] factionsTemp = {
                 "HIVER",
                 "pirates",
                 "tritachyon",
@@ -107,7 +107,8 @@ public class LordsModPlugin extends BaseModPlugin {
             log.info("can the "+a+" go to go and fight ?"+Utils.canBeAttacked(Global.getSector().getFaction(a)));
             log.info("can the "+a+" try to make peace ?"+Utils.canHaveRelations(Global.getSector().getFaction(a)));
             log.info("is the "+a+" a minor faction? "+Utils.isMinorFaction(Global.getSector().getFaction(a)));
-        }*/
+            //log.info("is the "+a+" playable? "+ NexConfig.getFactionConfig(a).playableFaction);
+        }/**/
     }
 
 
