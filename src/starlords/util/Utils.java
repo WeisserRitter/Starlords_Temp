@@ -4,14 +4,16 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
-import com.fs.starfarer.api.characters.FullName;
 import com.fs.starfarer.api.characters.PersonAPI;
 import com.fs.starfarer.api.combat.StatBonus;
 import com.fs.starfarer.api.impl.campaign.CoreReputationPlugin;
 import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.util.Misc;
 import lombok.Setter;
+import org.apache.log4j.Logger;
+import org.lwjgl.util.vector.Vector2f;
 import starlords.controllers.LordController;
+import starlords.lunaSettings.StoredSettings;
 import starlords.person.Lord;
 
 import java.util.*;
@@ -163,7 +165,9 @@ public class Utils {
         if (fleet.isInHyperspace()) {
             return "Hyperspace near " + Misc.getNearestStarSystem(fleet);
         } else {
-            return Misc.findNearestPlanetTo(fleet, false, true).getName() + " in " + fleet.getContainingLocation().getName();
+            SectorEntityToken out = fundNearestLocation(fleet);
+            if (out != null && out.getName() != null) return out.getName() + " in " + fleet.getContainingLocation().getName();
+            return "in "+fleet.getContainingLocation().getName();
         }
     }
 
@@ -212,7 +216,6 @@ public class Utils {
     // gets number of major faction enemies of specified faction
     // ignores pirate and lordless factions
 
-    public static int getNumMajorEnemies(FactionAPI faction) {return 0;}
     /*public static int getNumMajorEnemies(FactionAPI faction) {
         int numEnemies = 0;
         for (FactionAPI faction2 : LordController.getFactionsWithLords()) {
@@ -291,6 +294,64 @@ public class Utils {
         return clone;
     }
 
+    public static SectorEntityToken fundNearestLocation(SectorEntityToken target){
+        SectorEntityToken output = findAnyStaticEntity(target);
+        if (output != null) return output;
+        output = Misc.getNearestStarSystem(target).getCenter();
+        if (output != null){
+            output = findAnyStaticEntity(output);
+            if (output != null) return output;
+        }
+        Logger log = Global.getLogger(Utils.class);
+        log.info("ERROR: failed to acquire anything in a targeted system. and I am forced to ask: what on earth was going on? if you get this error, something went wrong in starlords. please report this to the modders responsible for that wonderful mod.");
+        //try one final time to get any starsystem, please please, get something to go to
+        StarSystemAPI starSystem = Misc.getNearbyStarSystem(target);
+        output = findAnyStaticEntity(starSystem.getCenter());
+        if (output != null) return output;
+        //at this point, why even bother? like, error handling is going to be required. the system does not even exist! wtf..
+        return null;
+    }
+    public static SectorEntityToken findAnyStaticEntity(SectorEntityToken target){
+        SectorEntityToken output = Misc.findNearestPlanetTo(target,false,true);
+        if (output != null) return output;
+        if (!target.isInHyperspace() && target.getStarSystem() != null){
+            if (target.getStarSystem().getJumpPoints() != null && target.getStarSystem().getJumpPoints().size() != 0){
+                return getClosest(target.getLocation(),target.getStarSystem().getJumpPoints());
+            }
+            if (target.getStarSystem().getStar() != null){
+                return target.getStarSystem().getStar();
+            }
+            if (target.getStarSystem().getCenter() != null){
+                return target.getStarSystem().getCenter();
+            }
+            if (target.getStarSystem().getAsteroids() != null && target.getStarSystem().getAsteroids().size() != 0){
+                return getClosest(target.getLocation(),target.getStarSystem().getAsteroids());
+            }
+            if(target.getStarSystem().getAllEntities() != null && target.getStarSystem().getAllEntities().size() != 0){
+                return getClosest(target.getLocation(),target.getStarSystem().getAllEntities());
+            }
+            return null;
+            //at this point, I need to start to look into nearby starsystems.
+        }
+        return null;
+    }
+    private static SectorEntityToken getClosest(Vector2f a, List<SectorEntityToken> b){
+        //i didn't test this. like, at all. I really really hope this does not have issues.
+        SectorEntityToken output = null;
+        float distance = 999999999;
+        for (SectorEntityToken c : b){
+            float x = a.x - c.getLocation().x;
+            float y = a.y - c.getLocation().y;
+            x = Math.max(-1*x,x);
+            y = Math.max(-1*y,y);
+            float d = x+y;
+            if (d < distance){
+                distance = d;
+                output = c;
+            }
+        }
+        return output;
+    }
     //determines if a given market can be attacked (some markets should be be attacked. like, hidden dustkeeper markets darn it.)
     @Setter
     private static HashSet<String> forcedAttack;
@@ -302,7 +363,6 @@ public class Utils {
         return NexerlinUtilitys.canBeAttacked(market);
     }
     //determines if a faction can be attacked at all. (pirates cant be raided for example. (or at least I think so))
-
     public static boolean canBeAttacked(FactionAPI faction){
         HashSet<String> forced = forcedAttack;
         HashSet<String> prevented = forcedNoAttack;
@@ -313,7 +373,6 @@ public class Utils {
         return NexerlinUtilitys.canBeAttacked(faction);
     }
     //determines if a faction can have there relations change. (aka, pirates don't have relationship changes. nore do some modded content.)
-
     @Setter
     private static HashSet<String> forcedRelations;
     @Setter
