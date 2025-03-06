@@ -12,7 +12,6 @@ import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.fleet.ShipRolePick;
 import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.MarketCMD;
-import com.fs.starfarer.api.impl.combat.BattleCreationPluginImpl;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.Pair;
 import starlords.controllers.*;
@@ -26,7 +25,6 @@ import starlords.person.Lord;
 import starlords.person.LordAction;
 import starlords.person.LordEvent;
 import starlords.person.LordPersonality;
-import starlords.plugins.TournamentDialogPlugin;
 import starlords.scripts.ActionCompleteScript;
 import starlords.ui.HostileEventIntelPlugin;
 import starlords.util.LordFleetFactory;
@@ -333,7 +331,7 @@ public class LordAI implements EveryFrameScript {
                 if (target == null) {
                     targetEntity = lord.getClosestBase();
                     if (targetEntity == null) {
-                        targetEntity = Misc.findNearestLocalMarket(lord.getFleet(), 1e10f, null).getPrimaryEntity();
+                        targetEntity = Utils.findNearestMarket(lord.getFleet());
                     }
                 } else {
                     targetEntity = target;
@@ -406,7 +404,7 @@ public class LordAI implements EveryFrameScript {
                 } else {
                     SectorEntityToken rallyPoint = lord.getClosestBase(false);
                     if (rallyPoint == null) {
-                        rallyPoint = Utils.fundNearestLocation(lord.getFleet());
+                        rallyPoint = Utils.findNearestLocation(lord.getFleet());
                     }
                     lord.setTarget(rallyPoint);
                     fleetAI.addAssignmentAtStart(
@@ -1039,28 +1037,7 @@ public class LordAI implements EveryFrameScript {
             respawnPoint = Misc.findNearestPlanetTo(fleet, false, true);
         }
         //added defenses against there being no planets left in a system. if everything here fails, its because there is nothing in a sector. no planets or markets. its done.
-        if (respawnPoint == null) {
-            List<MarketAPI> a = Global.getSector().getEconomy().getMarketsCopy();
-            for (MarketAPI b : a){
-                if (b.getPlanetEntity() != null && b.getFaction().getRelationshipLevel(lord.getFaction()).isAtWorst(RepLevel.SUSPICIOUS)){
-                    respawnPoint = b.getPlanetEntity();
-                    break;
-                }
-            }
-            if (respawnPoint == null && a.size() != 0){
-                respawnPoint = a.get(0).getPlanetEntity();
-
-            }
-        }
-        if (respawnPoint == null){
-            List<StarSystemAPI> a = Global.getSector().getStarSystems();
-            for (StarSystemAPI b : a){
-                if(b.getPlanets().size() != 0){
-                    respawnPoint = b.getPlanets().get(0);
-                    break;
-                }
-            }
-        }
+        if (respawnPoint == null) respawnPoint = Utils.findNearestMarket(fleet);
         respawnPoint.getContainingLocation().addEntity(fleet);
         fleet.setLocation(respawnPoint.getLocation().x, respawnPoint.getLocation().y);
         LordFleetFactory.addToLordFleet(new ShipRolePick(lord.getTemplate().flagShip), fleet, new Random());
