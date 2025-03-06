@@ -406,7 +406,7 @@ public class LordAI implements EveryFrameScript {
                 } else {
                     SectorEntityToken rallyPoint = lord.getClosestBase(false);
                     if (rallyPoint == null) {
-                        rallyPoint = Misc.findNearestPlanetTo(lord.getFleet(), false, true);
+                        rallyPoint = Utils.fundNearestLocation(lord.getFleet());
                     }
                     lord.setTarget(rallyPoint);
                     fleetAI.addAssignmentAtStart(

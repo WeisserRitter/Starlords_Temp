@@ -1,3 +1,5 @@
+V0.3.8:
+    (hopefully) fixed a few issues related to a lord trying to get a rally point in a system without planets (and maybe a few other issues. hopefully.)
 V0.3.7:
     note: this -should- be save compatible. but who knows? I don't, that's for sure.
     new:
