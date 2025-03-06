@@ -11,9 +11,9 @@ import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.util.Misc;
 import lombok.Setter;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.util.vector.Vector2f;
 import starlords.controllers.LordController;
-import starlords.lunaSettings.StoredSettings;
 import starlords.person.Lord;
 
 import java.util.*;
@@ -165,7 +165,7 @@ public class Utils {
         if (fleet.isInHyperspace()) {
             return "Hyperspace near " + Misc.getNearestStarSystem(fleet);
         } else {
-            SectorEntityToken out = fundNearestLocation(fleet);
+            SectorEntityToken out = findNearestLocation(fleet);
             if (out != null && out.getName() != null) return out.getName() + " in " + fleet.getContainingLocation().getName();
             return "in "+fleet.getContainingLocation().getName();
         }
@@ -294,7 +294,87 @@ public class Utils {
         return clone;
     }
 
-    public static SectorEntityToken fundNearestLocation(SectorEntityToken target){
+    public static SectorEntityToken findNearestMarket(SectorEntityToken target){
+        SectorEntityToken output = Misc.findNearestLocalMarket(target, 1e10f, null).getPrimaryEntity();
+        if (output != null) return output;
+        List<MarketAPI> a = Global.getSector().getEconomy().getMarketsCopy();
+
+        //give up on finding a market in system. just get the closest one.
+        MarketAPI sameFaction = null;
+        MarketAPI friendly = null;
+        MarketAPI notHostile = null;
+        MarketAPI any = null;
+        float sameFactionD = 99999999;
+        float friendlyD = 99999999;
+        float notHostileD = 99999999;
+        float anyD = 99999999;
+        for (MarketAPI b : a){
+            if (b.getPrimaryEntity().getFaction().equals(target.getFaction())){
+                float x = target.getLocationInHyperspace().x - b.getPrimaryEntity().getLocationInHyperspace().x;
+                float y = target.getLocationInHyperspace().y - b.getPrimaryEntity().getLocationInHyperspace().y;
+                x = Math.max(-1*x,x);
+                y = Math.max(-1*y,y);
+                float d = x+y;
+                if (d < sameFactionD){
+                    sameFactionD = d;
+                    sameFaction = b;
+                }
+            }
+            if (b.getPrimaryEntity().getFaction().getRelationshipLevel(target.getFaction()).isAtWorst(RepLevel.FAVORABLE)){
+                float x = target.getLocationInHyperspace().x - b.getPrimaryEntity().getLocationInHyperspace().x;
+                float y = target.getLocationInHyperspace().y - b.getPrimaryEntity().getLocationInHyperspace().y;
+                x = Math.max(-1*x,x);
+                y = Math.max(-1*y,y);
+                float d = x+y;
+                if (d < friendlyD){
+                    friendlyD = d;
+                    friendly = b;
+                }
+            }
+            if (b.getPrimaryEntity().getFaction().getRelationshipLevel(target.getFaction()).isAtWorst(RepLevel.NEUTRAL)){
+                float x = target.getLocationInHyperspace().x - b.getPrimaryEntity().getLocationInHyperspace().x;
+                float y = target.getLocationInHyperspace().y - b.getPrimaryEntity().getLocationInHyperspace().y;
+                x = Math.max(-1*x,x);
+                y = Math.max(-1*y,y);
+                float d = x+y;
+                if (d < notHostileD){
+                    notHostileD = d;
+                    notHostile = b;
+                }
+            }
+            float x = target.getLocationInHyperspace().x - b.getPrimaryEntity().getLocationInHyperspace().x;
+            float y = target.getLocationInHyperspace().y - b.getPrimaryEntity().getLocationInHyperspace().y;
+            x = Math.max(-1*x,x);
+            y = Math.max(-1*y,y);
+            float d = x+y;
+            if (d < anyD){
+                anyD = d;
+                any = b;
+            }
+        }
+        if (sameFaction != null) return sameFaction.getPlanetEntity();
+        if (friendly != null) return friendly.getPlanetEntity();
+        if (notHostile != null) return notHostile.getPlanetEntity();
+        if (any != null) return any.getPlanetEntity();
+
+        //if none exist, give up. give me a planet at random. who even cares anymore????
+        //also of note: this is a type of emergency backup to prevent crashes. it should never run for any reason ever. but it can, if it must.
+        List<StarSystemAPI> d = Global.getSector().getStarSystems();
+        for (StarSystemAPI b : d){
+            if(b.getPlanets().size() != 0){
+                output = b.getPlanets().get(0);
+                break;
+            }
+        }
+        if (output != null) return output;
+
+        Logger log = Global.getLogger(Utils.class);
+        log.info("there is only the void, empty and terrible. nowhere to respawn. nowhere to stand. it is all gone. what have you done? why?");
+        log.info("was it worth it?");
+        return null;
+    }
+
+    public static SectorEntityToken findNearestLocation(SectorEntityToken target){
         SectorEntityToken output = findAnyStaticEntity(target);
         if (output != null) return output;
         output = Misc.getNearestStarSystem(target).getCenter();

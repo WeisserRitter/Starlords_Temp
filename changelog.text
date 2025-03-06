@@ -1,3 +1,5 @@
+V0.3.9:
+    (hopefully) fixed a issue were a starlord with no faction will attempt to collect takes from nothing, crashing the game
 V0.3.8:
     (hopefully) fixed a few issues related to a lord trying to get a rally point in a system without planets (and maybe a few other issues. hopefully.)
 V0.3.7:
