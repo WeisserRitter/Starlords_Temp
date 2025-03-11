@@ -76,8 +76,8 @@ public class RelationController extends BaseIntelPlugin {
         //gets the new lord factionRelationship default.
         tempa = instance.factionRelations;
         instance.factionRelations = new int[numLieges][numLords];
-        for (int a = 0; a < tempa.length; a++){
-            for (int b = 0; b < tempa[a].length; b++){
+        for (int a = 0; a < tempa.length; a++) {
+            for (int b = 0; b < tempa[a].length; b++) {
                 instance.factionRelations[a][b] = tempa[a][b];
             }
         }
@@ -194,6 +194,19 @@ public class RelationController extends BaseIntelPlugin {
         if (!tmp.containsKey(factionId)) {
             // new faction must've been added after gamestart
             tmp.put(factionId, tmp.size());
+
+            int numLords = LordController.getLordsList().size();
+            List<FactionAPI> factions = Global.getSector().getAllFactions();
+            int numLieges = 24 + factions.size();  // save some space for adding new factions (or does adding this remove this requirement???)
+            if (instance.factionRelations.length < numLieges) {
+                int[][] tempa = instance.factionRelations;
+                instance.factionRelations = new int[numLieges][numLords];
+                for (int a = 0; a < tempa.length; a++) {
+                    for (int b = 0; b < tempa[a].length; b++) {
+                        instance.factionRelations[a][b] = tempa[a][b];
+                    }
+                }
+            }
         }
         return tmp.get(factionId);
     }

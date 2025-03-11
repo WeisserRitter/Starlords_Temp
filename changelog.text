@@ -1,5 +1,7 @@
 V0.3.11:
     fixed a rare crash do to a lords target being null, somehow.
+    fixed a issue were one could get a out of bound data from adding more then 24 factions mid game why would you do that you crazy person?
+    fixed a issue with lords not being released / forgetting about when they were removed and holding captives / being captive.
 V0.3.10:
     fixed a rare crash were a lords prisoners would be null.
     fixed a crash were a lord that was involved in politics in your own faction died.

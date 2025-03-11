@@ -138,6 +138,12 @@ public class LordController {
         getSavedLordsMemeoryKey(lord);
         Global.getSector().getMemory().set(getSavedLordsMemeoryKey(lord),null,1f);
         lord.getLordAPI().getFleet().despawn();
+        if (lord.getCaptor() != null){
+            getLordById(lord.getCaptor()).removePrisoner(lord.getLordAPI().getId());
+        }
+        for (String a : lord.getPrisoners()){
+            getLordById(a).setCaptor(null);
+        }
 
         //go into fiefController, politics, quest, relation, and remove this lord from them all.
         FiefController.stripLord(lord);
