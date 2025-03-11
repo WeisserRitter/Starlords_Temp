@@ -1,3 +1,5 @@
+V0.3.11:
+    fixed a rare crash do to a lords target being null, somehow.
 V0.3.10:
     fixed a rare crash were a lords prisoners would be null.
     fixed a crash were a lord that was involved in politics in your own faction died.
