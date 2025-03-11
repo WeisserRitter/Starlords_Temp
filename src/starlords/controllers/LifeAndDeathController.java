@@ -81,8 +81,9 @@ public class LifeAndDeathController extends BaseIntelPlugin{
             LordController.getLordsList().size() <= minLords ||
             LordGenerator.getRandom().nextDouble() >= oddsOfDeath ||
             lord.getLordAPI().hasTag(LordTags.TAG_IMMORTAL)) return false;
-        log.info("DEBUG: killing a starlord. poor soul");
+        log.info("DEBUG: killing a starlord. poor soul (lord ID, faction, name and remaining lords): "+lord.getLordAPI().getId()+", "+lord.getFaction()+", "+lord.getLordAPI().getNameString()+", "+LordController.getLordsList().size());
         LordController.removeLordMidGame(lord);
+        log.info("DEBUG: is lord still alive somehow???? "+(LordController.getLordById(lord.getLordAPI().getId()) != null));
         return true;
     }
     public void runMonth(){

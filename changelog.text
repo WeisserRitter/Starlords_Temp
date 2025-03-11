@@ -1,3 +1,9 @@
+V0.3.10:
+    fixed a rare crash were a lords prisoners would be null.
+    fixed a crash were a lord that was involved in politics in your own faction died.
+    ???? maybe fixed a issue were a relationship change could cause a crash ???
+    fixed a issue with 'findNearestMarket', that caused a crash for every crash it was built to fix. sorry about that.
+    improved the games ability to actually remove a starlord from the games data.
 V0.3.9:
     (hopefully) fixed a issue were a starlord with no faction will attempt to collect takes from nothing, crashing the game
 V0.3.8:

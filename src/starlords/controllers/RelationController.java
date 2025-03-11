@@ -4,6 +4,8 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.comm.IntelInfoPlugin;
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin;
+import org.apache.log4j.Logger;
+import starlords.lunaSettings.StoredSettings;
 import starlords.person.Lord;
 
 import java.util.HashMap;
@@ -139,8 +141,15 @@ public class RelationController extends BaseIntelPlugin {
             lord1.getLordAPI().getRelToPlayer().adjustRelationship(amount / 100f, null);
             return;
         }
-        int idx1 = getIndexOfLord(lord1);
-        int idx2 = getIndexOfLord(lord2);
+        int idx1 = -1;
+        int idx2 = -1;
+        try {
+            idx1 = getIndexOfLord(lord1);
+            idx2 = getIndexOfLord(lord2);
+        }catch (Exception e){
+            Logger log = Global.getLogger(RelationController.class);
+            log.info("ERROR: failed to get lords for relation change. ignoring relation changes");
+        }
         int newRel = Math.max(-100, Math.min(100, getInstance().lordRelations[Math.min(idx1, idx2)][Math.max(idx1, idx2)] + amount));
         getInstance().lordRelations[Math.min(idx1, idx2)][Math.max(idx1, idx2)] = newRel;
     }
