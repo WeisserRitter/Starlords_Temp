@@ -437,11 +437,11 @@ public class LordAI implements EveryFrameScript {
 
         // check if target is now invalid due to relation change
         boolean sameFactionFail = sameFactionTargetActions.contains(lord.getCurrAction().base)
-                && !lord.getFaction().equals(lord.getTarget().getFaction());
+                && (lord.getTarget() == null || !lord.getFaction().equals(lord.getTarget().getFaction()));
         boolean friendlyFactionFail = friendlyTargetActions.contains(lord.getCurrAction().base)
-                && lord.getFaction().isHostileTo(lord.getTarget().getFaction());
+                && (lord.getTarget() == null || lord.getFaction().isHostileTo(lord.getTarget().getFaction()));
         boolean hostileFactionFail = hostileTargetActions.contains(lord.getCurrAction().base)
-                && !lord.getFaction().isHostileTo(lord.getTarget().getFaction());
+                && (lord.getTarget() == null || !lord.getFaction().isHostileTo(lord.getTarget().getFaction()));
         if (sameFactionFail || friendlyFactionFail || hostileFactionFail) {
             EventController.removeFromAllEvents(lord);
             lord.setCurrAction(null);
