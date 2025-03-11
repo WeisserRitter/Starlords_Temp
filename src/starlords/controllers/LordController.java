@@ -147,7 +147,7 @@ public class LordController {
         EventController.removeFromAllEvents(lord);
         //remove the lord from the lists
         lordsList.remove(lord);
-        lordsMap.remove(lord);
+        lordsMap.remove(lord.getLordAPI().getId());
 
         //remove the lord from the intel plugins.
         LordsIntelPlugin.removeProfile(lord);
@@ -197,6 +197,7 @@ public class LordController {
     }
 
     public static int indexOf(Lord lord) {
+        //todo: DO NOT USE THIS. its a bad bad bad bad bad bad bad idea right now. I broke this and I would do it again (for real though, it was impossible to get working when I add / remove starlords mid game. it can cause all sorts of issues if you even try. I have fixed everything that required it though.)
         if (!lordIdxMap.containsKey(lord.getLordAPI().getId())) return -1;
         return lordIdxMap.get(lord.getLordAPI().getId());
     }
@@ -402,5 +403,35 @@ public class LordController {
             }
         }
         return Global.getSector().getEconomy().getMarket(id);
+    }
+
+    public static void logAllLords(){
+        //this exists as debugger, built do to evidence of save corruption. I must fix this somehow...
+        log.info("outputting the status of all in game starlords. please report any issues here...");
+        for (Lord a : lordsList){
+            String logS = "";
+            try {
+                logS += "lord found of name / ID: " + a.getLordAPI().getNameString() + ", " + a.getLordAPI().getId();
+                logS += '\n';
+                logS += "   prisoners: ";
+                logS += '\n';
+                for (String b : a.getPrisoners()) {
+                    String id = b;
+                    if (getLordById(id) != null) {
+                        logS += "       ERROR: got a starlord that does not exsist somehow. id of " + id;
+                        logS += '\n';
+                        continue;
+                    }
+                    logS += "       starlord has a prisoner of ID, name: " + id + ", " + getLordById(id).getLordAPI().getNameString();
+                    logS += '\n';
+                }
+                logS += "   got self based relation as: "+RelationController.getRelation(a, a);
+                log.info(logS);
+            }catch (Exception e){
+                log.info("ERROR: failed to get log data for lord because: "+e);
+                log.info("getting incomplete lord log as:");
+                log.info(logS);
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.*;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.util.Misc;
+import org.apache.log4j.Logger;
 import starlords.controllers.*;
 import starlords.person.Lord;
 import starlords.person.LordAction;
@@ -18,6 +19,7 @@ import java.util.Random;
 import static starlords.util.Constants.*;
 
 public class BattleListener extends BaseCampaignEventListener {
+    private static final Logger log = Global.getLogger(BattleListener.class);
     public BattleListener(boolean permaRegister) {
         super(permaRegister);
     }
@@ -199,6 +201,11 @@ public class BattleListener extends BaseCampaignEventListener {
 
             // check if defeated lord had prisoners. These prisoners are either freed or transferred to new captor
             for (String prisonerId : defeated.getPrisoners()) {
+                if (LordController.getLordById(prisonerId) == null) {
+                    //todo: somehow, starlords are getting lords that don't exist in normal gameplay as prisoners. I dont know if its because the lords are being removed by mistake, or something else. but regardless, this helps prevent issues from missing lords being freed or taken prisoner.
+                    log.info("ERROR: failed to get prisoner from lords inventory. missing lords persionID should have been: "+prisonerId);
+                    continue;
+                }
                 boolean freed = true;
                 Lord existingPrisoner = LordController.getLordById(prisonerId);
                 if (captor != null && captor.getFaction().isHostileTo(existingPrisoner.getFaction())) {

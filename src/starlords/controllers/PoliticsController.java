@@ -72,6 +72,7 @@ public class PoliticsController implements EveryFrameScript {
                 - rand.nextInt((int) (LORD_THINK_INTERVAL * ONE_DAY)));
     }
     public static void removeLord(Lord lord){
+        if(instance.lordProposalsMap.get(lord.getLordAPI().getId()) != null) instance.lordProposalsMap.get(lord.getLordAPI().getId()).kill();
         instance.lordTimestampMap.remove(lord.getLordAPI().getId());
         instance.lordProposalsMap.remove(lord.getLordAPI().getId());
         for(int a = instance.lordProposalsMap.size()-1; a >= 0; a--){

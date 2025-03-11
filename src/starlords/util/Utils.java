@@ -295,7 +295,9 @@ public class Utils {
     }
 
     public static SectorEntityToken findNearestMarket(SectorEntityToken target){
-        SectorEntityToken output = Misc.findNearestLocalMarket(target, 1e10f, null).getPrimaryEntity();
+        SectorEntityToken output = null;
+        MarketAPI marketTemp = Misc.findNearestLocalMarket(target, 1e10f, null);
+        if (marketTemp != null && marketTemp.getPrimaryEntity() != null) output = marketTemp.getPrimaryEntity();
         if (output != null) return output;
         List<MarketAPI> a = Global.getSector().getEconomy().getMarketsCopy();
 
