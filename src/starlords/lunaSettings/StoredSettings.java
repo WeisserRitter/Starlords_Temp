@@ -17,6 +17,7 @@ import starlords.generator.types.fleet.LordFleetGeneratorBase;
 import starlords.generator.types.fleet.LordFleetGenerator_Desing;
 import starlords.generator.types.fleet.LordFleetGenerator_Hullmod;
 import starlords.generator.types.fleet.LordFleetGenerator_System;
+import starlords.ui.LordsIntelPlugin;
 import starlords.util.Constants;
 import starlords.util.Utils;
 import starlords.util.WeightedRandom;
@@ -161,7 +162,7 @@ public class StoredSettings {
         picker.setT2Addition(LunaSettings.getDouble(Constants.MOD_ID,"EL_T2Additional"));
         picker.setT2oddsOfFief(LunaSettings.getDouble(Constants.MOD_ID,"EL_T2OddsOfFief"));
 
-        json = Global.getSettings().getMergedJSONForMod("data/generator/starlord_generaterSettings.json",Constants.MOD_ID);
+        json = Global.getSettings().getMergedJSONForMod("data/config/generator/starlord_generaterSettings.json",Constants.MOD_ID);
         JSONObject exscludedFactions = json.getJSONObject("excluded_factions");
         NewGameLordPicker.setExcludeFactions(new ArrayList<>());
         for (Iterator it = exscludedFactions.keys(); it.hasNext(); ) {
@@ -205,7 +206,7 @@ public class StoredSettings {
 
         LifeAndDeathController.setPointsOnMarketCreation(getLunaWeightedRandom("LAD_StartingPonits"));
 
-        json = Global.getSettings().getMergedJSONForMod("data/generator/starlord_LifeAndDeathSettings.json",Constants.MOD_ID);
+        json = Global.getSettings().getMergedJSONForMod("data/config/generator/starlord_LifeAndDeathSettings.json",Constants.MOD_ID);
         exscludedFactions = json.getJSONObject("excluded_factions");
         LifeAndDeathController.setExcludedFactions(new ArrayList<>());
         for (Iterator it = exscludedFactions.keys(); it.hasNext(); ) {
@@ -219,6 +220,14 @@ public class StoredSettings {
             LifeAndDeathController.getExtremestFactions().put(key,factionMultiplyer.getDouble(key));
         }
 
+
+
+        LordsIntelPlugin.setRepForComs(LunaSettings.getInt(Constants.MOD_ID,"Other_requiredRepForDirectContact"));
+        LordsIntelPlugin.setRepForLocation(LunaSettings.getInt(Constants.MOD_ID,"Other_requiredRepForKnowledgeOfLocation"));
+        LordsIntelPlugin.setRepForShips(LunaSettings.getInt(Constants.MOD_ID,"Other_requiredRepForKnowledgeOfShips"));
+        LordsIntelPlugin.setRepForWealth(LunaSettings.getInt(Constants.MOD_ID,"Other_requiredRepForKnowledgeOfWealth"));
+        LordsIntelPlugin.setRepForCurAction(LunaSettings.getInt(Constants.MOD_ID,"Other_requiredRepForKnowledgeOfCurAction"));
+        LordsIntelPlugin.setAllowLordsToBeViewed(LunaSettings.getBoolean(Constants.MOD_ID,"Other_showAllLordsIntelByDefault"));
 
         log.info("DEBUG: luna settings loaded successfully.");
     }
@@ -275,7 +284,7 @@ public class StoredSettings {
 
 
         //lord generator settings
-         json = Global.getSettings().getMergedJSONForMod("data/generator/starlord_generaterSettings.json",Constants.MOD_ID);
+         json = Global.getSettings().getMergedJSONForMod("data/config/generator/starlord_generaterSettings.json",Constants.MOD_ID);
         log.info("DEBUG: attempting to get normal config settings");
         LordGenerator.setStarlordLevelRatio(getConfigWeightedRandom("generator_lordLevel",json));
         LordGenerator.setSizeRatio(new WeightedRandom[]{
@@ -361,7 +370,7 @@ public class StoredSettings {
         NewGameLordPicker.instance = picker;
 
         //'life and death' settings
-        json = Global.getSettings().getMergedJSONForMod("data/generator/starlord_LifeAndDeathSettings.json",Constants.MOD_ID);
+        json = Global.getSettings().getMergedJSONForMod("data/config/generator/starlord_LifeAndDeathSettings.json",Constants.MOD_ID);
 
         Constants.ENABLE_LIFE_AND_DEATH_SYSTEM = json.getBoolean("fetures_lifeAndDeathSystem");
 
@@ -403,6 +412,13 @@ public class StoredSettings {
         }
 
 
+        json = Global.getSettings().getMergedJSONForMod("data/config/starlord_settings.json",Constants.MOD_ID);
+        LordsIntelPlugin.setRepForComs(json.getInt("requiredRepForDirectContact"));
+        LordsIntelPlugin.setRepForLocation(json.getInt("requiredRepForKnowledgeOfLocation"));
+        LordsIntelPlugin.setRepForShips(json.getInt("requiredRepForKnowledgeOfShips"));
+        LordsIntelPlugin.setRepForWealth(json.getInt("requiredRepForKnowledgeOfWealth"));
+        LordsIntelPlugin.setRepForCurAction(json.getInt("requiredRepForKnowledgeOfCurAction"));
+        LordsIntelPlugin.setAllowLordsToBeViewed(json.getBoolean("showAllLordsIntelByDefault"));
         log.info("DEBUG: normal config settings loaded successfully.");
     }
 

@@ -412,8 +412,10 @@ public class LordController {
     }
 
     public static void logAllLords(){
+
         //this exists as debugger, built do to evidence of save corruption. I must fix this somehow...
         log.info("outputting the status of all in game starlords. please report any issues here...");
+        String allLordIds2 = "allLordsInController = {";
         for (Lord a : lordsList){
             String logS = "";
             try {
@@ -431,6 +433,7 @@ public class LordController {
                     logS += "       starlord has a prisoner of ID, name: " + id + ", " + getLordById(id).getLordAPI().getNameString();
                     logS += '\n';
                 }
+                allLordIds2+='"'+a.getLordAPI().getId()+'"'+',';
                 logS += "   got self based relation as: "+RelationController.getRelation(a, a);
                 log.info(logS);
             }catch (Exception e){
@@ -439,5 +442,25 @@ public class LordController {
                 log.info(logS);
             }
         }
+        allLordIds2 += "};";
+
+        List<IntelInfoPlugin> lordIntel = Global.getSector().getIntelManager().getIntel();
+        log.info("checking lord plugins, just in case...");
+        int n = 0;
+        String allLordIds = "allLordsIntelIds =     {";
+        for (IntelInfoPlugin plugin : lordIntel) {
+            if (!(plugin instanceof LordsIntelPlugin)) continue;
+            n++;
+            Lord newLord = ((LordsIntelPlugin) plugin).getLord();
+            if (lordsMap.get(newLord.getLordAPI().getId()) == null){
+                log.info("ERROR: lord found in plugins, and is not in saved lord list. id of: "+newLord.getLordAPI().getId());
+                continue;
+            }
+            allLordIds+='"'+newLord.getLordAPI().getId()+'"'+',';
+        }
+        allLordIds+="};";
+        log.info("got a total intil lords / stored lords as: "+n+", "+lordsList.size());
+        log.info(allLordIds);
+        log.info(allLordIds2);
     }
 }
