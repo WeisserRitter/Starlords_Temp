@@ -1,3 +1,6 @@
+V0.3.12:
+    added some mod settings that allow you to view a lords stats / contact a given starlord in the lords intel tab
+    improved some logs for easier debugging
 V0.3.11:
     fixed a rare crash do to a lords target being null, somehow.
     fixed a issue were one could get a out of bound data from adding more then 24 factions mid game why would you do that you crazy person?

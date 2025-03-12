@@ -35,13 +35,25 @@ public class LordsIntelPlugin extends BaseIntelPlugin {
     @Setter
     private Lord lord;
 
+    @Setter
+    private static double repForComs;
+    @Setter
+    private static double repForLocation;
+    @Setter
+    private static double repForShips;
+    @Setter
+    private static double repForWealth;
+    @Setter
+    private static double repForCurAction;
+    @Setter
+    private static boolean allowLordsToBeViewed;
     private LordsIntelPlugin(Lord lord) {
         this.lord = lord;
     }
 
     @Override
     public boolean isHidden() {
-        return !lord.isKnownToPlayer() && !DEBUG_MODE;
+        return (!lord.isKnownToPlayer() && !DEBUG_MODE && !allowLordsToBeViewed);
     }
 
     @Override
@@ -80,7 +92,7 @@ public class LordsIntelPlugin extends BaseIntelPlugin {
             fiefStr = fiefStr.substring(0, fiefStr.length() - 2);
         }
         String wealthStr;
-        if (lord.getPlayerRel() < Utils.getThreshold(RepLevel.WELCOMING)
+        if (lord.getPlayerRel() < repForWealth
                 && !isSubject && !isMarried && !DEBUG_MODE) {
             wealthStr = "[REDACTED]";
         } else {
@@ -95,7 +107,7 @@ public class LordsIntelPlugin extends BaseIntelPlugin {
             personalityStr = "Unknown";
         }
         String orderStr;
-        if (lord.getPlayerRel() < Utils.getThreshold(RepLevel.FRIENDLY)
+        if (lord.getPlayerRel() < repForCurAction
                 && !isSubject && !isMarried && !DEBUG_MODE) {
             orderStr = "[REDACTED]";
         } else if (lord.getCurrAction() == LordAction.IMPRISONED) {
@@ -120,7 +132,7 @@ public class LordsIntelPlugin extends BaseIntelPlugin {
             }
         }
         String lastSeenStr;
-        if (lord.getPlayerRel() < Utils.getThreshold(RepLevel.COOPERATIVE)
+        if (lord.getPlayerRel() < repForLocation
                 && !isSubject && !isMarried && !DEBUG_MODE) {
             lastSeenStr = "[REDACTED]";
         }  else if (!fleet.isAlive()) {
@@ -153,7 +165,7 @@ public class LordsIntelPlugin extends BaseIntelPlugin {
                 faction.getBrightUIColor(), faction.getDarkUIColor(), Alignment.LMID, opad);
         // shiplist
         if (lord.getCurrAction() != LordAction.COMPANION) {
-            if (lord.getPlayerRel() >= Utils.getThreshold(RepLevel.FRIENDLY)
+            if (lord.getPlayerRel() >= repForShips
                     || isSubject || isMarried || DEBUG_MODE) {
                 int rows = 3;
                 if (lord.getLordAPI().getFleet().getNumShips() <= 30) rows = 2;
@@ -169,7 +181,7 @@ public class LordsIntelPlugin extends BaseIntelPlugin {
         float buttonPad = Math.min(Math.max(opad, height - outer.getHeightSoFar() - 160), 100 + pad);
         ButtonAPI button = outer.addButton("Open Comms", OPEN_COMMS_BUTTON, 150, 20, buttonPad);
         button.setShortcut(Keyboard.KEY_C, true);
-        if (lord.getPlayerRel() < Utils.getThreshold(RepLevel.COOPERATIVE)
+        if (lord.getPlayerRel() < repForComs
                 && !isSubject && !isMarried && !DEBUG_MODE) {
             button.setEnabled(false);
             outer.addTooltipToPrevious(new ToolTip(175, "Requires higher relations"),
@@ -184,7 +196,7 @@ public class LordsIntelPlugin extends BaseIntelPlugin {
 
     @Override
     public void buttonPressConfirmed(Object buttonId, IntelUIAPI ui) {
-        if (buttonId == OPEN_COMMS_BUTTON && lord.getPlayerRel() >= Utils.getThreshold(RepLevel.COOPERATIVE)) {
+        if (buttonId == OPEN_COMMS_BUTTON && lord.getPlayerRel() >= repForComs) {
             LordInteractionDialogPluginImpl conversationDelegate = new LordInteractionDialogPluginImpl();
             if (lord.getCurrAction() == LordAction.COMPANION) {
                 ui.showDialog(lord.getOldFleet(), conversationDelegate);
@@ -219,7 +231,7 @@ public class LordsIntelPlugin extends BaseIntelPlugin {
     public SectorEntityToken getMapLocation(SectorMapAPI map) {
         if (lord.getFaction().equals(Utils.getRecruitmentFaction())) {
             if (lord.getFaction().isPlayerFaction()
-                    || lord.getPlayerRel() >= Utils.getThreshold(RepLevel.COOPERATIVE) || lord.isMarried()) {
+                    || lord.getPlayerRel() >= repForLocation || lord.isMarried()) {
                 if (lord.getFleet() == null || !lord.getFleet().isAlive()) return null;
                 return lord.getFleet();
             }

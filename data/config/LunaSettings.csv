@@ -4,6 +4,14 @@ text_MainSettings,,Text,This is the area were you can enable / disable fetures.,
 fetures_newLordsInNewGame,Enable additonal lords on startup,Boolean,false,,"If set to true, when starting a new game factions will create there own randomly generated starlords, provided said faction does not already have any",,,Fetures
 fetures_lifeAndDeathSystem,Enable life and death system,Boolean,false,,"If set to true, starlord will beable to die. in additional, new starlords will enter the game as time goes on",,,Fetures
 ,,,,,,,,
+Header_lordRelationSettings,,Header,Lord intel interaction settings,,,,,Other
+Other_requiredRepForDirectContact,Required reputation for directly opening comunications from the lords tab,Int,75,,,-100,100,Other
+Other_requiredRepForKnowledgeOfLocation,Required reputation for knowing a lords location from the lords tab,Int,75,,,-100,100,Other
+Other_requiredRepForKnowledgeOfShips,Required reputation for knowing a lords ships from the lords tab,Int,50,,,-100,100,Other
+Other_requiredRepForKnowledgeOfWealth,Required reputation for knowing a lords wealth from the lords tab,Int,25,,,-100,100,Other
+Other_requiredRepForKnowledgeOfCurAction,Required reputation for knowing a lords current action from the lords tab,Int,50,,,-100,100,Other
+Other_showAllLordsIntelByDefault,Show lords in the intil tab before you meet them,Boolean,false,,,,,Other
+,,,,,,,,
 EL_EnableAdditionalLords,Enable additonal lords for all faction,Boolean,false,,"if set to true, every faction will beable to gain additional starlords. regardless of if they already have starlords or not",,,Exstra Lords
 EL_EnableMaxLords,Enable a maximum number of lords that the generator will allow,Boolean,true,,"if set to true, starlords will not be generated past the maximum amount. instead, the game will attempt to reduce everyfactions generated starlords so a number around the max amount is generated",,,Exstra Lords
 EL_MaxGeneratedLords,The maximum number of lords that will be generated.,Int,1000,,"please keep in mind: this will calulate each tier of lords indevidualy. it will also round down for that. so if this triggers, you will very rarely get the max number of lords. will only trigger if the calculated number of lords to generate is greater then this value",1,10000,Exstra Lords
