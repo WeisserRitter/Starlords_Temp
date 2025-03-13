@@ -425,7 +425,7 @@ public class LordController {
                 logS += '\n';
                 for (String b : a.getPrisoners()) {
                     String id = b;
-                    if (getLordById(id) != null) {
+                    if (getLordById(id) == null) {
                         logS += "       ERROR: got a starlord that does not exsist somehow. id of " + id;
                         logS += '\n';
                         continue;

@@ -94,15 +94,17 @@ public class RelationController extends BaseIntelPlugin {
         //recreates the relationship array without the inputted lord.
         int[][] tempa = instance.lordRelations;
         instance.lordRelations = new int[instance.lordRelations.length - 1][instance.lordRelations.length - 1];
+        //recreates the relationship array of every item before the removed lord.
         for (int a = 0; a < index; a++){
-            /*for (int b = 0; b < index; b++){
+            for (int b = 0; b < index; b++){
                 instance.lordRelations[a][b] = tempa[a][b];
-            }*/
+            }
             for (int b = index+1; b < tempa[a].length; b++){
                 instance.lordRelations[a][b-1] = tempa[a][b];
             }
         }
-        for (int a = tempa.length+1; a < tempa.length; a++){
+        //recreates the relationship array for every item after the removed lord
+        for (int a = index+1; a < tempa.length; a++){
             for (int b = 0; b < index; b++){
                 instance.lordRelations[a-1][b] = tempa[a][b];
             }
@@ -115,9 +117,9 @@ public class RelationController extends BaseIntelPlugin {
         tempa = instance.factionRelations;
         instance.factionRelations = new int[instance.factionRelations.length][LordController.getLordsList().size() - 1];
         for (int a = 0; a < tempa.length; a++){
-            /*for (int b = 0; b < index; b++){
-                instance.lordRelations[a][b] = tempa[a][b];
-            }*/
+            for (int b = 0; b < index; b++){
+                instance.factionRelations[a][b] = tempa[a][b];
+            }
             for (int b = index+1; b < tempa[a].length; b++){
                 instance.factionRelations[a][b-1] = tempa[a][b];
             }
