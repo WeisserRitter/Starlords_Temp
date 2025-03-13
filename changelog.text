@@ -1,3 +1,5 @@
+V0.3.13:
+    (life and death system) fixed starlords relationship data getting mass deleted whenever a starlord died. (I wish I was joking, im so sorry)
 V0.3.12:
     added some mod settings that allow you to view a lords stats / contact a given starlord in the lords intel tab
     improved some logs for easier debugging
