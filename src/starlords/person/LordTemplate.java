@@ -22,6 +22,7 @@ public final class LordTemplate {
     public final String flagShip;
     public final String lore;
     public final HashMap<String, Integer> shipPrefs;
+    public final HashMap<String, Integer> customSkills;
     public final String fief;
     public final String portrait;
     public final int level;
@@ -79,6 +80,14 @@ public final class LordTemplate {
         for (Iterator it = prefJson.keys(); it.hasNext(); ) {
             String key = (String) it.next();
             shipPrefs.put(key, prefJson.getInt(key));
+        }
+        customSkills = new HashMap<>();
+        JSONObject skillJson = template.getJSONObject("customSkills");
+        if (skillJson != null) {
+            for (Iterator it = skillJson.keys(); it.hasNext();) {
+                String key = (String) it.next();
+                customSkills.put(key, skillJson.getInt(key));
+            }
         }
     }
     @SneakyThrows
