@@ -136,5 +136,6 @@ public final class LordTemplate {
         level = template.level;
         ranking = template.ranking;
         shipPrefs = template.shipPrefs;
+        customSkills = template.customSkills;
     }
 }
