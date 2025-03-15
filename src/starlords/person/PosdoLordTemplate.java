@@ -11,7 +11,6 @@ public class PosdoLordTemplate {
     public String flagShip;
     public String lore;
     public HashMap<String, Integer> shipPrefs;
-    public HashMap<String, Integer> customSkills;
     public String fief;
     public String portrait;
     public int level;
@@ -35,6 +34,5 @@ public class PosdoLordTemplate {
         this.battlePersonality=battlePersonality;
         this.ranking=ranking;
         this.preferredItemId=preferredItemId;
-        this.customSkills=customSkills;
     }
 }
