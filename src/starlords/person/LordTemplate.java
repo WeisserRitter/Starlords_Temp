@@ -82,8 +82,8 @@ public final class LordTemplate {
             shipPrefs.put(key, prefJson.getInt(key));
         }
         customSkills = new HashMap<>();
-        JSONObject skillJson = template.getJSONObject("customSkills");
-        if (skillJson != null) {
+        if (template.has("customSkills")) {
+            JSONObject skillJson = template.getJSONObject("customSkills");
             for (Iterator it = skillJson.keys(); it.hasNext();) {
                 String key = (String) it.next();
                 customSkills.put(key, skillJson.getInt(key));
@@ -136,6 +136,6 @@ public final class LordTemplate {
         level = template.level;
         ranking = template.ranking;
         shipPrefs = template.shipPrefs;
-        customSkills = template.customSkills;
+        customSkills = template.customSkills != null ? template.customSkills : new HashMap<>();
     }
 }
