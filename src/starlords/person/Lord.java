@@ -195,7 +195,6 @@ public class Lord {
             try {
                 template.customSkills.forEach((skillName, skillLevel) -> lord.getStats().setSkillLevel(skillName, skillLevel));
             } catch (Exception e) {
-                log.info("DEBUG: Failed to add skill: " + skillName);
             }
         }
     }
