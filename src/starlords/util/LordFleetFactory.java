@@ -50,19 +50,24 @@ public class LordFleetFactory extends FleetFactoryV3 {
             }
             if (ship.isFlagship()) {
                 ship.setCaptain(lord.getLordAPI());
-            } else if (!Misc.isAutomated(ship)) {
-                PersonAPI officer = lord.getLordAPI().getFaction().createRandomPerson();
-                officer.setPersonality(lord.getTemplate().battlePersonality);
-                upskillOfficer(officer, true);
-                Misc.setUnremovable(officer, true);
-                lord.getLordAPI().getFleet().getFleetData().addOfficer(officer);
-                ship.setCaptain(officer);
             } else {
-                //modify this so it's dynamic... eventually
-                AICoreOfficerPlugin plugin = Misc.getAICoreOfficerPlugin(Commodities.BETA_CORE);
-                PersonAPI aiOfficer = plugin.createPerson(Commodities.BETA_CORE, Factions.REMNANTS, new Random());
-                ship.setCaptain(aiOfficer);
-                Misc.setUnremovable(aiOfficer, true);
+                PersonAPI officer = lord.getLordAPI().getFaction().createRandomPerson();
+
+                boolean isAuxiliaryAIShip = !officer.isAICore() && Misc.isAutomated(ship);
+
+                if (isAuxiliaryAIShip) {
+                    //modify this so it's dynamic... eventually
+                    AICoreOfficerPlugin plugin = Misc.getAICoreOfficerPlugin(Commodities.BETA_CORE);
+                    PersonAPI aiOfficer = plugin.createPerson(Commodities.BETA_CORE, Factions.REMNANTS, new Random());
+                    ship.setCaptain(aiOfficer);
+                    Misc.setUnremovable(aiOfficer, true);
+                } else {
+                    officer.setPersonality(lord.getTemplate().battlePersonality);
+                    upskillOfficer(officer, true);
+                    Misc.setUnremovable(officer, true);
+                    lord.getLordAPI().getFleet().getFleetData().addOfficer(officer);
+                    ship.setCaptain(officer);
+                }
             }
         }
     }
