@@ -596,7 +596,7 @@ public class PoliticsController implements EveryFrameScript {
             }
             if (proposal.targetLord != null) {
                 Lord target = LordController.getLordOrPlayerById(proposal.targetLord);
-                if (!target.getFaction().equals(proposal.getFaction())) isValid = false;
+                if (target == null || !target.getFaction().equals(proposal.getFaction())) isValid = false;
             }
             if (!isValid) {
                 proposal.kill();

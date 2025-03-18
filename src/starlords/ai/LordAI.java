@@ -672,6 +672,10 @@ public class LordAI implements EveryFrameScript {
                 if (Utils.getDaysSince(lord.getAssignmentStartTime()) > LARGE_OP_RECONSIDER_INTERVAL) {
                     FactionAPI faction = lord.getFaction();
                     LordEvent campaign = EventController.getCurrentCampaign(faction);
+                    if (campaign == null){
+                        //yes this happened. I don't know how or why.
+                        chooseAssignment(lord);
+                    }
                     int weight = EventController.getJoinCampaignWeight(lord);
                     if (campaign.getBattle() != null) {
                         // dont leave if battle ongoing
