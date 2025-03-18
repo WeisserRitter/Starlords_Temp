@@ -76,6 +76,12 @@ public class PoliticsController implements EveryFrameScript {
         instance.lordTimestampMap.remove(lord.getLordAPI().getId());
         instance.lordProposalsMap.remove(lord.getLordAPI().getId());
         for(int a = instance.lordProposalsMap.size()-1; a >= 0; a--){
+            //todo: I need to remember to fix this issue at some point, but I need to remove policies involving dead lords.
+            /*if (((LawProposal) instance.lordProposalsMap.values().toArray()[a])!= null && ((LawProposal) instance.lordProposalsMap.values().toArray()[a]).targetLord != null && ((LawProposal) instance.lordProposalsMap.values().toArray()[a]).targetLord.equals(lord.getLordAPI().getId()) ){
+                String key = (String) instance.lordProposalsMap.keySet().toArray()[a];
+                instance.lordProposalsMap.remove(key);
+                continue;
+            }*/
             if (((LawProposal)instance.lordProposalsMap.values().toArray()[a])!= null) {
                 ArrayList<String> b = ((LawProposal) instance.lordProposalsMap.values().toArray()[a]).getOpposers();
                 for (int c = 0; c < b.size(); c++) {
@@ -94,6 +100,7 @@ public class PoliticsController implements EveryFrameScript {
                     }
                 }
             }
+
         }
         if (getInstance().factionLawsMap.get(lord.getFaction().getId()).getMarshal() != null && getInstance().factionLawsMap.get(lord.getFaction().getId()).getMarshal().equals(lord.getLordAPI().getId())) getInstance().factionLawsMap.get(lord.getFaction().getId()).setMarshal(null);
         /*
