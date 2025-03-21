@@ -1,7 +1,7 @@
 V0.3.14:
     fixed a issue were a lord being dead well a policy is attempted to effect them could cause a crash.
     (hopefully) fixed a issue were a lord could still be on campaign, when the campaign was over.
-    (thanks WeisserRitter for the following:)
+    (thanks to (forum)Erlkönig / (discord)Zeilon depending on location for the following:)
         added support for having lords with custom skill sets.
 V0.3.13:
     (life and death system) fixed starlords relationship data getting mass deleted whenever a starlord died. (I wish I was joking, im so sorry)
