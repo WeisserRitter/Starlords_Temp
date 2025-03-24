@@ -4,8 +4,10 @@ import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import lombok.SneakyThrows;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 // Contains all immutable traits of a lord, from lords.json
 public final class LordTemplate {
@@ -19,6 +21,8 @@ public final class LordTemplate {
     public final String lore;
     public final HashMap<String, Integer> shipPrefs;
     public final HashMap<String, Integer> customSkills;
+    public final List<String> customLordSMods;
+    public final List<String> customFleetSMods;
     public final String fief;
     public final String portrait;
     public final int level;
@@ -85,6 +89,19 @@ public final class LordTemplate {
                 customSkills.put(key, skillJson.getInt(key));
             }
         }
+        customLordSMods = new ArrayList<>();
+        customFleetSMods = new ArrayList<>();
+        if (template.has("customSMods")) {
+            JSONObject customSmodsInTemplate = template.getJSONObject("customSMods");
+            for (Iterator it = customSmodsInTemplate.keys(); it.hasNext();) {
+                String key = (String) it.next();
+                if (customSmodsInTemplate.getInt(key) == 1) {
+                    customLordSMods.add(key);
+                } else {
+                    customFleetSMods.add(key);
+                }
+            }
+        }
     }
     @SneakyThrows
     public LordTemplate(PosdoLordTemplate template) {
@@ -120,7 +137,7 @@ public final class LordTemplate {
         flagShip = template.flagShip;
         lore = template.lore;
         portrait = template.portrait;
-        if (template.preferredItemId != null && !template.preferredItemId.equals("")) {
+        if (template.preferredItemId != null && !template.preferredItemId.isEmpty()) {
             preferredItemId = template.preferredItemId;
         } else {  // everyone likes butter by default
             preferredItemId = "food";
@@ -133,5 +150,7 @@ public final class LordTemplate {
         ranking = template.ranking;
         shipPrefs = template.shipPrefs;
         customSkills = new HashMap<>();
+        customLordSMods = new ArrayList<>();
+        customFleetSMods = new ArrayList<>();
     }
 }

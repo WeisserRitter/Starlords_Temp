@@ -51,6 +51,13 @@ public class LordFleetFactory extends FleetFactoryV3 {
             }
             if (ship.isFlagship()) {
                 ship.setCaptain(lord.getLordAPI());
+                if (!lord.getTemplate().customLordSMods.isEmpty()) {
+                    for (String customLordSMod : lord.getTemplate().customLordSMods) {
+                        if (!ship.getVariant().hasHullMod(customLordSMod)) {
+                            ship.getVariant().addPermaMod(customLordSMod, true);
+                        }
+                    }
+                }
             } else {
                 PersonAPI officer = lord.getLordAPI().getFaction().createRandomPerson();
                 officer.setPersonality(lord.getTemplate().battlePersonality);
@@ -58,6 +65,14 @@ public class LordFleetFactory extends FleetFactoryV3 {
                 Misc.setUnremovable(officer, true);
                 lord.getLordAPI().getFleet().getFleetData().addOfficer(officer);
                 ship.setCaptain(officer);
+            }
+
+            if (!lord.getTemplate().customFleetSMods.isEmpty()) {
+                for (String customLordSMod : lord.getTemplate().customFleetSMods) {
+                    if (!ship.getVariant().hasHullMod(customLordSMod)) {
+                        ship.getVariant().addPermaMod(customLordSMod, true);
+                    }
+                }
             }
         }
     }
