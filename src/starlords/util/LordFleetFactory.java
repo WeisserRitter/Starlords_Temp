@@ -17,6 +17,7 @@ import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.util.Misc;
+import com.fs.starfarer.api.util.WeightedRandomPicker;
 import starlords.person.Lord;
 import starlords.person.LordPersonality;
 
@@ -27,7 +28,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
     public static final float DP_CAP = 500;
     public static final float GARRISON_DP_CAP = 500;
     public static final float COST_MULT = 750;  // cost for a lord to buy a ship is its base DP cost * COST_MULT
-    public static final float MOD_COST = 250;  // cost for a lord to buy a s-mod is its base DP cost * MOD_COST
+    public static final float MOD_COST = 250;  // cost for a lord to buy an s-mod is its base DP cost * MOD_COST
     public static final int FUEL_COST = 10;  // cost for lord to buy 1 fuel
     public static final int MARINE_COST = 80;  // cost for lord to buy 1 marine
     public static final int HEAVY_ARMS_COST = 200;  // cost for lord to buy 1 heavy armament
@@ -56,9 +57,9 @@ public class LordFleetFactory extends FleetFactoryV3 {
                 boolean isAuxiliaryAIShip = !officer.isAICore() && Misc.isAutomated(ship);
 
                 if (isAuxiliaryAIShip) {
-                    //modify this so it's dynamic... eventually
-                    AICoreOfficerPlugin plugin = Misc.getAICoreOfficerPlugin(Commodities.BETA_CORE);
-                    PersonAPI aiOfficer = plugin.createPerson(Commodities.BETA_CORE, Factions.REMNANTS, new Random());
+                    String aiCore = getRandomAiCoreForLord(lord);
+                    AICoreOfficerPlugin plugin = Misc.getAICoreOfficerPlugin(aiCore);
+                    PersonAPI aiOfficer = plugin.createPerson(aiCore, Factions.REMNANTS, new Random());
                     ship.setCaptain(aiOfficer);
                     Misc.setUnremovable(aiOfficer, true);
                 } else {
@@ -70,6 +71,27 @@ public class LordFleetFactory extends FleetFactoryV3 {
                 }
             }
         }
+    }
+
+    private static String getRandomAiCoreForLord(Lord lord) {
+        WeightedRandomPicker<String> aiCorePicker = new WeightedRandomPicker<>();
+
+        switch (lord.getRanking()) {
+            case 0:
+                aiCorePicker.add(Commodities.GAMMA_CORE, 4f);
+                aiCorePicker.add(Commodities.BETA_CORE, 2f);
+                aiCorePicker.add(Commodities.ALPHA_CORE, 0.5f);
+            case 1:
+                aiCorePicker.add(Commodities.GAMMA_CORE, 2f);
+                aiCorePicker.add(Commodities.BETA_CORE, 3f);
+                aiCorePicker.add(Commodities.ALPHA_CORE, 1f);
+            case 2:
+                aiCorePicker.add(Commodities.BETA_CORE, 4f);
+                aiCorePicker.add(Commodities.ALPHA_CORE, 2f);
+                aiCorePicker.add(Commodities.OMEGA_CORE, 0.5f);
+        }
+
+        return aiCorePicker.pick();
     }
 
     // returns cost of ships purchased
@@ -202,7 +224,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
     }
 
     // buys fuel, marines, and heavy armaments
-    public static float buyGoodsforFleet(Lord lord, CampaignFleetAPI fleet, Random random, float cash) {
+    public static float buyGoodsForFleet(Lord lord, CampaignFleetAPI fleet, Random random, float cash) {
         float totalCost = 0;
         CargoAPI cargo = fleet.getCargo();
         int fuelCap = cargo.getFreeFuelSpace();
@@ -252,7 +274,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
         // allocate wealth to buying ships and upgrades
         CargoAPI cargo = lord.getFleet().getCargo();
         float shipFunds = Math.min(lord.getWealth(), lord.getWealth() * (2 - 2 * totalDP / DP_CAP));
-        // lords should buy a bit of fuel and marines before buying smods
+        // lords should buy a bit of fuel and marines before buying s-mods
         float minCargoFunds = Math.min(
                 lord.getWealth() - shipFunds,
                 FUEL_COST * Math.max(100, 500 - cargo.getFuel()) + MARINE_COST * Math.max(0, 200 - cargo.getMarines()));
@@ -264,7 +286,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
         lord.addWealth(-1 * cost);
         cost = buyGarrison(lord, lord.getWealth() - minCargoFunds);
         lord.addWealth(-1 * cost);
-        cost = buyGoodsforFleet(lord, lord.getFleet(), new Random(), lord.getWealth());
+        cost = buyGoodsForFleet(lord, lord.getFleet(), new Random(), lord.getWealth());
         lord.addWealth(-1 * cost);
         populateCaptains(lord);
     }
