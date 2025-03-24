@@ -92,10 +92,10 @@ public final class LordTemplate {
         customLordSMods = new ArrayList<>();
         customFleetSMods = new ArrayList<>();
         if (template.has("customSMods")) {
-            JSONObject customSmodsInTemplate = template.getJSONObject("customSMods");
-            for (Iterator it = customSmodsInTemplate.keys(); it.hasNext();) {
+            JSONObject customSModsInTemplate = template.getJSONObject("customSMods");
+            for (Iterator it = customSModsInTemplate.keys(); it.hasNext();) {
                 String key = (String) it.next();
-                if (customSmodsInTemplate.getInt(key) == 1) {
+                if (customSModsInTemplate.getInt(key) == 1) {
                     customLordSMods.add(key);
                 } else {
                     customFleetSMods.add(key);
