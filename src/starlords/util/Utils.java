@@ -11,7 +11,6 @@ import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.util.Misc;
 import lombok.Setter;
 import org.apache.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 import org.lwjgl.util.vector.Vector2f;
 import starlords.controllers.LordController;
 import starlords.person.Lord;
@@ -40,6 +39,9 @@ public class Utils {
         return Global.getSettings().getModManager().isModEnabled("nexerelin");
     }
 
+    public static boolean secondInCommandEnabled() {
+        return Global.getSettings().getModManager().isModEnabled("second_in_command");
+    }
 
     public static void adjustPlayerReputation(PersonAPI target, int delta) {
         CoreReputationPlugin.CustomRepImpact param = new CoreReputationPlugin.CustomRepImpact();
