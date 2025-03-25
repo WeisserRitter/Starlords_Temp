@@ -28,6 +28,7 @@ public final class LordTemplate {
     public final HashMap<String, List<String>> executiveOfficers;
     public final String fief;
     public final String portrait;
+    public final String portraitGroup;
     public final int level;
     public final String battlePersonality;
     public final int ranking;
@@ -120,6 +121,9 @@ public final class LordTemplate {
                 }
             }
         }
+        // Cursed be the parser that parses null to 'null'
+        String portraitGroup = template.getString("portraitGroup").toLowerCase();
+        this.portraitGroup = portraitGroup.equals("null") ? null : portraitGroup;
     }
     @SneakyThrows
     public LordTemplate(PosdoLordTemplate template) {
@@ -171,5 +175,6 @@ public final class LordTemplate {
         customLordSMods = new ArrayList<>();
         customFleetSMods = new ArrayList<>();
         executiveOfficers = new HashMap<>();
+        portraitGroup = null;
     }
 }

@@ -3,13 +3,12 @@ package starlords.util.crossmod;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import second_in_command.SCData;
 import second_in_command.SCUtils;
-import second_in_command.misc.PotentialPick;
 import second_in_command.specs.*;
 import starlords.person.Lord;
+import starlords.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class SCLordsFactory {
     public static void populateExecutiveOfficers(Lord lord) {
@@ -33,6 +32,11 @@ public class SCLordsFactory {
                 }
             }
             scData.setOfficerInSlot(currentSlot, officer);
+
+            if (lord.getTemplate().portraitGroup != null) {
+                Utils.setPortraitFromGroup(officer.getPerson(), lord.getTemplate().portraitGroup);
+            }
+
             currentSlot++;
         }
     }

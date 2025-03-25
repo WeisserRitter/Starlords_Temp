@@ -9,6 +9,7 @@ import com.fs.starfarer.api.combat.StatBonus;
 import com.fs.starfarer.api.impl.campaign.CoreReputationPlugin;
 import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.util.Misc;
+import com.fs.starfarer.api.util.WeightedRandomPicker;
 import lombok.Setter;
 import org.apache.log4j.Logger;
 import org.lwjgl.util.vector.Vector2f;
@@ -41,6 +42,16 @@ public class Utils {
 
     public static boolean secondInCommandEnabled() {
         return Global.getSettings().getModManager().isModEnabled("second_in_command");
+    }
+
+    public static void setPortraitFromGroup(PersonAPI person, String portraitGroup) {
+        FactionAPI factionFromGroup = Global.getSector()
+                .getFaction(portraitGroup);
+        if (factionFromGroup != null) {
+            WeightedRandomPicker<String> portraits = factionFromGroup.getPortraits(person.getGender());
+            String portraitId = portraits.pick();
+            person.setPortraitSprite(portraitId);
+        }
     }
 
     public static void adjustPlayerReputation(PersonAPI target, int delta) {

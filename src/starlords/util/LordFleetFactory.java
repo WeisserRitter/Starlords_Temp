@@ -70,6 +70,10 @@ public class LordFleetFactory extends FleetFactoryV3 {
                     Misc.setUnremovable(officer, true);
                     lord.getLordAPI().getFleet().getFleetData().addOfficer(officer);
                     ship.setCaptain(officer);
+
+                    if (lord.getTemplate().portraitGroup != null) {
+                        Utils.setPortraitFromGroup(officer, lord.getTemplate().portraitGroup);
+                    }
                 }
             }
 
