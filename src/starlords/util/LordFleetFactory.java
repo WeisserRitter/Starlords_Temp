@@ -70,6 +70,32 @@ public class LordFleetFactory extends FleetFactoryV3 {
                     ship.setCaptain(officer);
                 }
             }
+
+            if (!lord.getTemplate().customFleetSMods.isEmpty()) {
+                for (String customLordSMod : lord.getTemplate().customFleetSMods) {
+                    if (!ship.getVariant().hasHullMod(customLordSMod)) {
+                        ship.getVariant().addPermaMod(customLordSMod, true);
+                    }
+                }
+            }
+        }
+
+        pimpUpFlagship(lord);
+    }
+
+    private static void pimpUpFlagship(Lord lord) {
+        FleetMemberAPI flagship = lord.getFleet().getFlagship();
+        if (flagship != null && !lord.getTemplate().customLordSMods.isEmpty()) {
+            for (String customLordSMod : lord.getTemplate().customLordSMods) {
+                if (!flagship.getVariant().hasHullMod(customLordSMod)) {
+                    flagship.getVariant().addPermaMod(customLordSMod, true);
+                }
+            }
+            for (String customLordSMod : lord.getTemplate().customFleetSMods) {
+                if (!flagship.getVariant().hasHullMod(customLordSMod)) {
+                    flagship.getVariant().addPermaMod(customLordSMod, true);
+                }
+            }
         }
     }
 
