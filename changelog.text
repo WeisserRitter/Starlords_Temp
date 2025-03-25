@@ -1,4 +1,6 @@
 V0.3.15:
+    added a setting for changing the max number of S-mods on a lords ship.
+    added a setting that automatically increases this value by 5 if you have progressive S mods installed (default: on)
     (thanks to (forum)Erlkönig / (discord)Zeilon depending on location for the following:)
         added support for custom S-mods on starlords.
         made automated ships spawn with AI-cores as officers.

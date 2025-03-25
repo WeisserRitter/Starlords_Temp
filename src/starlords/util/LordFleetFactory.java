@@ -18,13 +18,15 @@ import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
+import lombok.Setter;
 import starlords.person.Lord;
 import starlords.person.LordPersonality;
 
 import java.util.*;
 
 public class LordFleetFactory extends FleetFactoryV3 {
-
+    @Setter
+    private static int maxSMods = 3;
     public static final float DP_CAP = 500;
     public static final float GARRISON_DP_CAP = 500;
     public static final float COST_MULT = 750;  // cost for a lord to buy a ship is its base DP cost * COST_MULT
@@ -206,7 +208,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
         List<FleetMemberAPI> members = fleet.getFleetData().getMembersListCopy();
         Collections.shuffle(members);
         for (FleetMemberAPI member : members) {
-            if (member.getVariant().getPermaMods().size() >= 3) continue;
+            if (member.getVariant().getPermaMods().size() >= maxSMods) continue;
             float modCost = MOD_COST * member.getUnmodifiedDeploymentPointsCost();
             if (member.isFlagship()) modCost = 0;
             // discount for very experienced ship
