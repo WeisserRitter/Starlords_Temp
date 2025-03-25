@@ -1,3 +1,7 @@
+V0.3.15:
+    (thanks to (forum)Erlkönig / (discord)Zeilon depending on location for the following:)
+        added support for custom S-mods on starlords.
+        made automated ships spawn with AI-cores as officers.
 V0.3.14:
     fixed a issue were a lord being dead well a policy is attempted to effect them could cause a crash.
     (hopefully) fixed a issue were a lord could still be on campaign, when the campaign was over.
