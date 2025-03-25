@@ -23,7 +23,11 @@ public final class LordTemplate {
     public final String lore;
     public final HashMap<String, Integer> shipPrefs;
     public final HashMap<String, Integer> customSkills;
+
+    public final List<String> customLordSMods;
+    public final List<String> customFleetSMods;
     public final HashMap<String, List<String>> executiveOfficers;
+
     public final String fief;
     public final String portrait;
     public final int level;
@@ -90,6 +94,7 @@ public final class LordTemplate {
                 customSkills.put(key, skillJson.getInt(key));
             }
         }
+
         executiveOfficers = new HashMap<>();
         if (template.has("executiveOfficers") && Utils.secondInCommandEnabled()) {
             JSONObject officerJson = template.getJSONObject("executiveOfficers");
@@ -102,6 +107,20 @@ public final class LordTemplate {
                         executiveOfficerSkills.add(aptitudeSkillList.getString(i));
                     }
                     executiveOfficers.put(key, executiveOfficerSkills);
+                }
+            }
+        }
+
+        customLordSMods = new ArrayList<>();
+        customFleetSMods = new ArrayList<>();
+        if (template.has("customSMods")) {
+            JSONObject customSModsInTemplate = template.getJSONObject("customSMods");
+            for (Iterator it = customSModsInTemplate.keys(); it.hasNext();) {
+                String key = (String) it.next();
+                if (customSModsInTemplate.getInt(key) == 1) {
+                    customLordSMods.add(key);
+                } else {
+                    customFleetSMods.add(key);
                 }
             }
         }
@@ -140,7 +159,7 @@ public final class LordTemplate {
         flagShip = template.flagShip;
         lore = template.lore;
         portrait = template.portrait;
-        if (template.preferredItemId != null && !template.preferredItemId.equals("")) {
+        if (template.preferredItemId != null && !template.preferredItemId.isEmpty()) {
             preferredItemId = template.preferredItemId;
         } else {  // everyone likes butter by default
             preferredItemId = "food";
@@ -154,5 +173,7 @@ public final class LordTemplate {
         shipPrefs = template.shipPrefs;
         customSkills = new HashMap<>();
         executiveOfficers = new HashMap<>();
+        customLordSMods = new ArrayList<>();
+        customFleetSMods = new ArrayList<>();
     }
 }

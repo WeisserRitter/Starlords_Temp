@@ -1,6 +1,7 @@
 package starlords.util;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.AICoreOfficerPlugin;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.CargoAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
@@ -14,10 +15,10 @@ import com.fs.starfarer.api.fleet.FleetMemberType;
 import com.fs.starfarer.api.fleet.ShipRolePick;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
-import com.fs.starfarer.api.impl.campaign.ids.Commodities;
-import com.fs.starfarer.api.impl.campaign.ids.HullMods;
-import com.fs.starfarer.api.impl.campaign.ids.Skills;
+import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.util.Misc;
+import com.fs.starfarer.api.util.WeightedRandomPicker;
+import lombok.Setter;
 import starlords.person.Lord;
 import starlords.person.LordPersonality;
 import starlords.util.crossmod.SCLordsFactory;
@@ -26,11 +27,12 @@ import java.util.*;
 
 
 public class LordFleetFactory extends FleetFactoryV3 {
-
+    @Setter
+    private static int maxSMods = 3;
     public static final float DP_CAP = 500;
     public static final float GARRISON_DP_CAP = 500;
     public static final float COST_MULT = 750;  // cost for a lord to buy a ship is its base DP cost * COST_MULT
-    public static final float MOD_COST = 250;  // cost for a lord to buy a s-mod is its base DP cost * MOD_COST
+    public static final float MOD_COST = 250;  // cost for a lord to buy an s-mod is its base DP cost * MOD_COST
     public static final int FUEL_COST = 10;  // cost for lord to buy 1 fuel
     public static final int MARINE_COST = 80;  // cost for lord to buy 1 marine
     public static final int HEAVY_ARMS_COST = 200;  // cost for lord to buy 1 heavy armament
@@ -55,17 +57,71 @@ public class LordFleetFactory extends FleetFactoryV3 {
                 ship.setCaptain(lord.getLordAPI());
             } else {
                 PersonAPI officer = lord.getLordAPI().getFaction().createRandomPerson();
-                officer.setPersonality(lord.getTemplate().battlePersonality);
-                upskillOfficer(officer, true);
-                Misc.setUnremovable(officer, true);
-                lord.getLordAPI().getFleet().getFleetData().addOfficer(officer);
-                ship.setCaptain(officer);
+
+                boolean isAuxiliaryAIShip = !officer.isAICore() && Misc.isAutomated(ship);
+
+                if (isAuxiliaryAIShip) {
+                    String aiCore = getRandomAiCoreForLord(lord);
+                    AICoreOfficerPlugin plugin = Misc.getAICoreOfficerPlugin(aiCore);
+                    PersonAPI aiOfficer = plugin.createPerson(aiCore, Factions.REMNANTS, new Random());
+                    ship.setCaptain(aiOfficer);
+                    Misc.setUnremovable(aiOfficer, true);
+                } else {
+                    officer.setPersonality(lord.getTemplate().battlePersonality);
+                    upskillOfficer(officer, true);
+                    Misc.setUnremovable(officer, true);
+                    lord.getLordAPI().getFleet().getFleetData().addOfficer(officer);
+                    ship.setCaptain(officer);
+                }
             }
         }
 
         if (Utils.secondInCommandEnabled() && !lord.getTemplate().executiveOfficers.isEmpty()) {
             SCLordsFactory.populateExecutiveOfficers(lord);
         }
+    }
+
+    private static void pimpUpFlagship(Lord lord) {
+        FleetMemberAPI flagship = lord.getFleet().getFlagship();
+        if (flagship != null && !lord.getTemplate().customLordSMods.isEmpty()) {
+            for (String customLordSMod : lord.getTemplate().customLordSMods) {
+                if (!flagship.getVariant().hasHullMod(customLordSMod)) {
+                    flagship.getVariant().addPermaMod(customLordSMod, true);
+                }
+            }
+            for (String customLordSMod : lord.getTemplate().customFleetSMods) {
+                if (!flagship.getVariant().hasHullMod(customLordSMod)) {
+                    flagship.getVariant().addPermaMod(customLordSMod, true);
+                }
+            }
+        }
+    }
+
+    private static String getRandomAiCoreForLord(Lord lord) {
+        WeightedRandomPicker<String> aiCorePicker = new WeightedRandomPicker<>();
+
+        switch (lord.getRanking()) {
+            case 0:
+                aiCorePicker.add(Commodities.GAMMA_CORE, 4f);
+                aiCorePicker.add(Commodities.BETA_CORE, 2f);
+                aiCorePicker.add(Commodities.ALPHA_CORE, 0.5f);
+            case 1:
+                aiCorePicker.add(Commodities.GAMMA_CORE, 2f);
+                aiCorePicker.add(Commodities.BETA_CORE, 3f);
+                aiCorePicker.add(Commodities.ALPHA_CORE, 1f);
+            case 2:
+                aiCorePicker.add(Commodities.BETA_CORE, 4f);
+                aiCorePicker.add(Commodities.ALPHA_CORE, 2f);
+                aiCorePicker.add(Commodities.OMEGA_CORE, 0.01f);
+                break;
+            default:
+                aiCorePicker.add(Commodities.GAMMA_CORE, 1f);
+                aiCorePicker.add(Commodities.BETA_CORE,2f);
+                aiCorePicker.add(Commodities.ALPHA_CORE, 3f);
+                aiCorePicker.add(Commodities.OMEGA_CORE, 0.02f);
+        }
+
+        return aiCorePicker.pick();
     }
 
     // returns cost of ships purchased
@@ -153,19 +209,19 @@ public class LordFleetFactory extends FleetFactoryV3 {
     }
 
     // adds s-mods to fleet members
-    public static float addModsToFleet(CampaignFleetAPI fleet, float cash) {
+    public static float addModsToFleet(CampaignFleetAPI fleet, float cash,Lord lord) {
         float totalCost = 0;
         List<FleetMemberAPI> members = fleet.getFleetData().getMembersListCopy();
         Collections.shuffle(members);
         for (FleetMemberAPI member : members) {
-            if (member.getVariant().getPermaMods().size() >= 3) continue;
+            if (member.getVariant().getPermaMods().size() >= maxSMods) continue;
             float modCost = MOD_COST * member.getUnmodifiedDeploymentPointsCost();
             if (member.isFlagship()) modCost = 0;
             // discount for very experienced ship
             if (member.getCaptain().getStats().getLevel() > 2 + 2 * member.getVariant().getSMods().size()) modCost /= 2;
             if (modCost + totalCost > cash) continue;
 
-            String modToAdd = chooseSMod(member);
+            String modToAdd = chooseSMod(member,lord);
             log.info("Adding mod " + modToAdd + ". Ship has " + member.getVariant().getPermaMods().size());
             if (modToAdd != null) {
                 totalCost += modCost;
@@ -198,7 +254,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
     }
 
     // buys fuel, marines, and heavy armaments
-    public static float buyGoodsforFleet(Lord lord, CampaignFleetAPI fleet, Random random, float cash) {
+    public static float buyGoodsForFleet(Lord lord, CampaignFleetAPI fleet, Random random, float cash) {
         float totalCost = 0;
         CargoAPI cargo = fleet.getCargo();
         int fuelCap = cargo.getFreeFuelSpace();
@@ -248,7 +304,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
         // allocate wealth to buying ships and upgrades
         CargoAPI cargo = lord.getFleet().getCargo();
         float shipFunds = Math.min(lord.getWealth(), lord.getWealth() * (2 - 2 * totalDP / DP_CAP));
-        // lords should buy a bit of fuel and marines before buying smods
+        // lords should buy a bit of fuel and marines before buying s-mods
         float minCargoFunds = Math.min(
                 lord.getWealth() - shipFunds,
                 FUEL_COST * Math.max(100, 500 - cargo.getFuel()) + MARINE_COST * Math.max(0, 200 - cargo.getMarines()));
@@ -256,11 +312,11 @@ public class LordFleetFactory extends FleetFactoryV3 {
         float cost = addToLordFleet(lord.getTemplate().shipPrefs, lord.getFleet(), new Random(), DP_CAP, shipFunds);
         lord.addWealth(-1 * cost);
         //log.info("Lord " + lord.getLordAPI().getNameString() + " purchased " + Math.round(cost) + " of ships.");
-        cost = addModsToFleet(lord.getFleet(), modFunds);
+        cost = addModsToFleet(lord.getFleet(), modFunds, lord);
         lord.addWealth(-1 * cost);
         cost = buyGarrison(lord, lord.getWealth() - minCargoFunds);
         lord.addWealth(-1 * cost);
-        cost = buyGoodsforFleet(lord, lord.getFleet(), new Random(), lord.getWealth());
+        cost = buyGoodsForFleet(lord, lord.getFleet(), new Random(), lord.getWealth());
         lord.addWealth(-1 * cost);
         populateCaptains(lord);
     }
@@ -276,7 +332,29 @@ public class LordFleetFactory extends FleetFactoryV3 {
         officer.getStats().setSkillLevel(candidates.get(new Random().nextInt(candidates.size())), skillLevel);
     }
 
-    private static String chooseSMod(FleetMemberAPI member) {
+    private static String choseCustomSMod(FleetMemberAPI member,List<String> s_list){
+        ArrayList<String> options = new ArrayList<>();
+        ArrayList<Integer> weights = new ArrayList<>();
+        for (String customLordSMod : s_list) {
+            for (String sMod : member.getVariant().getPermaMods()){
+                if (sMod.equals(customLordSMod)) continue;
+            }
+            if (!member.getVariant().hasHullMod(customLordSMod)){
+                addOption(options, weights, member, customLordSMod, 100);
+            }
+        }
+        if (options.isEmpty()) return null;
+        return Utils.weightedSample(options, weights, Utils.rand);
+    }
+    private static String chooseSMod(FleetMemberAPI member, Lord lord) {
+        if (!lord.getTemplate().customFleetSMods.isEmpty() && !member.isFlagship()) {
+            String out = choseCustomSMod(member,lord.getTemplate().customFleetSMods);
+            if (out != null) return out;
+        }
+        if (!lord.getTemplate().customLordSMods.isEmpty() && member.isFlagship()){
+            String out = choseCustomSMod(member,lord.getTemplate().customLordSMods);
+            if (out != null) return out;
+        }
         ArrayList<String> options = new ArrayList<>();
         ArrayList<Integer> weights = new ArrayList<>();
         boolean armorFocus = member.getVariant().getHullSpec().getManufacturer().equals("Low Tech")

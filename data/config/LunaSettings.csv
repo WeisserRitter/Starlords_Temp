@@ -12,6 +12,10 @@ Other_requiredRepForKnowledgeOfWealth,Required reputation for knowing a lords we
 Other_requiredRepForKnowledgeOfCurAction,Required reputation for knowing a lords current action from the lords tab,Int,50,,,-100,100,Other
 Other_showAllLordsIntelByDefault,Show lords in the intil tab before you meet them,Boolean,false,,,,,Other
 ,,,,,,,,
+Header_lordFleetSettings,,Header,Lord fleet settings,,,,,Other
+Other_maxSMods,Maximum number of S-Mods a starlord can have on each ship,Int,3,,,0,100,Other
+Other_exstraSModsForSpecalMods,Increases the max number of S-Mods a each ship can have by 5 if 'Progressive S-Mods' is instaled,Boolean,true,,,,,Other
+,,,,,,,,
 EL_EnableAdditionalLords,Enable additonal lords for all faction,Boolean,false,,"if set to true, every faction will beable to gain additional starlords. regardless of if they already have starlords or not",,,Exstra Lords
 EL_EnableMaxLords,Enable a maximum number of lords that the generator will allow,Boolean,true,,"if set to true, starlords will not be generated past the maximum amount. instead, the game will attempt to reduce everyfactions generated starlords so a number around the max amount is generated",,,Exstra Lords
 EL_MaxGeneratedLords,The maximum number of lords that will be generated.,Int,1000,,"please keep in mind: this will calulate each tier of lords indevidualy. it will also round down for that. so if this triggers, you will very rarely get the max number of lords. will only trigger if the calculated number of lords to generate is greater then this value",1,10000,Exstra Lords

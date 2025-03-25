@@ -19,6 +19,7 @@ import starlords.generator.types.fleet.LordFleetGenerator_Hullmod;
 import starlords.generator.types.fleet.LordFleetGenerator_System;
 import starlords.ui.LordsIntelPlugin;
 import starlords.util.Constants;
+import starlords.util.LordFleetFactory;
 import starlords.util.Utils;
 import starlords.util.WeightedRandom;
 
@@ -229,6 +230,9 @@ public class StoredSettings {
         LordsIntelPlugin.setRepForCurAction(LunaSettings.getInt(Constants.MOD_ID,"Other_requiredRepForKnowledgeOfCurAction"));
         LordsIntelPlugin.setAllowLordsToBeViewed(LunaSettings.getBoolean(Constants.MOD_ID,"Other_showAllLordsIntelByDefault"));
 
+        int maxSMods = LunaSettings.getInt(Constants.MOD_ID,"Other_maxSMods");
+        if (LunaSettings.getBoolean(Constants.MOD_ID,"Other_exstraSModsForSpecalMods") && Global.getSettings().getModManager().isModEnabled("progressiveSMods")) maxSMods += 5;
+        LordFleetFactory.setMaxSMods(maxSMods);
         log.info("DEBUG: luna settings loaded successfully.");
     }
     @SneakyThrows
@@ -419,6 +423,10 @@ public class StoredSettings {
         LordsIntelPlugin.setRepForWealth(json.getInt("requiredRepForKnowledgeOfWealth"));
         LordsIntelPlugin.setRepForCurAction(json.getInt("requiredRepForKnowledgeOfCurAction"));
         LordsIntelPlugin.setAllowLordsToBeViewed(json.getBoolean("showAllLordsIntelByDefault"));
+
+        int maxSMods = json.getInt("Other_maxSMods");
+        if (json.getBoolean("Other_exstraSModsForSpecalMods") && Global.getSettings().getModManager().isModEnabled("progressiveSMods")) maxSMods += 5;
+        LordFleetFactory.setMaxSMods(maxSMods);
         log.info("DEBUG: normal config settings loaded successfully.");
     }
 
