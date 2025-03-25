@@ -21,8 +21,10 @@ import com.fs.starfarer.api.util.WeightedRandomPicker;
 import lombok.Setter;
 import starlords.person.Lord;
 import starlords.person.LordPersonality;
+import starlords.util.crossmod.SCLordsFactory;
 
 import java.util.*;
+
 
 public class LordFleetFactory extends FleetFactoryV3 {
     @Setter
@@ -72,6 +74,10 @@ public class LordFleetFactory extends FleetFactoryV3 {
                     ship.setCaptain(officer);
                 }
             }
+        }
+
+        if (Utils.secondInCommandEnabled() && !lord.getTemplate().executiveOfficers.isEmpty()) {
+            SCLordsFactory.populateExecutiveOfficers(lord);
         }
     }
 

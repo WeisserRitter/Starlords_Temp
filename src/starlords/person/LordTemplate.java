@@ -2,7 +2,9 @@ package starlords.person;
 
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import lombok.SneakyThrows;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import starlords.util.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,8 +23,11 @@ public final class LordTemplate {
     public final String lore;
     public final HashMap<String, Integer> shipPrefs;
     public final HashMap<String, Integer> customSkills;
+
     public final List<String> customLordSMods;
     public final List<String> customFleetSMods;
+    public final HashMap<String, List<String>> executiveOfficers;
+
     public final String fief;
     public final String portrait;
     public final int level;
@@ -89,6 +94,23 @@ public final class LordTemplate {
                 customSkills.put(key, skillJson.getInt(key));
             }
         }
+
+        executiveOfficers = new HashMap<>();
+        if (template.has("executiveOfficers") && Utils.secondInCommandEnabled()) {
+            JSONObject officerJson = template.getJSONObject("executiveOfficers");
+            for (Iterator it = officerJson.keys(); it.hasNext();) {
+                String key = (String) it.next();
+                if (!officerJson.isNull(key)) {
+                    JSONArray aptitudeSkillList = officerJson.getJSONArray(key);
+                    List<String> executiveOfficerSkills = new ArrayList<>();
+                    for (int i = 0; i < aptitudeSkillList.length(); i++) {
+                        executiveOfficerSkills.add(aptitudeSkillList.getString(i));
+                    }
+                    executiveOfficers.put(key, executiveOfficerSkills);
+                }
+            }
+        }
+
         customLordSMods = new ArrayList<>();
         customFleetSMods = new ArrayList<>();
         if (template.has("customSMods")) {
@@ -150,6 +172,7 @@ public final class LordTemplate {
         ranking = template.ranking;
         shipPrefs = template.shipPrefs;
         customSkills = new HashMap<>();
+        executiveOfficers = new HashMap<>();
         customLordSMods = new ArrayList<>();
         customFleetSMods = new ArrayList<>();
     }
