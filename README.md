@@ -65,7 +65,7 @@ If you're a modder or just want to put your own characters into the game, all yo
 * "fief" should be a valid market id or null
 * "ranking" is the lord's rank, which affects their political weight and base income. It should be between 0 and 2, where 2 is highest.
 * "preferredItem" can be any of `domestic_goods`, `food`, `luxury_goods`, `drugs`, `hand_weapons`, `alpha_core`, or `lobster`.
-* "executiveOfficers" for custom second in command officer layouts. It is a json object where the id is the officer's aptitude, and the value a list of his chosen skills.
+* "executiveOfficers" for custom second in command officer layouts. It is a json object where the id is the officer's aptitude, and the value a list of his chosen skills. Skills will continue to be added at random until the executive officers are fully leveled up if they are not specified. 
 * Flagship and ship preferences must contain valid ship variant ids. You can find these under the `/data/variants` folder of `starsector-core` or any mod directories.
 * Faction and fief will be automatically converted to lower case. Ship variants are case-sensitive.
 
