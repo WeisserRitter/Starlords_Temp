@@ -83,6 +83,10 @@ public class LordFleetFactory extends FleetFactoryV3 {
         }
 
         pimpUpFlagship(lord);
+
+        if (Utils.secondInCommandEnabled()) {
+            SCLordsFactory.populateExecutiveOfficers(lord);
+        }
     }
 
     private static void pimpUpFlagship(Lord lord) {
@@ -120,17 +124,6 @@ public class LordFleetFactory extends FleetFactoryV3 {
         }
 
         return aiCorePicker.pick();
-                officer.setPersonality(lord.getTemplate().battlePersonality);
-                upskillOfficer(officer, true);
-                Misc.setUnremovable(officer, true);
-                lord.getLordAPI().getFleet().getFleetData().addOfficer(officer);
-                ship.setCaptain(officer);
-            }
-        }
-
-        if (Utils.secondInCommandEnabled()) {
-            SCLordsFactory.populateExecutiveOfficers(lord);
-        }
     }
 
     // returns cost of ships purchased
