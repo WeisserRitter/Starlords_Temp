@@ -20,8 +20,10 @@ import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import starlords.person.Lord;
 import starlords.person.LordPersonality;
+import starlords.util.crossmod.SCLordsFactory;
 
 import java.util.*;
+
 
 public class LordFleetFactory extends FleetFactoryV3 {
 
@@ -118,6 +120,17 @@ public class LordFleetFactory extends FleetFactoryV3 {
         }
 
         return aiCorePicker.pick();
+                officer.setPersonality(lord.getTemplate().battlePersonality);
+                upskillOfficer(officer, true);
+                Misc.setUnremovable(officer, true);
+                lord.getLordAPI().getFleet().getFleetData().addOfficer(officer);
+                ship.setCaptain(officer);
+            }
+        }
+
+        if (Utils.secondInCommandEnabled()) {
+            SCLordsFactory.populateExecutiveOfficers(lord);
+        }
     }
 
     // returns cost of ships purchased
