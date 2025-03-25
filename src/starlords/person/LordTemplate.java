@@ -121,9 +121,12 @@ public final class LordTemplate {
                 }
             }
         }
-        // Cursed be the parser that parses null to 'null'
-        String portraitGroup = template.getString("portraitGroup").toLowerCase();
-        this.portraitGroup = portraitGroup.equals("null") ? null : portraitGroup;
+        if (template.has("portraitGroup")) {
+            String portraitGroup = template.getString("portraitGroup").toLowerCase();
+            this.portraitGroup = portraitGroup.equals("null") ? null : portraitGroup;
+        } else {
+            this.portraitGroup = null;
+        }
     }
     @SneakyThrows
     public LordTemplate(PosdoLordTemplate template) {
