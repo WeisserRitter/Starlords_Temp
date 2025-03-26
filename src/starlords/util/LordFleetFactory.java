@@ -18,7 +18,6 @@ import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
 import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
-import com.fs.starfarer.api.util.WeightedRandomPicker;
 import lombok.Setter;
 import starlords.person.Lord;
 import starlords.person.LordPersonality;
@@ -79,17 +78,9 @@ public class LordFleetFactory extends FleetFactoryV3 {
                     }
                 }
             }
-
-            if (!lord.getTemplate().customFleetSMods.isEmpty()) {
-                for (String customLordSMod : lord.getTemplate().customFleetSMods) {
-                    if (!ship.getVariant().hasHullMod(customLordSMod)) {
-                        ship.getVariant().addPermaMod(customLordSMod, true);
-                    }
-                }
-            }
         }
 
-        pimpUpFlagship(lord);
+        //pimpUpFlagship(lord);
 
         if (Utils.secondInCommandEnabled() && !lord.getTemplate().executiveOfficers.isEmpty()) {
             SCLordsFactory.populateExecutiveOfficers(lord);
@@ -104,9 +95,11 @@ public class LordFleetFactory extends FleetFactoryV3 {
                     flagship.getVariant().addPermaMod(customLordSMod, true);
                 }
             }
-            for (String customLordSMod : lord.getTemplate().customFleetSMods) {
-                if (!flagship.getVariant().hasHullMod(customLordSMod)) {
-                    flagship.getVariant().addPermaMod(customLordSMod, true);
+            if (!lord.getTemplate().customFleetSMods.isEmpty()) {
+                for (String customLordSMod : lord.getTemplate().customFleetSMods) {
+                    if (!flagship.getVariant().hasHullMod(customLordSMod)) {
+                        flagship.getVariant().addPermaMod(customLordSMod, true);
+                    }
                 }
             }
         }
