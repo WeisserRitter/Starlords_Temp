@@ -22,10 +22,12 @@ public final class LordTemplate {
     public final String flagShip;
     public final String lore;
     public final HashMap<String, Integer> shipPrefs;
+
     public final HashMap<String, Integer> customSkills;
     public final List<String> customLordSMods;
     public final List<String> customFleetSMods;
     public final HashMap<String, List<String>> executiveOfficers;
+
     public final String fief;
     public final String portrait;
     public final String portraitGroup;
@@ -93,19 +95,7 @@ public final class LordTemplate {
                 customSkills.put(key, skillJson.getInt(key));
             }
         }
-        customLordSMods = new ArrayList<>();
-        customFleetSMods = new ArrayList<>();
-        if (template.has("customSMods")) {
-            JSONObject customSModsInTemplate = template.getJSONObject("customSMods");
-            for (Iterator it = customSModsInTemplate.keys(); it.hasNext();) {
-                String key = (String) it.next();
-                if (customSModsInTemplate.getInt(key) == 1) {
-                    customLordSMods.add(key);
-                } else {
-                    customFleetSMods.add(key);
-                }
-            }
-        }
+
         executiveOfficers = new HashMap<>();
         if (template.has("executiveOfficers") && Utils.secondInCommandEnabled()) {
             JSONObject officerJson = template.getJSONObject("executiveOfficers");
@@ -121,6 +111,21 @@ public final class LordTemplate {
                 }
             }
         }
+
+        customLordSMods = new ArrayList<>();
+        customFleetSMods = new ArrayList<>();
+        if (template.has("customSMods")) {
+            JSONObject customSModsInTemplate = template.getJSONObject("customSMods");
+            for (Iterator it = customSModsInTemplate.keys(); it.hasNext();) {
+                String key = (String) it.next();
+                if (customSModsInTemplate.getInt(key) == 1) {
+                    customLordSMods.add(key);
+                } else {
+                    customFleetSMods.add(key);
+                }
+            }
+        }
+
         if (template.has("portraitGroup")) {
             String portraitGroup = template.getString("portraitGroup").toLowerCase();
             this.portraitGroup = portraitGroup.equals("null") ? null : portraitGroup;
@@ -175,9 +180,9 @@ public final class LordTemplate {
         ranking = template.ranking;
         shipPrefs = template.shipPrefs;
         customSkills = new HashMap<>();
+        executiveOfficers = new HashMap<>();
         customLordSMods = new ArrayList<>();
         customFleetSMods = new ArrayList<>();
-        executiveOfficers = new HashMap<>();
         portraitGroup = null;
     }
 }

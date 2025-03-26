@@ -14,6 +14,18 @@ public class SCLordsFactory {
     public static void populateExecutiveOfficers(Lord lord) {
         SCData scData = SCUtils.getFleetData(lord.getFleet());
 
+        if (lord.getTemplate().executiveOfficers.size() < 3) {
+            WeightedRandomPicker<SCBaseAptitudePlugin> aptitudePicker = fillRandomAptitudePicker(
+                    lord.getTemplate().executiveOfficers.keySet().stream().toList(),
+                    scData,
+                    lord
+            );
+            for (int i = lord.getTemplate().executiveOfficers.size(); i < 3; i++) {
+                String aptitudeId = pickRandomAptitude(aptitudePicker);
+                lord.getTemplate().executiveOfficers.put(aptitudeId, new ArrayList<>());
+            }
+        }
+
         int currentSlot = 0;
         for (String aptitudeId : lord.getTemplate().executiveOfficers.keySet() ) {
             SCOfficer officer = new SCOfficer(lord.getFaction().createRandomPerson(), aptitudeId);
@@ -25,10 +37,11 @@ public class SCLordsFactory {
                 unlockedSkills.add(skillId);
                 currentSkill++;
             }
-            for (int i = currentSkill; i < 6; i++) {
+            for (int i = currentSkill; i < 5; i++) {
                 String newSkill = pickRandomSkill(officer, unlockedSkills);
                 if (newSkill != null) {
                     officer.addSkill(newSkill);
+                    unlockedSkills.add(newSkill);
                 }
             }
             scData.setOfficerInSlot(currentSlot, officer);
@@ -39,6 +52,20 @@ public class SCLordsFactory {
 
             currentSlot++;
         }
+    }
+
+    private static WeightedRandomPicker<SCBaseAptitudePlugin> fillRandomAptitudePicker(List<String> unlockedAptitudes, SCData data, Lord lord) {
+        WeightedRandomPicker<SCBaseAptitudePlugin> aptitudePicker = new WeightedRandomPicker<>();
+        List<SCBaseAptitudePlugin> availableAptitudes = SCSpecStore.getAptitudeSpecs().stream().map(SCAptitudeSpec::getPlugin).toList();
+        availableAptitudes = availableAptitudes.stream().filter(aptitude -> !unlockedAptitudes.contains(aptitude.getId())).toList();
+        for (SCBaseAptitudePlugin availableAptitude : availableAptitudes) {
+            aptitudePicker.add(availableAptitude, availableAptitude.getNPCFleetSpawnWeight(data, lord.getFleet()) + 0.01f);
+        }
+        return aptitudePicker;
+    }
+
+    private static String pickRandomAptitude(WeightedRandomPicker<SCBaseAptitudePlugin> aptitudePicker) {
+        return aptitudePicker.pickAndRemove().getId();
     }
 
     private static String pickRandomSkill(SCOfficer officer, List<String> unlockedSkills) {
