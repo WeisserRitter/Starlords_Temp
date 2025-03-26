@@ -82,7 +82,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
 
         //pimpUpFlagship(lord);
 
-        if (Utils.secondInCommandEnabled() && !lord.getTemplate().executiveOfficers.isEmpty()) {
+        if (Utils.secondInCommandEnabled()) {
             SCLordsFactory.populateExecutiveOfficers(lord);
         }
     }
