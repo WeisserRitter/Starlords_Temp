@@ -8,14 +8,19 @@ import starlords.person.Lord;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SCLordsFactory {
     public static void populateExecutiveOfficers(Lord lord) {
         SCData scData = SCUtils.getFleetData(lord.getFleet());
 
         if (lord.getTemplate().executiveOfficers.size() < 3) {
+            /*ArrayList<String> a = new ArrayList<>();
+            for (Object b : lord.getTemplate().executiveOfficers.keySet().toArray()){
+                a.add((String) b);
+            }*/
             WeightedRandomPicker<SCBaseAptitudePlugin> aptitudePicker = fillRandomAptitudePicker(
-                    lord.getTemplate().executiveOfficers.keySet().stream().toList(),
+                    new ArrayList<>(lord.getTemplate().executiveOfficers.keySet()),//lord.getTemplate().executiveOfficers.keySet().stream().toList(),
                     scData,
                     lord
             );
@@ -50,8 +55,8 @@ public class SCLordsFactory {
 
     private static WeightedRandomPicker<SCBaseAptitudePlugin> fillRandomAptitudePicker(List<String> unlockedAptitudes, SCData data, Lord lord) {
         WeightedRandomPicker<SCBaseAptitudePlugin> aptitudePicker = new WeightedRandomPicker<>();
-        List<SCBaseAptitudePlugin> availableAptitudes = SCSpecStore.getAptitudeSpecs().stream().map(SCAptitudeSpec::getPlugin).toList();
-        availableAptitudes = availableAptitudes.stream().filter(aptitude -> !unlockedAptitudes.contains(aptitude.getId())).toList();
+        List<SCBaseAptitudePlugin> availableAptitudes = SCSpecStore.getAptitudeSpecs().stream().map(SCAptitudeSpec::getPlugin).collect(Collectors.toList());
+        availableAptitudes = availableAptitudes.stream().filter(aptitude -> !unlockedAptitudes.contains(aptitude.getId())).collect(Collectors.toList());
         for (SCBaseAptitudePlugin availableAptitude : availableAptitudes) {
             aptitudePicker.add(availableAptitude, availableAptitude.getNPCFleetSpawnWeight(data, lord.getFleet()) + 0.01f);
         }
