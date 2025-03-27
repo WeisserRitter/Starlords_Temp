@@ -19,6 +19,8 @@ import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.util.WeightedRandomPicker;
 import lombok.Setter;
+import org.apache.log4j.Logger;
+import starlords.lunaSettings.StoredSettings;
 import starlords.person.Lord;
 import starlords.person.LordPersonality;
 import starlords.util.crossmod.SCLordsFactory;
@@ -78,22 +80,6 @@ public class LordFleetFactory extends FleetFactoryV3 {
 
         if (Utils.secondInCommandEnabled()) {
             SCLordsFactory.populateExecutiveOfficers(lord);
-        }
-    }
-
-    private static void pimpUpFlagship(Lord lord) {
-        FleetMemberAPI flagship = lord.getFleet().getFlagship();
-        if (flagship != null && !lord.getTemplate().customLordSMods.isEmpty()) {
-            for (String customLordSMod : lord.getTemplate().customLordSMods) {
-                if (!flagship.getVariant().hasHullMod(customLordSMod)) {
-                    flagship.getVariant().addPermaMod(customLordSMod, true);
-                }
-            }
-            for (String customLordSMod : lord.getTemplate().customFleetSMods) {
-                if (!flagship.getVariant().hasHullMod(customLordSMod)) {
-                    flagship.getVariant().addPermaMod(customLordSMod, true);
-                }
-            }
         }
     }
 
@@ -332,29 +318,30 @@ public class LordFleetFactory extends FleetFactoryV3 {
         officer.getStats().setSkillLevel(candidates.get(new Random().nextInt(candidates.size())), skillLevel);
     }
 
-    private static String choseCustomSMod(FleetMemberAPI member,List<String> s_list){
-        ArrayList<String> options = new ArrayList<>();
-        ArrayList<Integer> weights = new ArrayList<>();
-        for (String customLordSMod : s_list) {
+    private static void getCustomSMod(FleetMemberAPI member,HashMap<String,Integer> s_list,ArrayList<String> options, ArrayList<Integer> weights){
+        for (String customLordSMod : s_list.keySet()) {
             if (member.getVariant().getPermaMods().contains(customLordSMod)) continue;
             if (!member.getVariant().hasHullMod(customLordSMod)){
-                addOption(options, weights, member, customLordSMod, 100);
+                addOption(options, weights, member, customLordSMod, s_list.get(customLordSMod));
             }
         }
-        if (options.isEmpty()) return null;
-        return Utils.weightedSample(options, weights, Utils.rand);
     }
     private static String chooseSMod(FleetMemberAPI member, Lord lord) {
-        if (!lord.getTemplate().customFleetSMods.isEmpty() && !member.isFlagship()) {
-            String out = choseCustomSMod(member,lord.getTemplate().customFleetSMods);
-            if (out != null) return out;
-        }
-        if (!lord.getTemplate().customLordSMods.isEmpty() && member.isFlagship()){
-            String out = choseCustomSMod(member,lord.getTemplate().customLordSMods);
-            if (out != null) return out;
-        }
         ArrayList<String> options = new ArrayList<>();
         ArrayList<Integer> weights = new ArrayList<>();
+        if (!lord.getTemplate().customFleetSMods.isEmpty() && !member.isFlagship()) {
+            getCustomSMod(member,lord.getTemplate().customFleetSMods,options,weights);
+            log.info("GOT Fleet Smods: "+lord.getTemplate().fleetName+". options.size, flagship, forcedLordSMods, forcedFleetSMods "+options.size()+", "+member.isFlagship()+", "+lord.getTemplate().forceLordSMods+", "+lord.getTemplate().forceFleetSMods);
+        }
+        if (!lord.getTemplate().customLordSMods.isEmpty() && member.isFlagship()){
+            getCustomSMod(member,lord.getTemplate().customLordSMods,options,weights);
+            log.info("GOT Lord Smods: "+lord.getTemplate().fleetName+". options.size, flagship, forcedLordSMods, forcedFleetSMods "+options.size()+", "+member.isFlagship()+", "+lord.getTemplate().forceLordSMods+", "+lord.getTemplate().forceFleetSMods);
+        }
+        if(options.size() != 0 && ((member.isFlagship() && lord.getTemplate().forceLordSMods) || (!member.isFlagship() && lord.getTemplate().forceFleetSMods))){
+            log.info("GOT FORCED LORD THING FOR lord named: "+lord.getTemplate().fleetName+". options.size, flagship, forcedLordSMods, forcedFleetSMods "+options.size()+", "+member.isFlagship()+", "+lord.getTemplate().forceLordSMods+", "+lord.getTemplate().forceFleetSMods);
+            return Utils.weightedSample(options, weights, Utils.rand);
+        }
+
         boolean armorFocus = member.getVariant().getHullSpec().getManufacturer().equals("Low Tech")
                 || member.getHullSpec().getShieldType() == ShieldAPI.ShieldType.NONE;
         boolean phaseFocus = member.getHullSpec().getShieldType() == ShieldAPI.ShieldType.PHASE;

@@ -1,9 +1,12 @@
 package starlords.person;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import lombok.SneakyThrows;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import starlords.lunaSettings.StoredSettings;
 import starlords.util.Utils;
 
 import java.util.ArrayList;
@@ -24,8 +27,11 @@ public final class LordTemplate {
     public final HashMap<String, Integer> shipPrefs;
     public final HashMap<String, Integer> customSkills;
 
-    public final List<String> customLordSMods;
-    public final List<String> customFleetSMods;
+    public final HashMap<String, Integer> customLordSMods;
+    public final HashMap<String, Integer> customFleetSMods;
+    public final boolean forceLordSMods;
+    public final boolean forceFleetSMods;
+
     public final HashMap<String, List<String>> executiveOfficers;
 
     public final String fief;
@@ -111,19 +117,24 @@ public final class LordTemplate {
             }
         }
 
-        customLordSMods = new ArrayList<>();
-        customFleetSMods = new ArrayList<>();
-        if (template.has("customSMods")) {
-            JSONObject customSModsInTemplate = template.getJSONObject("customSMods");
+        customLordSMods = new HashMap<String,Integer>();
+        customFleetSMods = new HashMap<String,Integer>();
+        if (template.has("customFleetSMods")) {
+            JSONObject customSModsInTemplate = template.getJSONObject("customFleetSMods");
             for (Iterator it = customSModsInTemplate.keys(); it.hasNext();) {
                 String key = (String) it.next();
-                if (customSModsInTemplate.getInt(key) == 1) {
-                    customLordSMods.add(key);
-                } else {
-                    customFleetSMods.add(key);
-                }
+                customFleetSMods.put(key,customSModsInTemplate.getInt(key));
             }
         }
+        if (template.has("customLordSMods")) {
+            JSONObject customSModsInTemplate = template.getJSONObject("customLordSMods");
+            for (Iterator it = customSModsInTemplate.keys(); it.hasNext();) {
+                String key = (String) it.next();
+                customLordSMods.put(key,customSModsInTemplate.getInt(key));
+            }
+        }
+        forceFleetSMods = !(template.has("fleetForceCustomSMods") && !template.getBoolean("fleetForceCustomSMods"));
+        forceLordSMods = !(template.has("flagshipForceCustomSMods") && !template.getBoolean("flagshipForceCustomSMods"));
     }
     @SneakyThrows
     public LordTemplate(PosdoLordTemplate template) {
@@ -173,7 +184,9 @@ public final class LordTemplate {
         shipPrefs = template.shipPrefs;
         customSkills = new HashMap<>();
         executiveOfficers = new HashMap<>();
-        customLordSMods = new ArrayList<>();
-        customFleetSMods = new ArrayList<>();
+        customLordSMods = new HashMap<String,Integer>();
+        customFleetSMods = new HashMap<String,Integer>();
+        forceFleetSMods = true;
+        forceLordSMods = true;
     }
 }
