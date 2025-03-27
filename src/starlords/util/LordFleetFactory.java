@@ -336,9 +336,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
         ArrayList<String> options = new ArrayList<>();
         ArrayList<Integer> weights = new ArrayList<>();
         for (String customLordSMod : s_list) {
-            for (String sMod : member.getVariant().getPermaMods()){
-                if (sMod.equals(customLordSMod)) continue;
-            }
+            if (member.getVariant().getPermaMods().contains(customLordSMod)) continue;
             if (!member.getVariant().hasHullMod(customLordSMod)){
                 addOption(options, weights, member, customLordSMod, 100);
             }
