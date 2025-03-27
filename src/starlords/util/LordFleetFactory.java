@@ -76,7 +76,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
             }
         }
 
-        if (Utils.secondInCommandEnabled() && !lord.getTemplate().executiveOfficers.isEmpty()) {
+        if (Utils.secondInCommandEnabled()) {
             SCLordsFactory.populateExecutiveOfficers(lord);
         }
     }
