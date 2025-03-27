@@ -1,11 +1,18 @@
 package starlords.person;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import lombok.SneakyThrows;
+import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import starlords.lunaSettings.StoredSettings;
+import starlords.util.Utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 // Contains all immutable traits of a lord, from lords.json
 public final class LordTemplate {
@@ -19,6 +26,14 @@ public final class LordTemplate {
     public final String lore;
     public final HashMap<String, Integer> shipPrefs;
     public final HashMap<String, Integer> customSkills;
+
+    public final HashMap<String, Integer> customLordSMods;
+    public final HashMap<String, Integer> customFleetSMods;
+    public final boolean forceLordSMods;
+    public final boolean forceFleetSMods;
+
+    public final HashMap<String, List<String>> executiveOfficers;
+
     public final String fief;
     public final String portrait;
     public final int level;
@@ -85,6 +100,41 @@ public final class LordTemplate {
                 customSkills.put(key, skillJson.getInt(key));
             }
         }
+
+        executiveOfficers = new HashMap<>();
+        if (template.has("executiveOfficers") && Utils.secondInCommandEnabled()) {
+            JSONObject officerJson = template.getJSONObject("executiveOfficers");
+            for (Iterator it = officerJson.keys(); it.hasNext();) {
+                String key = (String) it.next();
+                if (!officerJson.isNull(key)) {
+                    JSONArray aptitudeSkillList = officerJson.getJSONArray(key);
+                    List<String> executiveOfficerSkills = new ArrayList<>();
+                    for (int i = 0; i < aptitudeSkillList.length(); i++) {
+                        executiveOfficerSkills.add(aptitudeSkillList.getString(i));
+                    }
+                    executiveOfficers.put(key, executiveOfficerSkills);
+                }
+            }
+        }
+
+        customLordSMods = new HashMap<String,Integer>();
+        customFleetSMods = new HashMap<String,Integer>();
+        if (template.has("customFleetSMods")) {
+            JSONObject customSModsInTemplate = template.getJSONObject("customFleetSMods");
+            for (Iterator it = customSModsInTemplate.keys(); it.hasNext();) {
+                String key = (String) it.next();
+                customFleetSMods.put(key,customSModsInTemplate.getInt(key));
+            }
+        }
+        if (template.has("customLordSMods")) {
+            JSONObject customSModsInTemplate = template.getJSONObject("customLordSMods");
+            for (Iterator it = customSModsInTemplate.keys(); it.hasNext();) {
+                String key = (String) it.next();
+                customLordSMods.put(key,customSModsInTemplate.getInt(key));
+            }
+        }
+        forceFleetSMods = !(template.has("fleetForceCustomSMods") && !template.getBoolean("fleetForceCustomSMods"));
+        forceLordSMods = !(template.has("flagshipForceCustomSMods") && !template.getBoolean("flagshipForceCustomSMods"));
     }
     @SneakyThrows
     public LordTemplate(PosdoLordTemplate template) {
@@ -120,7 +170,7 @@ public final class LordTemplate {
         flagShip = template.flagShip;
         lore = template.lore;
         portrait = template.portrait;
-        if (template.preferredItemId != null && !template.preferredItemId.equals("")) {
+        if (template.preferredItemId != null && !template.preferredItemId.isEmpty()) {
             preferredItemId = template.preferredItemId;
         } else {  // everyone likes butter by default
             preferredItemId = "food";
@@ -133,5 +183,10 @@ public final class LordTemplate {
         ranking = template.ranking;
         shipPrefs = template.shipPrefs;
         customSkills = new HashMap<>();
+        executiveOfficers = new HashMap<>();
+        customLordSMods = new HashMap<String,Integer>();
+        customFleetSMods = new HashMap<String,Integer>();
+        forceFleetSMods = true;
+        forceLordSMods = true;
     }
 }

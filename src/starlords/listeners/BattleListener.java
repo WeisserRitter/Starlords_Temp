@@ -266,6 +266,7 @@ public class BattleListener extends BaseCampaignEventListener {
                     marshal.setControversy(Math.min(100, marshal.getControversy() + 1));
                 }
             }
+
         }
     }
 

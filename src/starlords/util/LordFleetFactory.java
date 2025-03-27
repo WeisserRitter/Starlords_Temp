@@ -1,6 +1,7 @@
 package starlords.util;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.AICoreOfficerPlugin;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.CargoAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
@@ -14,21 +15,26 @@ import com.fs.starfarer.api.fleet.FleetMemberType;
 import com.fs.starfarer.api.fleet.ShipRolePick;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactoryV3;
 import com.fs.starfarer.api.impl.campaign.fleets.FleetParamsV3;
-import com.fs.starfarer.api.impl.campaign.ids.Commodities;
-import com.fs.starfarer.api.impl.campaign.ids.HullMods;
-import com.fs.starfarer.api.impl.campaign.ids.Skills;
+import com.fs.starfarer.api.impl.campaign.ids.*;
 import com.fs.starfarer.api.util.Misc;
+import com.fs.starfarer.api.util.WeightedRandomPicker;
+import lombok.Setter;
+import org.apache.log4j.Logger;
+import starlords.lunaSettings.StoredSettings;
 import starlords.person.Lord;
 import starlords.person.LordPersonality;
+import starlords.util.crossmod.SCLordsFactory;
 
 import java.util.*;
 
-public class LordFleetFactory extends FleetFactoryV3 {
 
+public class LordFleetFactory extends FleetFactoryV3 {
+    @Setter
+    private static int maxSMods = 3;
     public static final float DP_CAP = 500;
     public static final float GARRISON_DP_CAP = 500;
     public static final float COST_MULT = 750;  // cost for a lord to buy a ship is its base DP cost * COST_MULT
-    public static final float MOD_COST = 250;  // cost for a lord to buy a s-mod is its base DP cost * MOD_COST
+    public static final float MOD_COST = 250;  // cost for a lord to buy an s-mod is its base DP cost * MOD_COST
     public static final int FUEL_COST = 10;  // cost for lord to buy 1 fuel
     public static final int MARINE_COST = 80;  // cost for lord to buy 1 marine
     public static final int HEAVY_ARMS_COST = 200;  // cost for lord to buy 1 heavy armament
@@ -53,13 +59,55 @@ public class LordFleetFactory extends FleetFactoryV3 {
                 ship.setCaptain(lord.getLordAPI());
             } else {
                 PersonAPI officer = lord.getLordAPI().getFaction().createRandomPerson();
-                officer.setPersonality(lord.getTemplate().battlePersonality);
-                upskillOfficer(officer, true);
-                Misc.setUnremovable(officer, true);
-                lord.getLordAPI().getFleet().getFleetData().addOfficer(officer);
-                ship.setCaptain(officer);
+
+                boolean isAuxiliaryAIShip = !officer.isAICore() && Misc.isAutomated(ship);
+
+                if (isAuxiliaryAIShip) {
+                    String aiCore = getRandomAiCoreForLord(lord);
+                    AICoreOfficerPlugin plugin = Misc.getAICoreOfficerPlugin(aiCore);
+                    PersonAPI aiOfficer = plugin.createPerson(aiCore, Factions.REMNANTS, new Random());
+                    ship.setCaptain(aiOfficer);
+                    Misc.setUnremovable(aiOfficer, true);
+                } else {
+                    officer.setPersonality(lord.getTemplate().battlePersonality);
+                    upskillOfficer(officer, true);
+                    Misc.setUnremovable(officer, true);
+                    lord.getLordAPI().getFleet().getFleetData().addOfficer(officer);
+                    ship.setCaptain(officer);
+                }
             }
         }
+
+        if (Utils.secondInCommandEnabled()) {
+            SCLordsFactory.populateExecutiveOfficers(lord);
+        }
+    }
+
+    private static String getRandomAiCoreForLord(Lord lord) {
+        WeightedRandomPicker<String> aiCorePicker = new WeightedRandomPicker<>();
+
+        switch (lord.getRanking()) {
+            case 0:
+                aiCorePicker.add(Commodities.GAMMA_CORE, 4f);
+                aiCorePicker.add(Commodities.BETA_CORE, 2f);
+                aiCorePicker.add(Commodities.ALPHA_CORE, 0.5f);
+            case 1:
+                aiCorePicker.add(Commodities.GAMMA_CORE, 2f);
+                aiCorePicker.add(Commodities.BETA_CORE, 3f);
+                aiCorePicker.add(Commodities.ALPHA_CORE, 1f);
+            case 2:
+                aiCorePicker.add(Commodities.BETA_CORE, 4f);
+                aiCorePicker.add(Commodities.ALPHA_CORE, 2f);
+                aiCorePicker.add(Commodities.OMEGA_CORE, 0.01f);
+                break;
+            default:
+                aiCorePicker.add(Commodities.GAMMA_CORE, 1f);
+                aiCorePicker.add(Commodities.BETA_CORE,2f);
+                aiCorePicker.add(Commodities.ALPHA_CORE, 3f);
+                aiCorePicker.add(Commodities.OMEGA_CORE, 0.02f);
+        }
+
+        return aiCorePicker.pick();
     }
 
     // returns cost of ships purchased
@@ -147,20 +195,20 @@ public class LordFleetFactory extends FleetFactoryV3 {
     }
 
     // adds s-mods to fleet members
-    public static float addModsToFleet(CampaignFleetAPI fleet, float cash) {
+    public static float addModsToFleet(CampaignFleetAPI fleet, float cash,Lord lord) {
         float totalCost = 0;
         List<FleetMemberAPI> members = fleet.getFleetData().getMembersListCopy();
         Collections.shuffle(members);
         for (FleetMemberAPI member : members) {
-            if (member.getVariant().getPermaMods().size() >= 3) continue;
+            if (member.getVariant().getSMods().size() >= maxSMods) continue;
             float modCost = MOD_COST * member.getUnmodifiedDeploymentPointsCost();
             if (member.isFlagship()) modCost = 0;
             // discount for very experienced ship
             if (member.getCaptain().getStats().getLevel() > 2 + 2 * member.getVariant().getSMods().size()) modCost /= 2;
             if (modCost + totalCost > cash) continue;
 
-            String modToAdd = chooseSMod(member);
-            log.info("Adding mod " + modToAdd + ". Ship has " + member.getVariant().getPermaMods().size());
+            String modToAdd = chooseSMod(member,lord);
+            log.info("Adding mod " + modToAdd + ". Ship has " + member.getVariant().getPermaMods().size() + " out of " + maxSMods);
             if (modToAdd != null) {
                 totalCost += modCost;
                 member.getVariant().addPermaMod(modToAdd, true);
@@ -192,7 +240,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
     }
 
     // buys fuel, marines, and heavy armaments
-    public static float buyGoodsforFleet(Lord lord, CampaignFleetAPI fleet, Random random, float cash) {
+    public static float buyGoodsForFleet(Lord lord, CampaignFleetAPI fleet, Random random, float cash) {
         float totalCost = 0;
         CargoAPI cargo = fleet.getCargo();
         int fuelCap = cargo.getFreeFuelSpace();
@@ -242,7 +290,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
         // allocate wealth to buying ships and upgrades
         CargoAPI cargo = lord.getFleet().getCargo();
         float shipFunds = Math.min(lord.getWealth(), lord.getWealth() * (2 - 2 * totalDP / DP_CAP));
-        // lords should buy a bit of fuel and marines before buying smods
+        // lords should buy a bit of fuel and marines before buying s-mods
         float minCargoFunds = Math.min(
                 lord.getWealth() - shipFunds,
                 FUEL_COST * Math.max(100, 500 - cargo.getFuel()) + MARINE_COST * Math.max(0, 200 - cargo.getMarines()));
@@ -250,11 +298,11 @@ public class LordFleetFactory extends FleetFactoryV3 {
         float cost = addToLordFleet(lord.getTemplate().shipPrefs, lord.getFleet(), new Random(), DP_CAP, shipFunds);
         lord.addWealth(-1 * cost);
         //log.info("Lord " + lord.getLordAPI().getNameString() + " purchased " + Math.round(cost) + " of ships.");
-        cost = addModsToFleet(lord.getFleet(), modFunds);
+        cost = addModsToFleet(lord.getFleet(), modFunds, lord);
         lord.addWealth(-1 * cost);
         cost = buyGarrison(lord, lord.getWealth() - minCargoFunds);
         lord.addWealth(-1 * cost);
-        cost = buyGoodsforFleet(lord, lord.getFleet(), new Random(), lord.getWealth());
+        cost = buyGoodsForFleet(lord, lord.getFleet(), new Random(), lord.getWealth());
         lord.addWealth(-1 * cost);
         populateCaptains(lord);
     }
@@ -270,9 +318,30 @@ public class LordFleetFactory extends FleetFactoryV3 {
         officer.getStats().setSkillLevel(candidates.get(new Random().nextInt(candidates.size())), skillLevel);
     }
 
-    private static String chooseSMod(FleetMemberAPI member) {
+    private static void getCustomSMod(FleetMemberAPI member,HashMap<String,Integer> s_list,ArrayList<String> options, ArrayList<Integer> weights){
+        for (String customLordSMod : s_list.keySet()) {
+            if (member.getVariant().getPermaMods().contains(customLordSMod)) continue;
+            if (!member.getVariant().hasHullMod(customLordSMod)){
+                addOption(options, weights, member, customLordSMod, s_list.get(customLordSMod));
+            }
+        }
+    }
+    private static String chooseSMod(FleetMemberAPI member, Lord lord) {
         ArrayList<String> options = new ArrayList<>();
         ArrayList<Integer> weights = new ArrayList<>();
+        if (!lord.getTemplate().customFleetSMods.isEmpty() && !member.isFlagship()) {
+            getCustomSMod(member,lord.getTemplate().customFleetSMods,options,weights);
+            log.info("GOT Fleet Smods: "+lord.getTemplate().fleetName+". options.size, flagship, forcedLordSMods, forcedFleetSMods "+options.size()+", "+member.isFlagship()+", "+lord.getTemplate().forceLordSMods+", "+lord.getTemplate().forceFleetSMods);
+        }
+        if (!lord.getTemplate().customLordSMods.isEmpty() && member.isFlagship()){
+            getCustomSMod(member,lord.getTemplate().customLordSMods,options,weights);
+            log.info("GOT Lord Smods: "+lord.getTemplate().fleetName+". options.size, flagship, forcedLordSMods, forcedFleetSMods "+options.size()+", "+member.isFlagship()+", "+lord.getTemplate().forceLordSMods+", "+lord.getTemplate().forceFleetSMods);
+        }
+        if(options.size() != 0 && ((member.isFlagship() && lord.getTemplate().forceLordSMods) || (!member.isFlagship() && lord.getTemplate().forceFleetSMods))){
+            log.info("GOT FORCED LORD THING FOR lord named: "+lord.getTemplate().fleetName+". options.size, flagship, forcedLordSMods, forcedFleetSMods "+options.size()+", "+member.isFlagship()+", "+lord.getTemplate().forceLordSMods+", "+lord.getTemplate().forceFleetSMods);
+            return Utils.weightedSample(options, weights, Utils.rand);
+        }
+
         boolean armorFocus = member.getVariant().getHullSpec().getManufacturer().equals("Low Tech")
                 || member.getHullSpec().getShieldType() == ShieldAPI.ShieldType.NONE;
         boolean phaseFocus = member.getHullSpec().getShieldType() == ShieldAPI.ShieldType.PHASE;
