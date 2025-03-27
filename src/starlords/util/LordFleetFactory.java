@@ -214,7 +214,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
         List<FleetMemberAPI> members = fleet.getFleetData().getMembersListCopy();
         Collections.shuffle(members);
         for (FleetMemberAPI member : members) {
-            if (member.getVariant().getPermaMods().size() >= maxSMods) continue;
+            if (member.getVariant().getSMods().size() >= maxSMods) continue;
             float modCost = MOD_COST * member.getUnmodifiedDeploymentPointsCost();
             if (member.isFlagship()) modCost = 0;
             // discount for very experienced ship
@@ -222,7 +222,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
             if (modCost + totalCost > cash) continue;
 
             String modToAdd = chooseSMod(member,lord);
-            log.info("Adding mod " + modToAdd + ". Ship has " + member.getVariant().getPermaMods().size());
+            log.info("Adding mod " + modToAdd + ". Ship has " + member.getVariant().getPermaMods().size() + " out of " + maxSMods);
             if (modToAdd != null) {
                 totalCost += modCost;
                 member.getVariant().addPermaMod(modToAdd, true);
@@ -345,7 +345,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
         return Utils.weightedSample(options, weights, Utils.rand);
     }
     private static String chooseSMod(FleetMemberAPI member, Lord lord) {
-        if (!lord.getTemplate().customFleetSMods.isEmpty() && !member.isFlagship()) {
+        if (!lord.getTemplate().customFleetSMods.isEmpty()) {
             String out = choseCustomSMod(member,lord.getTemplate().customFleetSMods);
             if (out != null) return out;
         }
