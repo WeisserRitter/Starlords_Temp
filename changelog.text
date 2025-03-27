@@ -1,4 +1,5 @@
 V0.3.15:
+    note save compatible with any previous version
     fixes
         reduced the odds of random policy's causing crashes after a lord dies.
         fixed a issue with 'lord2' from the relation controller
