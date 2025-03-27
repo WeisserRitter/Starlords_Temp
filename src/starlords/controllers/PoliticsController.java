@@ -76,12 +76,10 @@ public class PoliticsController implements EveryFrameScript {
         instance.lordTimestampMap.remove(lord.getLordAPI().getId());
         instance.lordProposalsMap.remove(lord.getLordAPI().getId());
         for(int a = instance.lordProposalsMap.size()-1; a >= 0; a--){
-            //todo: I need to remember to fix this issue at some point, but I need to remove policies involving dead lords.
-            /*if (((LawProposal) instance.lordProposalsMap.values().toArray()[a])!= null && ((LawProposal) instance.lordProposalsMap.values().toArray()[a]).targetLord != null && ((LawProposal) instance.lordProposalsMap.values().toArray()[a]).targetLord.equals(lord.getLordAPI().getId()) ){
-                String key = (String) instance.lordProposalsMap.keySet().toArray()[a];
-                instance.lordProposalsMap.remove(key);
-                continue;
-            }*/
+            //todo: I need to remember to fix this issue at some point, but I need to remove policies involving dead lords, that are already in consul.
+            if (((LawProposal) instance.lordProposalsMap.values().toArray()[a])!= null && ((LawProposal) instance.lordProposalsMap.values().toArray()[a]).targetLord != null && ((LawProposal) instance.lordProposalsMap.values().toArray()[a]).targetLord.equals(lord.getLordAPI().getId()) ){
+                ((LawProposal) instance.lordProposalsMap.values().toArray()[a]).kill();
+            }
             if (((LawProposal)instance.lordProposalsMap.values().toArray()[a])!= null) {
                 ArrayList<String> b = ((LawProposal) instance.lordProposalsMap.values().toArray()[a]).getOpposers();
                 for (int c = 0; c < b.size(); c++) {
@@ -1036,11 +1034,15 @@ public class PoliticsController implements EveryFrameScript {
             if (itemized) reasons.add(addPlus(delta) + " Proposer");
         } else {
             // opinion of proposer, +25/-25
-            delta = RelationController.getRelation(
-                    LordController.getLordOrPlayerById(lordId),
-                    LordController.getLordOrPlayerById(proposal.getOriginator())) / 4;
-            approval += delta;
-            if (itemized && delta != 0) reasons.add(addPlus(delta) + " Opinion of proposer");
+            if (LordController.getLordOrPlayerById(proposal.getOriginator()) != null) {
+                delta = RelationController.getRelation(
+                        LordController.getLordOrPlayerById(lordId),
+                        LordController.getLordOrPlayerById(proposal.getOriginator())) / 4;
+                approval += delta;
+                if (itemized && delta != 0) reasons.add(addPlus(delta) + " Opinion of proposer");
+            }else{
+                log.info("ERROR: failed to get proposal of a lord in a policy. please report this to the star lords mod page.");
+            }
         }
 
         if (beneficiary != null) {
