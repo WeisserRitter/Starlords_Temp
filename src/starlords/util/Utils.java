@@ -453,7 +453,7 @@ public class Utils {
         if (forced.contains(faction.getId())) return true;
         if (prevented.contains(faction.getId())) return false;
         //if (isMinorFaction(faction)) return false;
-        if (!Global.getSettings().getModManager().isModEnabled("nexerelin")) return isMinorFaction(faction);
+        if (!Global.getSettings().getModManager().isModEnabled("nexerelin")) return !isMinorFaction(faction);
         return NexerlinUtilitys.canBeAttacked(faction);
     }
     //determines if a faction can have there relations change. (aka, pirates don't have relationship changes. nore do some modded content.)
@@ -467,7 +467,7 @@ public class Utils {
         if (forced.contains(faction.getId())) return true;
         if (prevented.contains(faction.getId())) return false;
         //if (isMinorFaction(faction)) return false;
-        if (!Global.getSettings().getModManager().isModEnabled("nexerelin")) return isMinorFaction(faction);//return true;
+        if (!Global.getSettings().getModManager().isModEnabled("nexerelin")) return !isMinorFaction(faction);//return true;
         return NexerlinUtilitys.canChangeRelations(faction);
     }
     //prevents some factions from having war / peace declared, engaging/getting in invasions, and being raided (like pirates, for not pirates)
