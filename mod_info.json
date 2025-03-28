@@ -8,7 +8,7 @@
     "patch":16
   },
   "description":"Mount and Blade in Space",
-  "gameVersion":"0.97a-RC11",
+  "gameVersion":"0.98a-RC5",
   "totalConversion":false,
   "jars":["jars/StarLords.jar"],
   "dependencies": [],
