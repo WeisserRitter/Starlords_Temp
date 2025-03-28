@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import starlords.lunaSettings.StoredSettings;
 import starlords.person.Lord;
 import starlords.person.LordPersonality;
+import starlords.util.SModSupport.SModSet;
 import starlords.util.crossmod.SCLordsFactory;
 
 import java.util.*;
@@ -320,10 +321,10 @@ public class LordFleetFactory extends FleetFactoryV3 {
 
     private static void getCustomSMod(FleetMemberAPI member,HashMap<String,Integer> s_list,ArrayList<String> options, ArrayList<Integer> weights){
         for (String customLordSMod : s_list.keySet()) {
-            if (member.getVariant().getPermaMods().contains(customLordSMod)) continue;
-            if (!member.getVariant().hasHullMod(customLordSMod)){
-                addOption(options, weights, member, customLordSMod, s_list.get(customLordSMod));
-            }
+            //if (member.getVariant().getPermaMods().contains(customLordSMod)) continue;
+            //if (!member.getVariant().hasHullMod(customLordSMod)){
+            addOption(options, weights, member, customLordSMod, s_list.get(customLordSMod));
+            //}
         }
     }
     private static String chooseSMod(FleetMemberAPI member, Lord lord) {
@@ -342,6 +343,15 @@ public class LordFleetFactory extends FleetFactoryV3 {
             return Utils.weightedSample(options, weights, Utils.rand);
         }
 
+        for(SModSet a : SModSet.getSets()){
+            if (a.canAddMods(member,lord)){
+                HashMap<String, Integer> mods = a.getSMods();
+                for (String customLordSMod : mods.keySet()) {
+                    addOption(options,weights,member,customLordSMod,mods.get(customLordSMod));
+                }
+            }
+        }
+        /*
         boolean armorFocus = member.getVariant().getHullSpec().getManufacturer().equals("Low Tech")
                 || member.getHullSpec().getShieldType() == ShieldAPI.ShieldType.NONE;
         boolean phaseFocus = member.getHullSpec().getShieldType() == ShieldAPI.ShieldType.PHASE;
@@ -397,7 +407,7 @@ public class LordFleetFactory extends FleetFactoryV3 {
             addOption(options, weights, member, HullMods.HARDENED_SHIELDS, 40);
             addOption(options, weights, member, HullMods.STABILIZEDSHIELDEMITTER, 20);
         }
-
+        */
         if (options.isEmpty()) return null;
         return Utils.weightedSample(options, weights, Utils.rand);
     }
