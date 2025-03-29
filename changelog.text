@@ -1,3 +1,8 @@
+V0.3.17:
+    updated to the newest version of starsector. may malice embrace us as we enter this terrifying age.
+    added a new SMods.json file, so users can now edit the base Smods ships and lords have access to (see the readme for details)
+    (thanks to (forum)Erlkönig / (discord)Zeilon depending on location for the following:)
+        fixed a issue were factions would not have policy's / feasts / anything interesting without nexerlin installed
 V0.3.16:
     (life and death system) farther improved the death system, so if a lord dies well a proposal they made is in session, the game wont crash forever. (wont effect you if you are already suffering from this crash, but will prevent it from ever crashing in the future.)
 V0.3.15:

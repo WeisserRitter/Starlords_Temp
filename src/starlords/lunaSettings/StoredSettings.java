@@ -20,6 +20,7 @@ import starlords.generator.types.fleet.LordFleetGenerator_System;
 import starlords.ui.LordsIntelPlugin;
 import starlords.util.Constants;
 import starlords.util.LordFleetFactory;
+import starlords.util.SModSupport.SModSet;
 import starlords.util.Utils;
 import starlords.util.WeightedRandom;
 
@@ -30,7 +31,7 @@ import java.util.Iterator;
 
 public class StoredSettings {
     public static void getSettings(){
-        AvailableShipData.startup();
+        getUniversalSettings();
         if (Global.getSettings().getModManager().isModEnabled("lunalib")){
             getLunaSettings();
             return;
@@ -430,7 +431,12 @@ public class StoredSettings {
         log.info("DEBUG: normal config settings loaded successfully.");
     }
 
-
+    @SneakyThrows
+    private static void getUniversalSettings(){
+        AvailableShipData.startup();
+        JSONObject json = Global.getSettings().getMergedJSONForMod("data/lords/SMods.json",Constants.MOD_ID);
+        SModSet.applySModSets(json);
+    }
 
 
     private static WeightedRandom getLunaWeightedRandom(String name){
